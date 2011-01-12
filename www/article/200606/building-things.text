@@ -1,0 +1,42 @@
+﻿Building Things
+Date: 2006-06-26 22:58:06
+Label: WeeBox Project
+
+Last night I was playing with the cross-compilation environment for the Weebox
+I've built in <a href="http://scratchbox.org">Scratchbox</a>.
+
+The first thing I've tried compiling is MFD itself; just to get a feeling for
+what kind of problems I might come up against.  To be frugal, I've set up the
+Scratchbox ARM emulation enviroment with the uclib C library, which is
+apparently a lot smaller than glibc, and is more suited to smaller-footprinted
+applications.  Pretty much what I'd want in a 64Mb RAM, 128Mb flash RAM system!
+
+I picked up the MFD source direct from its Subversion repository, and tried to
+build it...boom, no glibc.  Luckily MFD has a <a
+href="http://mpd.wikia.com/wiki/BuildingWithoutGlib">patch</a> to build with non
+glibc calls, which I dutifully installed --- much better!
+
+Things I had to note:
+
+* I first needed to configure, build and install install libao, alsalib,
+  libogg, libtremor, libvorbis and libmad. (I may have missed a few out of this,
+  most of these configured and compiled out of the box).
+* alsa needed a quick patch --- it uses a header file not in the uclib.  Luckily the header
+  isn't actually used, so I could safely comment out the include for it. The files
+  `src/alisp/alisp.c` and `src/names.c` can safely have the include for  removed.
+* when configuring MFD, I used `--with-tremor` so it uses the integer OGG library instead 
+  of the float one (which requires cosf and sinf; neither of which are in the uclib).
+* `tag.c` in MFD needed a patch, again it was using a header which isn't in my micro distribution;
+  again it wasn't actually needed and could be safely commented out.
+
+So far so good --- I ended up with an MFD binary in ARM format which
+ran (under emulation) right up until it needed some sound.  Which my current
+linux box doesn't have --- yet.  I've ordered a USB sound dongle from Ebay
+(£5, bargain), and hopefully I'll be able to test MFD under emulation with
+it.
+
+I've also started talking to <a href="http://www.embeddedarm.com/index.html">Technologic Systems</a> about
+getting a quote for the hardware.  I'll let you know when I get any information
+back from them.
+
+All in all, pretty successful for an evening's sit-in-front-of-TV-idly-compiling :)

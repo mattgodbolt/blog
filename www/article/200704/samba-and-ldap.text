@@ -1,0 +1,39 @@
+Samba & LDAP
+Date: 2007-04-17 09:26:58
+Label: Coding
+
+A quick one this.  At the weekend I was playing around using LDAP as the backend
+for my home Samba PDC.  LDAP should in theory make everything that much nicer,
+with nice tools to manage the domain and integration in Thunderbird etc as an
+email address book and all that.  It's also nicely interoperable with the PAM
+login modules, so single-sign on is, well, a bit nicer.
+
+I mostly followed <a href="http://times.usefulinc.com/2005/09/25-ldap">a
+tutorial</a> I found on the web, and then I got stuck.  Right after I got
+everything working I found I had no users or groups being given out by Samba,
+either via `net groupmap list` or via the Windows User Manager.  I spent
+literally hours googling and finding nothing.  Eventually, with the source in
+hand and with an enormous amount of debug , I tracked the problem.
+
+Far from being a problem in Samba or the LDAP tools, there was a minor
+discrepancy between the smbldap-tools setup and the samba LDAP setup.  Smbldap-
+tools was storing groups and users in "ou=Group" and "ou=People" respectively.
+Samba was configured to read them from "ou=Groups" and "ou=Users" instead.
+
+Once I had poked samba into looking into "Group" and "People", all was well!
+So, if you have a problem adding groups, or an empty samba groupmap list, double
+check your smbldap.conf and smb.conf and make sure they're looking in the same
+place!  Running in debug, `net groupmap list` will have a line like:
+
+    ldapsam_setsamgrent: 0 entries in the base
+
+--- that'll be a clear giveaway.  Especially if 
+
+    ldapsearch -x "(&(objectClass=sambaDomain)(sambaDomainName=*YOURDOMAIN*))"
+
+and
+
+    ldapsearch -x "(objectclass=sambaGroupMapping)"
+
+still yield results --- so you know you have some valid data, just it isn't 
+appearing in Samba's group lists.

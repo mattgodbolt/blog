@@ -1,0 +1,74 @@
+Strict aliasing in C
+Date: 2007-12-28 23:30
+Status: Public
+Label: Coding
+Summary: It's not OK anymore to cast willy nilly in C++.  Well, it never was.  But it's less so now.
+
+A lot of the code I write is for computer games.  In such code bases it's commonplace to use
+various [binary hacks][binaryhacks] for things like floating point comparisons to get an edge on performance.
+As a result I've become rather blazé about aliasing types in my pointers.
+
+[binaryhacks]: http://graphics.stanford.edu/~seander/bithacks.html "twiddle my bits, matron"
+
+Pointer type aliasing is where you "lie" to the compiler and tell it a memory address contains a type of
+data that it in fact doesn't.  A quick example:
+
+    ::: cpp
+    inline bool IsNegative(float f)
+    {
+        return *reinterpret_cast<int*>(&f) 
+            & 0x80000000;
+    }
+
+Here, the floating point value `f` is interpreted as an integer --- we lie to the compiler and tell it
+that there's a pointer to an integer at the same location (an alias), then read its data.  Since
+we know the top bit of a floating point value is its sign bit, if it's set, we know `f` was a negative
+value.  In some cases, a routine like this can be faster than a traditional `f < 0` as it doesn't directly
+involve floating point operations.  On some processors this can be faster, in some circumstances.
+
+Anyway, this kind of stuff is not uncommon in game code, especially in the guts of the core engine.  While
+I've always known that such code is a bit "dodgy", it was a bit of a shock to learn that in recent [GCC][]
+versions "strict pointer aliasing" is now the default.
+
+[GCC]: http://gcc.gnu.org "GNUs not UNIX"
+
+Strict pointer aliasing is allowed by the C++ standard, and is where the compiler is allowed to decide
+two pointers don't point at the same object if they're of unrelated types.  If they don't point at the
+same object, the compiler isn't forced to reload values into registers when one is written to.
+
+On an x86 machine, this isn't usually an issue.  The processor has so few registers, almost everything
+lives in memory all the time anyway.  However, on more modern RISC-type architectures (PowerPC, ARM etc)
+a lot of the performance gains come from heavy pipelining and many registers.  Being able to keep values
+in registers and not relying on reading and writing to and from memory is a positive boon.  So it's
+understandable why GCC has gone for stricter aliasing.
+
+The main reason this has passed me by is because I'm either working on x86 machines (where this rarely bites,
+and only really on [Intel's compiler][icc]), or on PlayStation 1 or 2.  The latter two machines use
+creaking old versions of the compiler (2.95.6 or so) which aren't strict, nor that clever at optimising.
+
+[icc]: http://www.intel.com/cd/software/products/asmo-na/eng/284527.htm "I see sea?"
+
+With the Playstation 3, all that's changed.  The machine is PowerPC-based, and the compiler is more recent.
+Luckily, a guy called [Mike Acton][mikea] has written several [useful][] [articles][] on the subject, and
+he has plenty of handy advice about how to avoid common pitfalls.
+
+[mikea]: http://www.cellperformance.com/mike_acton/
+[useful]: http://www.cellperformance.com/mike_acton/2006/06/understanding_strict_aliasing.html "strict aliasing"
+[articles]: http://www.cellperformance.com/mike_acton/2006/05/demystifying_the_restrict_keyw.html "using the restrict keyword"
+
+In the example above, the code should be:
+
+    ::: cpp
+    inline bool IsNegative(float f)
+    {
+        union
+        {
+            float f;
+            int i;
+        } u;
+        u.f = f;
+        return u.i & 0x80000000;
+    }
+
+Or alternatively, adding `-fno-strict-aliasing` to the command-line parameters will do the trick too.
+Though that's cheating, and means you don't get the full benefit of the optimiser.

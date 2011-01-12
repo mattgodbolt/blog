@@ -1,0 +1,83 @@
+Hacking about with stacks
+Date: 2008-08-02 23:59:01
+Status: Public
+Label: Coding
+Summary: An investigation of the processor stacks on Windows and Linux.
+
+<p class="side" style="max-width:150px;">
+<a href="http://www.flickr.com/photos/summervillain/83947048/">
+<img src="/200808/stack-of-plates" width="150" height="113" alt="A stack of plates"/>
+</a>
+</p>
+
+At the most recent [Google London Open Source Jam][osjam], I got chatting to
+a Googler about how operating systems deal with the processor stack.  Specifically,
+what's the largest object you can allocate on the stack.  Not just the maximum stack limit
+itself, but the implementation of modern operating systems might limit the largest object
+that can be made on the stack.  Take, for example, this code snippet:
+
+[osjam]: http://osjam.appspot.com/ "London OS Jam"
+
+    :::cpp
+    void Function() {
+      char buffer[32 * 1024];
+      buffer[0] = 0; // uh-oh?
+      ...
+    }
+
+We were discussing whether this would work ok on all platforms.  Well, why wouldn't it?
+
+Well, on some operating systems, pages of memory (4KB each on x86) aren't
+actually allocated to a process until the last possible moment.  This
+improves performance and in general means more physical memory is available
+to the system as a whole.  This is achieved by the system marking the pages
+as "not present" in the memory management unit, and then catching the page
+faults which occur when the program attempts to access them.  At this point
+the operating system actually goes and finds a spare page, gives it to the process, and restarts
+the process.
+
+So far so good --- but how does the system discriminate between an invalid memory
+access (a programming error), from a stack access just below the current bottom
+page of the stack?
+
+In order to investigate this, I wrote some [experimental code][code], and tested it on
+Windows XP and Linux 2.6.18.  The code uses two ways to see how far it can poke under
+the stack: One using large stack-based character arrays, and secondly using assembly-level
+instructions to directly poke below the stack (which is pretty naughty, and not "supposed"
+to work.)
+
+[code]: /200808/stack.cpp "Hacky code, use it however you like."
+
+The main conclusion:  On both Windows and Linux, the original code above is totally valid.
+
+On Windows, whenever the compiler spots a large amount of stack is needed, instead of
+simply subtracting from the stack pointer, it calls a function `_chkstk`, passing
+how much stack it needs.  This function probes the memory starting at the current stack
+pointer and stepping back one page at a time until it has walked the stack pointer
+down by the given amount.
+Each probe is a read operation that might fault, and means Windows ensures there's
+a page of memory ready for each page in the stack.
+
+On Linux, the kernel treats any access within 32 bytes below the current stack pointer
+as being valid.  The 32-byte threshold is to deal with the fact that some of the x86
+instructions (`PUSH` etc) write to memory before they update the stack pointer.  (Having
+the [source available][linux] makes this an easier diagnosis than on Windows.)
+
+[linux]: http://www.google.co.uk/codesearch?hl=en&q=do_page_fault+show:A89ZRDchOFU:vNaQnxjWVnA:Aca1titQ8Ts&source=universal&cs_p=http://kernel.osuosl.org/pub/linux/kernel/v1.3/linux-1.3.99.tar.gz&cs_f=linux/arch/i386/mm/fault.c#l32 "Linux, where source is king"
+
+My experiment also revealed the default maximum stack size on Windows is 1MB, and on Linux it's
+at least 4MB.  Windows pre-allocates about 64KB of stack pages, and Linux seems to
+allocate about 128KB.
+
+A surprising discovery for me was how smart the Microsoft compiler was at optimising
+the code!  It took several iterations before I got it to not optimise out the calls
+to my "stack eater" function, and then for it not to optimise the usage of the stack
+so only one of my large stack buffers was ever used.
+
+In conclusion then: Using large stack-based buffers is safe on both Windows and x86 Linux.
+On Windows, the compiler protects you, and forcibly probes every page so they're all allocated
+by the operating system.  On Linux, the operating system uses the stack pointer register
+to work out whether an access is valid, and will allocate pages to the stack on demand.
+
+My gut feeling is that Linux's way is slightly better, as it defers the page allocations until
+they're actually needed.

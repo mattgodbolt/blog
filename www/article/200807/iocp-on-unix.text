@@ -1,0 +1,37 @@
+IO Completion Ports - the UNIX equivalents
+Date: 2008-07-18 15:08:01
+Status: Public
+Label: Coding
+Summary: In which we learn the UNIX equivalents of IOCPs.
+
+[Yesterday][] I was complaining about IO Completion Ports, and I mentioned that I wasn't
+aware of any UNIXy equivalent.   I didn't look very hard --- I've had a few emails linking
+me to several sources (nice to know people actually read this stuff!)
+It seems the UNIX world is a bit fragmented in how it achieves high performance networking:
+
+[yesterday]: /200807/iocp
+
+On Linux 2.6 there's [epoll][] and [kevent][]. There's also a proposal by Ulrich Drepper
+for a [new network interface][drepper].
+
+[drepper]: http://lwn.net/Articles/192410/
+[epoll]: http://blog.kovyrin.net/2006/04/13/epoll-asynchronous-network-programming/
+[kevent]: http://lwn.net/Articles/172844/
+
+On older versions of Linux (Linuces?) you might consider using [Realtime signals][realtime].
+
+[realtime]: http://www.kegel.com/c10k.html#nb.sigio
+
+On FreeBSD and NetBSD there's [kqueue][].
+
+[kqueue]: http://www.freebsd.org/cgi/man.cgi?query=kqueue&apropos=0&sektion=0&manpath=FreeBSD+5.0-current&format=html
+
+Additionally, it's possible to use standard signals or [asynchronous I/O][aio] to acheive similar results.
+I've always found signals to be unwieldy and cumbersome, so I wouldn't recommend these.
+
+[aio]: http://www.opengroup.org/onlinepubs/007908799/xsh/realtime.html
+
+The main source of this information is this [handy web page][kegel] that describes various ways
+of getting good network performance on UNIX systems.
+
+[kegel]: http://www.kegel.com/c10k.html

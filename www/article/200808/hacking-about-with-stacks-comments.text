@@ -1,0 +1,103 @@
+Comments on hacking about with stacks
+Date: 2008-08-04 22:41:23
+Status: Public
+Label: Coding
+Summary: Justin's comments on my investigation of the processor stacks on Windows and Linux.
+
+One day I'll update this blog to support comments, so I don't have to post a new article
+when I get some really smart emails.  One such came in last night from [Justin Fletcher][gerph],
+on my [stack post][stack].
+
+[gerph]: http://www.gerph.org "Justin's web pages"
+[stack]: /200808/hacking-about-with-stacks "The joy of stacks"
+
+I hope Justin'll forgive me for posting his email in bits, with some thoughts
+of mine interspersed:
+
+> The allocation of pages only on access is a great way of saving memory that might not
+  actually be needed by the process, especially on systems where the allocation of memory
+  would be costly due to synchronisation issues (I'm thinking of earlier ARMs specifically
+  here, where the cost of the cache and TLB flush as excessive compared to allocating
+  pages immediately the program says it needs it --- also a multi-processor system will need
+  to synchronise its memory use if they are using a shared memory model).
+
+Something I hadn't considered --- the cost of synchronising across multiple processors.
+From what I can gather Linux has pretty lightweight locking for this, but it is a consideration.
+A side point that occurs to me here is how multiple threads' stacks are arranged in memory.
+How does the operating system prevent threads' stacks from overrunning into each other's memory
+areas?  When I get more time I'll have to look into it.
+
+> In the Windows case, probing the memory before use has a number of effects:
+
+> * A failure can be detected (probably fatally and non-recoverably) at the point the potential
+   allocation occurs. This might be deferred from the point of declaration, depending on the
+   intelligence of the compiler (and I've seen their compiler do some nice things). This earlier
+   indication of the failure can be seen as being more useful in many cases, particularly if
+   you can guarantee it. For example if you had code that set up a transaction with a piece of
+   hardware then you would want your code to crash *before* you put it into a state that you
+   couldn't recover from. (take, for example, the case of changing the internal memory map of
+   a device to perform a transient, but important, operation). Same, of course, goes for
+   non-hardware examples.
+
+The `_chkstk` function throws a Stack Overflow exception at the point of the stack-based allocation
+--- a hard stack limit check anyway.  There's nothing smart in the stack probe itself, the probes
+are literally just a read at each page, no clever kernel code is called.  I would imagine that if one of
+the probes fails, then the process would be put to sleep until a page is available, just as if memory
+were exhausted for any other reason.
+
+> * It increases page table churn. Your page tables get re-written a lot as the new pages are
+   made available to the application *even if it doesn't use them*. This may also mean in-use
+   memory being paged out for just this allocation. Which the application might not use.
+   Allocations from the heap might not do the probe, so might not matter.
+
+From what I've seen of the heap code on Windows (and I've spent rather too long debugging
+heap issues), no such probe is made for allocations.  This makes a lot of sense as it's more
+often the case that you'll do a very big heap allocation than you'll make a big stack allocation.
+The cost of paging in and committing resources to feasibly hundreds of megabytes of the heap
+would seem too much.
+
+> * If the page is probed then it's got to have been cleared by the system as well, so not only
+  have you allocated the memory by probing it, but you've also caused the system to clear it as
+  well. For security, obviously --- you don't want your stack to contain data from other processes.
+
+An incredibly important point!  The memory would be cleared on demand as it was paged in anyway
+(assuming it was actually used) but it does front-load the cost at the point of the stack allocation.
+Also interesting: some [modern processors][ppc] have some fast ways of clearing memory in a cache efficient way.
+
+[ppc]: http://www.ibm.com/developerworks/power/library/pa-memory/index.html
+
+> * You always know how much memory the application is actually using --- it can't fail because
+  parts of the stack can't be allocated at some random point, only if the _entire_ allocation failed.
+
+Again, on Linux and Windows I think the process is put to sleep if there are no free page frames; but
+on an embedded system with no backing store this would definitely be the case.
+
+> With the on-demand (non-probed) stack system, you have a few issues:
+
+> * You never know if the space set aside by the application is actually used. This isn't a problem
+  _per se_, but it does make internal metering of the application harder --- valgrind probably tells you
+  more about this, though so it's probably not a big deal.
+
+Justin's not wrong here, it's not a problem as such.  That being said I wonder how many programmers (myself included...)
+have written something like:
+
+    :::cpp
+    char buf[64*1024];
+    sprintf(buf, "file-%04d.dat", num);
+
+> * Stack allocation failures go unnoticed until the stack is used. This is a serious problem
+   because it makes your application completely non-deterministic in a low memory situation for
+   a language feature. If you've allocated your memory (`char buffer[bigsize]`) then you expect
+   it to be there, pretty much. Unless you explicitly write to every single byte of the buffer
+   (unless you know the page allocation size --- and remember that it is the prerogative of the
+   operating system to change its own internal allocation size for pages as it deems fit ---
+   there may be different page sizes in use depending on the usage pattern of the application)
+   you can't be sure that access to those pages won't fail. It's not unreasonable for the developer
+   to assume that just because the memory has been allocated that accessing it should work.
+
+As above, this is an embedded system issue I think.
+
+Many thanks to Justin for taking the time to reply.  His embedded systems [point of view][pov] has
+caused a lot of further thinking on my part
+
+[pov]: http://www.picsel.com/ "Justin's POV.  Skewed by this company"

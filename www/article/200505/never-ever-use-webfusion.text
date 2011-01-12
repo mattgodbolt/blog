@@ -1,0 +1,139 @@
+﻿Never, ever, use WebFusion
+Date: 2005-05-03 17:14:00
+Label: Blog
+
+"WebFusion --- Seriously Easy WebHosting" &#8211; I beg to differ...
+
+A long while ago we chose <a href="http://www.webfusion.co.uk/">WebFusion</a> to
+host the company web site, choosing their 'MyServerWorld.NET' package.  Oh my
+word, what a mistake!  Never **ever** consider using them as a hosting provider,
+and to be honest given that their support is provided by <a
+href="http://www.pipex.net">PIPEX</a>, don't use **them** either!
+
+I suppose this rant has become more a review of WebFusion's services, and
+touches also on the effectiveness of PIPEX's technical support.
+
+Setting up the site initially was a bit awkward.  I received the email with all
+the server and log-in details, which seemed all fine.  I'm usually pretty good
+at this kind of thing, but I just couldn't get uploads working at all, I was
+unable to see my directory folders or any files inside.  So, I trotted off to
+their sham of a <a href="http://www.hosting-support.pipex.net/">technical
+support website</a>.  Here, not only was I utterly confused by the layout of the
+site, it didn't actually cover my choice of hosting!  Honestly, try and use it
+--- it's rubbish.
+
+So having exhausted the pitiful search for login problems on that site, I
+emailed technical support.  After a few hours (yes really) they got back to me,
+and pointed out where I was going wrong &#8211; I had to set the 'home
+directory' to be /mydomain/web --- something which, in fairness, is clearly on
+the instructions I was emailed.  So I was being a fool, and fair enough thought
+I.
+
+The site uploaded without a hitch then and was fine for a few weeks.  Then, just
+as we needed to do an urgent site update, I was unable to log in, either to the
+'control panel' or the FTP site.  'Very odd' thought I, checking all my password
+details, and checking with the only other person who has access to the site ---
+has he changed the password etc?  Nothing.  So, I'll have to speak to tech
+support...oh wait...
+
+Without being able to log into the 'control panel' it's almost impossible to
+find out what the support email addresses or phone numbers are.  Great work
+there --- they're not on webfusion's site (or weren't at the time) --- so how
+the flippin' heck am I supposed to get the password reset?  Eventually a <a
+href="http://desktop.google.com">Google Desktop Search</a> found an email
+mentioning it, and I rang them up.
+
+They offered no explanation as to why my password had changed 'just one of those
+things' apparently.  Yes, I often find my passwords change all by themselves.
+
+So, not a good start, but again we were up and running ok, so I put my
+misgivings aside.  Then...guess what?  Yup, password stopped working again.
+This time I wrote a fairly nice email to the tech support people explaining that
+this had happened again...and could they explain why?  They reset my password,
+and the only explanation was:
+
+*"Our apologies Matt, the only advice I can give you at present is to be
+carefull (sic) that you're not logged on at the same time in 2 places with both
+MyServerWorld, FTP and/or email. "*
+
+Riiiight!  Of course!  Since the dawn of time, logging into a computer from two
+locations at once **resets the password**!  How foolish of me.  And yes, he
+really did say 'don't have two people logged into email at the same time'.  Hey
+Mr Clever, how are we supposed to give our employees their own email addresses,
+but not have them log in at the same time?  Organise a bloody rota?  Jesus!  I
+tried to get a better answer from them on this, but as yet I haven't received a
+response from the emails I sent.
+
+About this time we asked about statistics for the site too, a fairly reasonable
+thing to expect when even my ISP (<a
+href="http://www.freedom2surf.com">Freedom2Surf</a> --- highly recommended)
+provides excellent stats on its free webspace.  The best we got was
+*'unfortunately we don't have a definite date of when this will happen. In the
+mean time, there are plenty of places on the net that offer a service you can
+use on your hosting.'* So you mean, pay someone else?  Great.  We're using the
+free counters at <a>StatCounter</a> at the moment --- but today I noticed
+WebFusion's now implemented some stats of its own.  Not that they bothered to
+tell me.
+
+So, today we were ready to upload our latest site information --- and guess
+what?  Yup, password broke again.  So same drill again, ringing them up.  The
+world's most bored-sounding man answered the phone, and reset the password.  I
+mentioned this has happened 3 times now, and he said, 'oh that's because the
+passwords get reset every 42 days'.
+
+**Aaaaaargh** --- why the fuck didn't they mention that before?  I had pestered
+them and tried to cajole a simple answer from them, but no.  It took a chance
+mention from one of their techies to 'fix' a problem!  I've just re-searched
+their tech support site, and there's no mention of it anywhere!
+
+Forgiving soul that I am, I thought, 'right, that's all that done then, water
+under the bridge' --- at least I know why etc etc.
+
+So we uploaded the new site, which includes an executable file.  Doing a quick
+check to see if it all worked...'file not found' --- oh?  The executable file
+wouldn't download.  Hmm...we renamed it to .TXT and all was well.  O-kay, so I
+contacted tech support again:
+
+<i>Thank you for your email.
+
+For security purposes the use of .exe is not allowed on our servers. The best
+work arouns (sic) is either to rename the file as you have been doing or to Zip
+the file.
+
+I hope that this helps.
+
+</i>  **NO IT BLOODY DOESN'T HELP!!!**  It's hardly very professional to hand
+out a URL to our customers and tell them to 'rename it from a TXT to an EXE'.
+Nor is it much better to unnecessarily ZIP up our already-highly-compressed-
+self-installing executable, just because it's "a security risk".  What security
+risk anyway?  I can host EXEs on xania.org with no security risk.  My ISP hosts
+them too.  So why in the name of sanity can't a professional business-grade
+provider host them?  I put this to them in email-form, and 3 hours on I'm still
+waiting for a reply.
+
+While researching for this blog entry, suddenly the 'control panel' stopped
+working:
+
+<img width="599" height="442"
+src="http://xania.org/media/webfusion_gits_1.gif" alt="" />  Uh-oh ---
+here we go again.  Firstly, was it some problem at my end?  I asked a few
+friends to try, and they had the same problem too.  So it wasn't me --- I sent
+yet another tech support request to them.  After an hour or so, I got the reply
+*"The control panel should now be back online.  Please let us know if you have
+any more problems."*  Well, I'm trying now, and it's still intermittently
+failing.  So I can't configure my webspace at all.  Fantastic.
+
+That was the last straw.  I put a sanitised précised version of this blog entry
+into an email, and sent it to webfusion, CC'ing their services and sales people
+too.  I sincerely doubt anything will come of it --- they've ignored all my
+other emails --- but who knows.
+
+In the meantime I'm looking for a new hosting solution.  If anyone has any
+recommendations, let me know.  I'm also contemplating just colocating my own
+server and using that instead; at least the only person who can bugger it up
+then is me, and not a wall of faceless idiots.  <a
+href="http://www.paul.sladen.org/colo/">Paul Sladen</a> has a list of cheap
+colocation solutions, I'm thinking about it anyway.
+
+Well, I'm glad that lot's off my chest.  In summary --- don't ever consider
+WebFusion as a web host, nor even PIPEX itself.

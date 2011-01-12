@@ -1,0 +1,72 @@
+Measuring productivity losses due to long builds
+Date: 2006-08-14 10:14:00
+Label: Coding
+
+One of the most rewarding things about programming for me is the immediacy of my
+work.  There's nothing I enjoy more than making changes that have a real visible
+impact, and the shorter the time between an idea coming into my head and me
+seeing the results on screen, the better.  I think that's one of the reasons I
+always enjoyed graphics programming --- there's such a fast turnaround between
+making a change to a rendering algorithm and then seeing the results of your
+labour there on the screen.  More recently I've enjoyed doing some Windows GUI
+programming, and with the RAD tools around today there's a lot of the same fast
+turnaround buzz.
+
+Of course, not all programming is like this --- some areas of code will always
+be dull to work on.  But still, that immediacy for me is a key part of
+motivation, and in the wider picture, productivity.  If you've ever started a
+project from scratch you'll no doubt remember the excitement of a blank canvas
+to work with --- and a fast turn around on your compiles.  Then, ever so slowly,
+that turn around time fades off into an interminable set of watching-paint-dry
+sessions as you stare at the compiler and linker.
+
+It needn't always be so.  Proper design, layout and maintenance of your code
+base using ideas like <a
+href="http://www.amazon.com/gp/product/0201633620/103-1209985-3830265?v=glance&amp;n=283155">John
+Lakos</a>'s, appropriate computer hardware, <a
+href="http://www.xoreax.com/main.htm">distributed builds</a> and the like can
+all help you achieve those long-forgotten 3 second recompiles.  But these
+techniques are not without cost --- both in direct financial terms and in
+programmer time.  Like anything with a price tag, trying to argue with your line
+manager that spending a week of code cleanup and refactoring is worth it or that
+buying an expensive distributed compiler will give a good return on investment
+is *hard!*  Especially when line managers are usually more worried about
+deadline slippage and anything that deviates from the direct path to completion
+scares them!
+
+But...how bad is it really?  How long do you spend each day just twiddling your
+thumbs, reading <a href="http://slashdot.org">Slashdot</a> and <a
+href="http://www.dilbert.com/">Dilbert</a>, and taking extended coffee breaks
+just to spare yourself the tedium of staring at the output of CL.exe?
+
+At <a href="http://www.profactor.co.uk/">ProFactor</a> we're working on
+techniques and technology to help you and your manager make the right decisions
+about your programming environment: Code layout and style, programming
+methodology, workstation hardware specification and software.
+
+Like lots of problems though, the first step is admitting you *have* a problem.
+To that end we're developing a tool to monitor and measure your build times, and
+help you determine whether there *is* a problem worth spending time and money
+fixing.  I trialled a very early version of the tool at a client and was frankly
+staggered by how much time per day was spent waiting for the compiler.  After
+showing the results to the client, we were able to spend a day fixing some
+obvious dependency and makefile issues, and shaved a good 30% off the average
+time spent per day compiling.  A back of the envelope calculation suggests this
+change alone saved many thousands of pounds per month in wasted time.  Not bad
+for a day's work, but without the evidence from the build monitor we'd never
+have been able to justify spending the time working on something not directly
+involved with completing the project.
+
+<img src="http://xania.org/media/BuildMonitor.png" alt="BuildMonitor Icon"
+align="left" height="200" width="200" />
+
+We're hoping to release the tool, BuildMonitor, as a free download soon on the
+ProFactor website and we're currently looking for beta testers.  So if you're
+suffering from long build times and want some evidence to show your manager, or
+you're just curious as to how long you spend each day, week and month waiting
+for your compiler, drop me an email at <a
+href="mailto:matt@profactor.co.uk">matt@profactor.co.uk</a> and I'll add 
+you to the
+beta test trial.  The beta currently works in Visual Studio 2003 and Visual
+Studio 2005, but we hope to get a generic 'build' wrapper to cover any Windows
+build system (scons, makefiles etc).

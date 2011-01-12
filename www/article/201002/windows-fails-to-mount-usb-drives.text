@@ -1,0 +1,49 @@
+Windows fails to mount USB drives when they're inserted - a solution
+Label: Blog
+Status: Public
+Summary: I finally found out why my laptop had lost the ability to mount USB drives
+Date: 2010-02-13 17:35:00
+
+This might actually be useful to people other than people who know me, so I've
+split this article into two:
+
+Short version
+-------------
+
+If Windows notices USB drives when you plug them in but they don't appear as
+drive letters, try installing [this][fix].
+
+Long version
+------------
+
+The tumbleweeds are really starting to set in on this blog, aren't they? I
+really need to get something to post, but what with [twittering](http://twitter.com/mattgodbolt) and now using [Google Buzz](http://buzz.google.com/), I'm finding less need to write anything here.
+
+Still, every now and then I have something to post and it might be useful to
+share in case anyone else has problems.
+
+My laptop has for some time had problems mounting USB drives. I'd put the USB
+stick in, Windows would notice it and "install drivers", but then no drive
+letter would get mapped. If I really dug about inside "Manage Computer" I could
+manually assign a drive letter to it but even that would only allow `cmd.exe` to
+see the drive, never Explorer or any other Windows program.
+
+After a huge amount of dead ends followed, it turns out the culprit was a broken
+installation of [Daemon Tools](http://www.daemon-tools.cc/eng/home). Even though
+it wasn't showing up, it seems as part of the install it also installs some kind
+of global storage filter, provided by a company called
+[Duplex Secure](http://www.duplexsecure.com/).
+
+I discovered I could fix the problem by simply attempting to install the latest
+version of Duplex Secure's "SPTD" from their [download page][fix]. As part of
+the installation it first disables and removes any pre-existing SPTD filter,
+before asking you to reboot and retry installation.  I simply let it disable
+and remove and then rebooted. I didn't go on to reinstall as I don't need it.
+
+[fix]: http://www.duplexsecure.com/en/downloads 
+
+So now I can plug in my USB drives again and access the data on them! The reason
+this had become so important is I've finally caved in and bought a digital
+picture frame and I wanted to mount its internal drive to copy my pictures onto
+it.
+

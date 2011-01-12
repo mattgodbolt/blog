@@ -1,0 +1,70 @@
+The C library's strcmp routine is badly named
+Status: Public
+Date: 2008-04-14 12:45:00
+Label: Coding
+Summary: My thoughts on the ill-named strcmp function.
+
+One of those gotchas you find early in your C programming career is the 
+`strcmp` string comparison routine.  It takes two const char pointers to null-
+terminated strings and returns a integer: zero if the two strings match, -1 if 
+the second is lexicographically less than the first, else 1.
+
+However, it's really easy to forget this and assume the routine compares _for 
+equality_, and that the return value is effectively a boolean.  I'm sure we've 
+all forgotten this at some point and ended up debugging a problem which turns 
+out to be inverted logic in a string compare.
+
+Why can't `strcmp` return `true` for equality?  Well, its return value is a
+tri-state value, of which two states indicate non-equality.  That means the
+only choice for indicating equality is zero.
+
+A common idiom for using `strcmp` is this:
+
+    :::cpp
+    if (!strcmp(name, "Bob"))
+        printf("Hello Bob");
+
+What's with the logical not operator? Of course it's to turn the implied false 
+(from the zero if the strings are equal) into the true needed to compare for 
+equality (which is what the programmer actually wanted).  It's easy to forget
+the not operator.  Another common idiom is:
+
+    :::cpp
+    if (strcmp(name, "Bob") == 0)
+        printf("Hello Bob");
+
+Again, it's easy to forget the `== 0` part.  I've also seen code that incorrcctly
+combines both:
+
+    :::cpp
+    // This doesn't work...
+    if (!strcmp(name, "Bob") == 0)
+        printf("Hello Bob");
+
+This kind of bug is hard to spot when reading through code.  You tend to see what you
+expect to see there, not what's actually there.
+
+I think it would have been much less error-prone if the function had been 
+named `strdiff`.  To me this better indicates that the function returns the 
+difference between two strings.  The example code reads a little more 
+naturally:
+
+    :::cpp
+    if (!strdiff(name, "Bob"))
+        printf("Hello Bob");
+
+Of course, even this isn't an ideal name.  One might reasonably expect the
+difference between two strings to have a magnitude, not just a sign.
+
+An alternative,
+suggested by Malcolm, is to separate the operations "are these strings the same" and
+"is this string greater than or less than".  Perhaps it would make more sense then to
+have a function `streq` (returning a boolean) checking for equality, in addition to the
+`strdiff` function.  (The `strdiff` function is still useful inasmuch as its return value
+is compatible with sorting functions like `qsort`.)
+
+The example code would then be:
+
+    :::cpp
+    if (streq(name, "Bob"))
+        printf("Hello Bob");

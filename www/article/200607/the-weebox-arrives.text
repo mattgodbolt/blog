@@ -1,0 +1,78 @@
+The Weebox arrives!
+Date: 2006-07-05 12:01:00
+Label: WeeBox Project
+
+...or at least the hardware does!  After initial excitement in the morning when
+a package arrived --- it was only the USB sound dongle --- I spent the rest of
+yesterday listening out for the tell-tale diesel engine of a delivery van.  At
+about 5.30pm, the very nice man from UPS turned up with my package from <a
+href="http://www.embeddedarm.com">Embedded ARM</a>.  After a small altercation
+about import duty (involving a quick trip to the cash machine!) I was finally
+able to lay eyes on my purchase.
+
+Initial impressions were good --- everything that I ordered was there --- yay!
+The power adapter was a continental one, rather than a UK one, a bit of a
+disappointment but I knew with a bit of biro-in-the-wall-socket action I could
+coax it to plug in.
+
+<div><a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject/photo#4948225316589862930"><img
+src="http://xania.org/media/weebox1.jpg" alt="Och the weebox is so wee"
+align="middle" height="216" width="288" /></a>
+
+</div>
+
+My excitement was a bit short-lived when I looked at the power cable and
+realised that it just ended in a block terminal --- the same as the one on the
+board --- not an obvious plug me in job.  A quick read through the instructions
+and it implied I needed to wire the power directly in.  Great --- no problem,
+the terminals came loose easily ... but... which was positive and which
+negative?  I made a guess, wired them in, and very briefly twitched the power
+on.  The LEDs on the board all came on, convincing me that I had guessed the
+polarity correctly, so I turned the power on and left it on --- all was well.
+Phew, first potential disaster over.
+
+Now I had a powered-up tiny ARM computer running --- yay!  Let's take a look at
+it.  I dug out a null modem serial cable from my bag of wires, and plugged one
+end into the box, and then hunted around the back of my PC to plug in the other
+end.  Disaster!  My main PC doesn't have any serial ports!  I suppose in this
+day and age everything's USB or Firewire, of which the PC has a plethora of
+ports.  What a pain!  Luckily, my downstairs lounge PC has a serial port, so,
+almost falling down the stairs in excitement, I set up all the gear on the
+lounge table.
+
+Within a few minutes (getting bloody terminal emulators working is a right
+pallaver) I was presented with a boot screen!
+
+<div><a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject/photo#4948225496278892562"><img
+alt="First boot!" src="http://xania.org/media/weebox2.jpg" height="216"
+width="288" /></a>
+
+</div>
+
+Yay!  From then on in it was a case of just playing with the flash memory, NFS
+mounts and so on.  I briefly tried out the LCD display too, that's all working
+too.  One thing I discovered at this stage was how to stop Redboot from auto-
+running linux: The instructions tell you to hit ctrl-C at the Redboot prompt,
+but that wasn't working on some terminals.  After faffing around I found a
+terminal program which let me do so, and subsequently I realised it wasn't the
+terminal but the line settings.  To interrupt Redboot's script you need to
+ensure your serial connection has **no** flow control enabled at all.
+
+I'm now spending all of today just getting the system set up nicely --- I've
+just been into Maplins to buy a USB to serial adapter, and that's working a
+treat.  As a fringe benefit, the box the adapter came in (after a bit of
+Stanley-knife action) has doubled as the development enclosue:
+
+<div><a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject/photo#4948225752259624978"><img
+alt="Dodgy-looking setup" src="http://xania.org/media/weebox3.jpg" height="216"
+width="288" /></a>
+
+</div>
+
+More pics on the <a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject">Weebox Photo
+Album</a>.  Next step --- getting the USB wireless card and USB sound dongles
+working!

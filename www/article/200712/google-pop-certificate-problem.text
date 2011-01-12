@@ -1,0 +1,38 @@
+Google POP3 certificate problem and Thunderbird
+Date: 2007-12-04 12:02, 2007-12-04 16:05
+Summary: A temporary issue with Google's SSL certificates, and a workaround.
+Label: Blog
+Status: Public
+
+Last night I noticed my hosted Google mail accounts filling up with messages.  Usually
+my email client at work drains all the new messages into its inbox, meaning my web account
+empties as quickly as messages come in.
+When I got into the office this morning I found it was [Thunderbird][] complaining of a certificate problem --- 
+Thunderbird was connecting to pop.googlemail.com but getting an expired certificate
+from cpop.corp.google.com.
+
+[thunderbird]: http://www.thunderbird.org "Reclaim your inbox...from what?"
+
+Working together with Malcolm, we were able to track this down to an
+issue where the servers report the wrong certificate, if and only if there's a [TLS][]
+`server_name` extension in the initial handshake packet.  Only Thunderbird seems to
+send this; viewing the port via [curl][] or Internet Explorer didn't have the issue.
+Thanks to [Wireshark][] for the tip-off.  A build of the latest [OpenSSL][] shows this up:
+
+[curl]: http://curl.haxx.se/ "groks those URLs, apparently"
+[Wireshark]: http://www.wireshark.org/ "Go deep into your packets"
+[openssl]: http://www.openssl.org/ "Open, SSLme"
+[TLS]: http://en.wikipedia.org/wiki/Transport_Layer_Security "Transport Layer Security"
+
+    openssl s_client -msg -debug \
+            -servername pop.googlemail.com -tlsextdebug \
+            -connect 66.249.93.16:995
+
+Malcolm's reported a bug to Google, and we're hoping it's a quick fix.  In the meantime,
+there's a workaround for Thunderbird.  If you go to Tools->Options, then the Advanced page
+and click the "Config Editor", you can disable TLS (and therefore the TLS extension).  Type
+"tls" into the box and uncheck the "security.enable_tls" option.
+
+Hopefully it'll be fixed soon!
+
+**Update** 4pm : this issue is now confirmed fixed by Google.  Quick work there!

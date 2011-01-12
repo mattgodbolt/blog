@@ -1,0 +1,84 @@
+More on BASIC line numbers
+Date: 2007-11-16 09:00
+Label: Coding
+Status: Public
+Summary: More on the BBC BASIC binary line number encoding.
+
+With regards to the BBC BASIC [line number encoding][prev], [Malcolm][] asked the very sensible 
+question "Why the exclusive `OR` with `0x54` for the third byte?  Why not `OR` with `0x40`
+like the other two?"
+
+[prev]: http://xania.org/200711/bbc-basic-line-number-format "Previously on WTF BBC OMG"
+[malcolm]: http://www.farside.org.uk/ "He of the twins"
+
+The answer emerges when you look at how the values are decoded at run time:
+
+<p class="sidenote">The BASIC code, as part of RISC OS, is licensed under a 
+<a href="http://www.castle-technology.co.uk/riscosbaselicence.htm" title="Castle Technology's RISC OS license">proprietary license</a>, 
+which allows me to reproduce this here.
+</p>
+
+    ARM assembly                C equivalent
+                            int Decode(unsigned char*ptr) {
+                                int r0, r1, r10;
+    LDRB    R10,[LINE],#1       r10 = *ptr++;
+    MOV     R0,R10,LSL #2       r0 = r10 << 2;
+    AND     R1,R0,#&C0          r1 = r0 & 0xc0;
+    LDRB    R10,[LINE],#1       r10 = *ptr++;
+    EOR     R1,R1,R10           r1 ^= r10;
+    LDRB    R10,[LINE],#1       r10 = *ptr++;
+    EOR     R0,R10,R0,LSL #2    r0 = r10 ^ (r0 << 2);
+    AND     R0,R0,#255          r0 &= 0xff;
+    ORR     R0,R1,R0,LSL #8     r0 = r1 | (r0<<8)
+    MOV     PC,R14              return r0;
+                            }
+
+Using `0b00000000` as binary representations for ease of understanding the shifts, this is:
+
+1. Read the first byte, which contains the top two bits of the two bytes which make up the line number.
+   As mentioned [before][prev], these are stored `0b00LlHh00` exclusive `OR`red with `0b01010100` (`0x54`).  The exclusive `OR` (`EOR`) effectively
+   makes this byte `0b01L^H^00`, where the `^` signifies the relevant bit has been inverted.
+2. Shift this new value such that the top two bits of the least significant byte (LSB) are in place (`0bL^H^0000`.)
+3. Read the next byte.  Recall this contains the bottom six bits of the LSB, ORred with `0b01000000` (`0x40`.)
+4. Isolate the top two bits of the first value, and `EOR` this with the lower byte.  We now have the fully
+   decoded LSB --- the bit inverting cancels out here.
+5. Shift the "top bit" value up so the high bits are in place (`0bH^000000`.)
+6. Read the next byte and `EOR` with the top bits --- again the bit inverting has cancelled out to leave
+   the most significant byte (MSB) decoded.
+7. Combine the LSB and MSB and we're done.
+
+So the strange choice of `0x54` as the `EOR` means that some of the work to isolate the bottom six
+bits and top bits is avoided.  This saves an instruction or two of ARM code, but was probably something more useful on the original BBC Micro
+version, where the savings on its [6502][] were probably much greater:
+
+    ; input in (&70-1) offset by Y
+    ; output to &72-3
+    LDA (&70), Y    ; read top bits
+    INY             ; move pointer on
+    ASL A           ; shift once
+    ASL A           ; shift again
+    PHA             ; store this for later
+    AND #&c0        ; isolate top two bits
+    EOR (&70), Y    ; decode low bit
+    INY             ; move pointer on
+    STA &73         ; store low pointer
+    PLA             ; retrieve value
+    ASL A           ; shift
+    ASL A           ; and again
+    EOR (&70), Y    ; decode high bit
+    INY             ; move pointer on
+    STA &72         ; store out high bit
+
+A less well thought-out version would likely need several more instructions.  Indeed, according to [this site][fsnet], the
+code can be squeezed into 11 instructions; though this does rely on the line number information being copied to a
+temporary location.  The actual BASIC routines are [available here][bbcb], and are essentially the same as
+my guessed-at code above, except that for speed they use the `X` register instead of the stack (`PHA`/`PLA`) as the temporary
+storage.
+
+[bbcb]: http://www.bbcmicro.net/old-8bs/basic/basic4-9b1c.htm#9B1E "The actual 6502 code for BBC BASIC"
+[6502]: http://www.obelisk.demon.co.uk/6502/ "Nice info on the 6502"
+[fsnet]: http://www.mdfsnet.f9.co.uk/Docs/Comp/BBCBasic/Line/Numbers3 "Another person's attempt to solve this riddle"
+
+BBC BASIC was arguably the fastest version of BASIC around; optimisations like this helped make that possible.
+
+_Thanks to Richard Talbot-Watkins for the Beeb links._

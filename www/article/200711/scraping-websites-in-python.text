@@ -1,0 +1,51 @@
+HTML scraping in Python
+Date: 2007-11-06 15:05
+Label: Coding
+Status: Public
+Summary: Discussing a couple of Python libraries designed for parsing real world websites.
+
+Sometimes it's nice to be able to read the information of a website
+programmatically --- sometimes referred to as screen-scraping.  This is the
+kind of thing I knock up occasionally to do one-off things like "find all the
+[line painting][paul] companies in Torquay, outputting to a CSV" or "guess how many
+people have bought a particular title for [Xbox Live][xbox] by looking at the [high score tables][hsc]."
+
+[paul]: http://www.linemarkingservices.co.uk/ "LMS, Torquay.  Good at painting lines on roads"
+[xbox]: http://www.xbox.com/ "Xbox - plural of Xbock"
+[hsc]: http://www.mygamercard.net/ "My Gamer Card - which inadvertantly helps you guess at xbox live sales"
+
+When doing so, it's tempting to think you can just use some [regular expressions][re] and find
+the data in the HTML source you need.  But often this isn't realistic, and it's better if
+you could parse the document's HTML yourself.  However, this is usually non-trivial --- the HTML
+you find on websites is usually _very_ broken.
+
+[re]: http://www.regular-expressions.info/ "Regular expressions help.  Really good reference"
+
+To the rescue come a couple of really handy libraries --- [html5lib][] from Google, and [Beautiful Soup][bs].
+Both have support for parsing broken HTML, and turning it into a "best guess" of what the author
+*actually* meant.  Both can generate a [DOM][] and allow you to fairly easily find the stuff you need.
+
+I've not actually used Beautiful Soup, but its interface looks a little more easy to use than the html5lib one.
+
+A quick example, taken from a script which has a look through the above-mentioned high-score tables, looking
+for rows of data:
+
+    :::python
+    # Create an HTML parser which creates DOMs.
+    parser = html5lib.HTMLParser(tree=dom.TreeBuilder)
+    # Parse the source.
+    tree = parser.parse(source)
+    # Normalise the tree.  This basically cleans up the
+    # text nodes inside which makes our life easier.
+    tree.normalize()
+
+    # Create a list of all the rows (that is, all <div>
+    # tags with the class of "row")
+    rows = [div for div in tree.getElementsByTagName("div")\
+            if div.getAttribute("class").strip() == "row"]
+
+    # Go on to process the rows here...
+
+[html5lib]: http://code.google.com/p/html5lib/ "Google's HTML parser"
+[bs]: http://www.crummy.com/software/BeautifulSoup/ "Beautiful Soup - an HTML parser"
+[DOM]: http://en.wikipedia.org/wiki/Document_Object_Model "DOM - not an S&M term"

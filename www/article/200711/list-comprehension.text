@@ -1,0 +1,52 @@
+List comprehensions in Python
+Date: 2007-11-08 14:10
+Status: Public
+Label: Coding
+Summary: The coolest thing in Python --- list comprehensions.
+
+If you listen to some people, they say that in [Python][], [everything is a dictionary][dict].
+This may be true, but for me the most powerful thing in the language is its list processing
+capabilities.
+
+[Python]: http://www.python.org/ "Python.  Not actually a snake"
+[dict]: http://wiki.osuosl.org/display/howto/Everything+Is+a+Dictionary "Lies"
+
+Python's syntax for lists is simple.  Anything in between square brackets (`[` and `]`) is treated
+as a list.  That list can then be easily iterated over with the simple `for item in list:` syntax:
+
+    :::python
+    list = [1, 4, 9, 16, 25]
+    for item in list:
+        print item
+
+However, there's a really cunning thing you can do with lists called "List Comprehension."  This allows
+you to create a list from another list, applying an arbitrary set of transformation and filters.  A
+simple example is `[x*2 for x in otherlist]`, which creates a list containing all the values in `otherlist`,
+each value doubled.
+
+The source list and the expression applied to each entry can be arbitrarily complex.  For example, I can
+rewrite the code in my first example (printing a list of the squares of numbers 1--5) as:
+
+    :::python
+    for item in [x*x for x in range(1, 5)]:
+        print item
+
+Things get even more interesting when you use the `if` syntax.  This allows arbitrary elements 
+to be filtered from the source list.  Take my example from [HTML scraping][html].  I grab a list of all `<div>`
+DOM node elements, and filter them by their class name in a single line:
+
+[html]: http://xania.org/200711/scraping-websites-in-python "Previously on my blog - scraping with Python"
+
+    :::python
+    rows = [div for div in tree.getElementsByTagName("div")\
+            if div.getAttribute("class").strip() == "row"]
+
+Another example; parsing a `key=value` style file and reading it into a dictionary, ignoring blank lines:
+
+    :::python
+    params = dict([param.split('=', 1) for param \
+                   in open('file').read().split('\n')
+                   if param])
+
+List comprehension lets you write concise code without sacrificing readability.  Well, once you know a little
+about them, that is.

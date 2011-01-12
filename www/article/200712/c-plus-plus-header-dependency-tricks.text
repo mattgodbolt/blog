@@ -1,0 +1,171 @@
+C++ header dependency tricks
+Summary: Some tricks for reducing dependencies and hence compile times in C++.
+Label: Coding
+Status: Public
+Date: 2007-12-10 21:45
+
+Keeping header file dependencies to a minimum in C++ is always a good idea.  There's
+a great book on the subject --- John Lakos's [Large Scale C++ Design][lakos] --- but
+there's plenty of little tricks that aren't mentioned.  In this article I'm going to 
+discuss a handy trick I've discovered in reducing dependencies, particularly useful for
+[STL][] headers.
+
+[lakos]: http://www.amazon.co.uk/Large-Scale-C-Software-Design-APC/dp/0201633620 "the best book I've found on real world C++ design"
+[stl]: http://www.sgi.com/tech/stl/ "the C++ Standard Template Library"
+
+Take for example, this header file, which declares a class for averaging integers:
+
+    ::: cpp
+    // Averager.h
+    #include <list>
+
+    class Averager
+    {
+    public:
+        Averager();
+        // Add a single int to the running average.
+        void Add(int);
+        // Add a list of ints to the running average.
+        void Add(const std::list<int>&);
+        // Get the current average.
+        int GetAverage() const;
+    private:
+        int mNumAdded;  // number of ints added
+        int mTotal;     // running total so far
+    };
+
+As ever, this is a fairly contrived example.  Typically you'd imagine applications using
+this class via the `Add(int)` method, then extract the average through `GetAverage`.
+For STL convenience, there's a method accepting a `std::list` of integers too.
+
+So what's wrong with this code?  Well, in some respects, nothing.  Like Lakos recommends, the
+header file is self-contained --- it will compile by itself as it includes the `<list>`
+header.  So how to improve this?
+
+Well, let's look at the include graph (courtesy of [IncludeManager][]):
+
+<p class="picture">
+<a href="/200712/graph-thanks-to-includemanager">
+<img src="/200712/graph-thanks-to-includemanager-thumb" width="280" height="240"
+  title="oh what a tangled web we weave"
+  alt="[A saved graph from IncludeManager showing the inclusion graph on the code in this article]"/>
+</a>
+<br/>Good grief, all this for one include?
+<br/>The top box is the original header, the rest is what 
+<code>&lt;list&gt;</code> brings in.
+</p>
+
+[IncludeManager]: http://www.profactor.co.uk/includemanager.php "a #include dependency grapher for Visual Studio"
+
+What a mess!  Anything wanting to call `Add(const std::list<int>&)` includes `"Averager.h"`
+and gets `<list>` included.
+Fair enough.  But what about things that just want to use the simpler add method `Add(int)`?
+They don't need `<list>`
+but have it thrust upon them along with all its dependencies, the cost of parsing and compiling the
+unused `std::list` code.  This is far from the C idea of "[you only pay for what you use][only]."
+
+[only]: http://www.ddj.com/cpp/184403384 "scroll down a bit to Bjarne's quote"
+
+The usual way to solve this kind of issue is by forward declaration, where you
+just declare the class needed in-place, and don't define it.  C++ allows you to
+refer to a declared (but not defined) class as long as you don't try and find
+its size, or call any functions within it.  This means you don't need the `#include <list>`
+after all:
+
+    ::: cpp
+    // NaiveAverager.h
+    // Forward declare std::list.
+    namespace std { template<typename T> class list; }
+
+    class Averager
+    {
+        //...as before...
+    };
+
+But this doesn't won't work!  `std::list` --- being an STL class --- isn't just templated on
+the type that it holds.  It also has an allocator parameter which controls how the memory needed
+is allocated.  This second parameter is defaulted to `allocator<T>`, and forward declaring this
+gets more and more complex.  Not to mention, `std::list` isn't _necessarily_ as simply defined as
+even that.  In Visual Studio 2005's implementation, `std::list` publicly inherits from `_List_val<_Ty, _Ax>`,
+and on GCC 4.2.3 it uses protected inheritance from `_List_base<_Tp, _Alloc>`.
+
+Does this mean that forward declaration isn't possible?
+
+Not necessarily.  There's a little trick to getting around this issue; though it's not without
+its drawbacks.  If we define our own non-templated list class and use that instead, we wouldn't
+have these issues with predeclaration.  But implementing our own list class isn't easy, and
+we don't get all the benefits of `std::list`'s implementation.  Well, so you might think --- but
+how about something like this, in `MyList.h`:
+
+    ::: cpp
+    // MyList.h
+    #include <list>
+    template<typename T>
+    class MyList : public std::list<T> {};
+
+And then:
+
+    ::: cpp
+    // NewAverager.h
+    // Forward declare a template list.
+    template<class T> class MyList;
+    
+    class Averager
+    {
+    public:
+    	Averager();
+    	// Add a single int to the running average.
+    	void Add(int);
+    	// Add a list of ints to the running average.
+    	void Add(const MyList<int>&);
+    	// Get the current average.
+    	int GetAverage() const;
+    private:
+    	int mNumAdded;  // number of ints added
+    	int mTotal;     // running total so far
+    };
+
+Now we have the situation where clients of the `Averager` class who use the `std::list` function
+must include the `"MyList.h"` header, and as such have to suffer the dependencies and compile
+time of `<list>`.  However, if the client just needs the single integer `Add(int)`, then they just include
+`"NewAverager.h"` and don't get `<list>` at all.  While this isn't the traditional façade mentioned
+in the [GoF's book][gof], the name "façade" seems too good a fit, so that's what I call this technique.
+
+[gof]: http://www.amazon.co.uk/Design-patterns-elements-reusable-object-oriented/dp/0201633612/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1197225183&sr=8-1
+
+Of course, nothing's perfect.  The main drawback of this approach is that in order to use any
+constructors of the base class you need to explicitly re-implement them (usually just passing parameters through
+to the base implementation) in your façade class.
+
+But how much difference does this really make?  Of course, this depends on your code and its other
+dependencies.  Using [IncludeManager][]'s project view you can see the cost of the files:
+
+<p class="picture">
+<a href="/200712/project-details">
+<img src="/200712/project-details-thumb" width="440" height="401" 
+  title="some include file costs thanks to IncludeManager"
+  alt="[An IncludeManager screenshot showing the relative compilation costs of the files in this article]"/>
+</a>
+<br/>Project details for my example project.
+<br/><code>listclient.cpp</code> uses the <code>std::list</code> 
+functionality,
+<code>simpleclient.cpp</code> just uses <code>Add(int)</code>.
+</p>
+
+The "PP Tokens" column is the number of post preprocessing tokens in a file, and "PP Total Tokens"
+takes into account all the `#include`d files' tokens too.
+This gives a rough guide to compile-time complexity.  As you can see, `listclient.cpp` contains 47
+tokens in itself, but the total cost of its inclusion is some 68,000 tokens.  `simpleclient.cpp`
+has around 33 tokens in itself, and its total cost is only 79 --- rather fewer tokens than `listclient.cpp`.
+While this is a contrived example, you can get some flavour of the improvements that can be made with this
+idea.
+
+We've this technique to great effect in ProFactor's code, specifically for strings and a few key object
+lists (which façade `std::list<Type>`).  Of course, best of all it sticks to that most basic of
+C tenets --- you should only pay for what you actually use.
+
+The source code used here is [available][source] in [7-Zip][zip] format.  Note there's no actual implementation
+of `Averager` anywhere.
+
+[source]: /200712/BlogIncludes.7z "toy source code used in this article"
+[zip]: http://www.7-zip.org/ "7-Zip is the free compressor I use at home - very much recommended"

@@ -1,0 +1,27 @@
+Changelists in Subversion
+Date: 2007-11-09 17:40
+Status: Public
+Summary: Something I'm looking forward to seeing in Subversion --- changelists.
+
+I love [Subversion][svn] and have been using it as a [source control system][scm] for some
+years now.  I was catching up on some reading (mostly linked from [Malcolm's blog][far]) and
+spotted an exciting thing coming up in Subversion --- [changelists][cl].
+
+[svn]: http://subversion.tigris.org/ "My choice of source control"
+[scm]: http://en.wikipedia.org/wiki/Revision_control "Handy, and surprising how many people don't use it"
+[far]: http://www.farside.org.uk/ "Farblog --- Malcolm Rowe's blog"
+[cl]: http://blogs.open.collab.net/svn/2007/07/one-quality-of-.html "Changelists in Subversion"
+
+When I'm coding I tend to end up working on multiple bugs and features at once, and it becomes a pain to work out which
+edited files correspond to which bug when I then come to check stuff in.  
+
+[pf]: http://www.perforce.com/ "A pretty good non-free source control package"
+
+The source control system I used previously --- [Perforce][pf] --- deals with this by allowing user-created
+changelists.  These are user-created sets of files tagged with a checkin comment before they're actually checked in.
+I often had 3--4 of these active at any one time, with checkin comments such as "Work on feature XX" or more commonly "TESTING --- DO NOT CHECK IN".
+
+Thankfully, this feature is coming to Subversion in version 1.5, and I'm really looking forward to it.
+I'm sure the guys on the [TortoiseSVN][] project will do a spiffing UI to it too.
+
+[tortoisesvn]: http://tortoisesvn.tigris.org "The best UI for Subversion"

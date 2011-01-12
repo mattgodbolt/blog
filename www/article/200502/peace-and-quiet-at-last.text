@@ -1,0 +1,65 @@
+Peace and quiet at last
+Date: 2005-02-21 09:48:54
+Label: Blog
+
+Last night I finally worked out how to install my <a
+href="http://www.zalman.co.kr/">Zalman</a> VGA fan.  I've now replaced all the
+internal fans with Zalman fans, and I've enclosed the hard disks inside acoustic
+cases.  I really can't recommend doing this enough; my PC now is whisper quiet;
+just sounds a bit like a convection heater on the lowest setting.  Previously
+the whines and whooshes were unbearably loud, especially the graphics card.
+
+The graphics card in question is a pre-release GeForce FX5800 I wangled from
+NVidia during my games development days.  An excellent little card, if BLOODY
+LOUD.  It's one of those cards with the two-speed fans: slow but squeaky during
+normal operation and Harrier Jump-Jet taking off during 3D rendering.  The jump-
+jet I could handle --- just --- as usually I'd be playing some loud game or
+other, but during normal work the whiney squeak of the fan was beginning to
+undermine my sanity.
+
+I didn't even discover that the main source of noise in my PC was the graphics
+card until recently; I went on a spree of noise-prevention, attacking the CPU,
+motherboard fan, case fan, and hard disks first.  Still it was noisy --- only
+the highly scientific approach of putting my finger on the graphics card fan to
+stop it turning was able to demonstrate that this was the culprit.
+
+So, I headed off to <a href="http://www.quietpc.co.uk/">QuietPC</a> and found
+myself a new VGA fan (the Zalman VF700-Cu if you're taking notes).  There's a
+lovely Flash animation demonstrating the ease of installing the Zalman onto your
+graphics card --- and indeed it is utterly simple and nearly idiot-proof to
+attach the new fan and heatsinks onto your GeForce.  Of course, what they
+neglect to tell you is it's *nearly impossible* to remove the bloody existing
+heatsink and fans!
+
+The GeForce board's heatsinks were extensively pushpin-clamped to the
+circuitboard.  I've never had to remove a pushpin before, and I'm sure my
+approach of 'wrench it hard until the plastic snaps' is not an IEEE-sanctioned
+method.  It did work, however.  This left the fan unit itself.  I carefully
+unscrewed everything, but still the thing didn't want to move.  It seems welded
+onto the board by some unseen force.  In a fit of frustration, I just stuck on
+all the new Zalman heatsinks and left the original fan stuck on.
+
+This turned out to be a **bad** idea.  Windows booted OK, but anything remotely
+taxing on the graphics card and the drivers went into panic mode and disabled
+acceleration.  Oops...guess those little Zalman heatsinks rely on the Zalman fan
+blowing air over them (the NVidia one hardly seemed to move any air, despite the
+noise it made!)
+
+So, I yanked out the graphics card again and took it downstairs to where I'd
+left all the tools.  In doing so I was holding the thing by the fan unit....and
+I noticed it was starting to budge!  Of course!  The bloody thing isn't glued to
+the board; the thermal grease is holding it there!  Once the thing's heated up,
+the grease became slightly gooey instead of glue-like.  I was able to wrench off
+the fan with little problem, to my immense relief.  A few minutes careful
+cleaning of the chip with some borrowed nail polish remover and I was away.  The
+new fan went on very easily.
+
+Then to the moment of truth --- virtually no noise; a temperature *lower* than
+before; no jump-jet during 3d acceleration --- fantastic!  It's been all
+worthwhile!  I'm now writing this without feeling like I need loud music to
+disguise my PC's sound.  And I've still not risked putting the fan on 'silent'
+mode --- it's on 'normal' at the moment.  On silent it'll probably generate
+negative amounts of noise or something.
+
+I've also taken a few <a href="http://xania.org/gallery/inside_pc">pictures of
+the inside of my PC</a> which show the modifications, and the old heatsink too.

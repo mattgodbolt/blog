@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+  xml:lang="en-GB">
+[%- if label -%]
+  <title>[%= label.name %] &#8212; Matt Godbolt&#8217;s blog</title>
+[%- else -%]
+  <title>Matt Godbolt&#8217;s blog</title>
+[%- end -%]
+  <author><name>Matt Godbolt</name></author>
+[%- if label -%]
+  <id>http://xania.org/feed/[%= label.filename %]</id>
+[%- else -%]
+  <id>http://xania.org/feed.atom</id>
+[%- end -%]
+
+  <icon>/favicon.ico</icon>
+[%- if label -%]
+  <link href="http://xania.org/[%= label.filename %]?utm_source=feed&amp;utm_medium=rss" />
+  <link href="http://xania.org/feed/[%= label.name %]" rel="self" />
+[%- else -%]
+  <link href="http://xania.org/?utm_source=feed&amp;utm_medium=rss" />
+  <link href="http://xania.org/feed" rel="self" />
+[%- end -%]
+  <updated>[%= latestUpdateISO %]</updated>
+  <rights>Copyright [%= year %] Matt Godbolt. Unless otherwise stated, all content is licensed under the Creative Commons Attribution-NonCommercial 2.5 License.</rights>
+[%- for article in articles -%]
+
+  <entry>
+    <id>tag:xania.org,2007:[%= article.basename %]</id>
+    <title>[%= article.title %]</title>
+[%- if article.summary != "" -%]
+    <summary>[%= article.summary %]</summary>
+[%- end -%]
+    <link href="http://xania.org/[%= article.basename %]?utm_source=feed&amp;utm_medium=rss" />
+[%- if article.via != "" -%]
+    <link href="[%= article.via %]" rel="via" />
+[%- end -%]
+    [%= article.datesAtom %]
+
+    <content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml">
+[%= article.contentXHTML %]
+    </div></content>
+  </entry>
+[%- end -%]
+</feed>

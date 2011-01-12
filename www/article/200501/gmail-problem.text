@@ -1,0 +1,28 @@
+GMail problem
+Date: 2005-01-26 14:37:00
+Label: Blog
+
+Ever had this when signing in to gmail using FireFox --- &quot;Your session has
+expired. Please sign in again&quot; ?
+Would seem the way to fix it is to go into your cookies
+(Tools-&gt;Options-&gt;Privacy-&gt;Cookies-&gt;View cookies) and kill all the <a
+href="http://www.google.com">www.google.com</a> cookies.  Then try logging in
+again, from the <a href="http://www.gmail.com">www.gmail.com</a> address, and
+all should be well. Seems an errant cookie can sometimes end up in your cookie
+jar which confuses gmail.
+
+If you're not sure what I'm talking about, hopefully these images'll help.
+After going to the menu bar and choosing 'Tools' then 'Options...' you should
+get this:
+<img width="567" height="464"
+src="http://xania.org/media/googlegmailprob_1.png" alt="" />
+Click 'Privacy' then 'View Cookies' --- you should get another box popping up
+like this:
+<img width="365" height="389"
+src="http://xania.org/media/googlegmailprob_2.png" alt="" />
+On this, scroll all the way down to the '<a
+href="http://www.google.com">www.google.com</a>' cookies (in the screenshot
+above there's only one; but when gmail was broken for me I had about 8-9 google
+cookies).  Select each one in turn, and then hit 'Remove Cookie'.  You should
+end up with no google cookies listed.
+Then just hit OK on both popups and try logging back into gmail.

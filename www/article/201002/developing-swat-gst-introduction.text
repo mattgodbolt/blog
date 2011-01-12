@@ -1,0 +1,75 @@
+Game Development: SWAT
+Date: 2010-02-26 10:05:00
+Status: Public
+Summary: Part one of &#8220;How SWAT: GST was made&#8221; &#8212; a background
+Label: Games
+
+It's been a long while since I've wrote anything worthwhile on this blog. After chatting with some workmates about life in the games industry it occurred to me that one of the more interesting things I could post about is some of the things I got up to back in the day.
+
+[swat]: http://web.archive.org/web/20040828232624/http://www.swatgst.com/ "Official site, thanks to archive.org"
+
+<p class="picture">
+<img src="/201002/swat-outdoor-scene.jpeg" width="450" height="337" 
+ alt="Image of SWAT: Global Strike Team - an outdoor scene"/>
+</p>
+
+One of my favourite games to work on was [SWAT: Global Strike Team][swat]. It was released on both Xbox and Playstation 2, and got an average 69 ([PS2][mcps2]/[Xbox][mcxbox]) on [MetaCritic][mc] --- not the best score, but not embarrassing.  Over the next few posts I'm going to go over how we came up with the idea and how that changed as the project went on, what tools we built and used to make it, and as much as I can remember from the programming point of view. I was one of the graphics coders, so my memory is somewhat skewed in the graphics direction, but I'll try and cover everything.
+
+[mc]: http://www.metacritic.com/
+[mcps2]: http://www.metacritic.com/games/platforms/ps2/swatglobalstriketeam
+[mcxbox]: http://www.metacritic.com/games/platforms/xbox/swatglobalstriketeam
+
+Important Note
+--------------
+
+This series of posts represents my memory of what happened during development (which was around 2000--2003). It may be missing things, missing key people or even downright wrong. If it is --- and you know different --- please let me know and I'll fix it. Where I clearly remember who did what I'll try and attribute stuff to them. If something isn't attributed, it doesn't mean I did it, just that I don't remember who did!
+
+Origins --- Kleaners
+--------------------
+
+SWAT started out life as a Dreamcast prototype of an idea that was kicking around between Sefton Hill (now Director at [Rocksteady Studios](http://www.rocksteadyltd.com/)), Dave Taylor (now Art Director at [Blue Castle Games](http://www.bluecastlegames.com/)), and [me](/MattGodbolt). It was called "Kleaners" and was going to be a top-down sort of turn-based action game where you controlled a band of killers (the "Kleaners" of the title), doing contract killings for shady governments in the future.
+
+We used the [Red Dog][reddog] engine and did a few static renders and camera fly-bys.  We were given the go-ahead by Argonaut management to develop the idea further, and as the Dreamcast was effectively a dead console by then (sadly!), we started work on an Xbox engine and tools.
+
+[reddog]: http://en.wikipedia.org/wiki/Red_Dog:_Superior_Firepower
+
+The game quickly moved towards being more a first person shooter, with its unique selling point being two semi-autonomous sidekicks --- a sharp-shooting assassin and a tech specialist able to hack security systems.
+
+We made some videos demoing the main characters, some test environments and scenarios. We took them along to the [Electronics Entertainment Expo][e3] and pitched to publishers, but there wasn't much interest in the idea.  I've found a couple of videos on an old CD:
+
+[e3]: http://www.e3expo.org/
+
+<p class="picture">
+ <object width="425" height="344" type="application/x-shockwave-flash" data="http://www.youtube.com/v/XiYDCJN9csc&amp;hl=en&amp;fs=1">
+  <param name="movie" value="http://www.youtube.com/v/XiYDCJN9csc&amp;hl=en&amp;fs=1"/>
+  <param name="allowFullScreen" value="true"/>
+  <param name="allowscriptaccess" value="always"/>
+ </object>
+ <br/>
+ A demo render of the three main characters. Very early version of the engine.
+</p>
+
+<p class="picture">
+ <object width="425" height="344" type="application/x-shockwave-flash" data="http://www.youtube.com/v/DF_1P6cprnM&amp;hl=en&amp;fs=1">
+  <param name="movie" value="http://www.youtube.com/v/DF_1P6cprnM&amp;hl=en&amp;fs=1"/>
+  <param name="allowFullScreen" value="true"/>
+  <param name="allowscriptaccess" value="always"/>
+ </object>
+ <br/>
+ A demo scene where the leader character (the player) has ordered the other two characters to take down the targets. Things of note here: the annoying idle animation of the main character, the glitch in the shadow algorithm that causes big spikes of black to emanate from the weapons of the other characters.
+</p>
+
+Although the Kleaners idea didn't get much of a look-in at E3, Sierra (now [Activision][]) saw the technology and were impressed enough to talk to us about doing a SWAT game for them.  This would be the first console SWAT game, so we felt we should distance ourselves a little from the typical SWAT game, which tends to be quite slow-paced. Our game would be a lot more action-heavy.  We set it in the future a little, and wanted to have a somewhat international theme, and so the idea of a special team of SWAT guys sent out worldwide to deal with organised crime and terrorists was dreamt up. This "Global Strike Team" would give the game its new name.
+
+[activision]: http://www.activision.com/
+
+SWAT: Global Strike Team
+------------------------
+
+The engine and tool-set were developed to take advantage of the Xbox, with all its "new" features like bump-mapping, 3D textures and so on. However, we realised that to be commercially viable we needed a Playstation 2 port too. Luckily Argonaut had some pretty good PS2 experience, and we could leverage a lot of the code already written. Unluckily the PS2's capabilities were seriously lacking compared to the Xbox, so we had to come up with some fairly creative rendering solutions.
+
+Another pretty cool thing we added (rather late in the day) was support for voice commands -- ordering your team around using the Xbox's microphone. We knocked up some internal tests to do voice recognition, but ultimately bought in a package to do it for us.
+
+That's the background; next time I'll go into some of the details of [producing SWAT's artwork][part2].
+
+[part2]: /201003/swat-artwork

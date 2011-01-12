@@ -1,0 +1,12 @@
+Site down last night
+Date: 2005-02-10 10:51:43
+Label: Blog
+
+Oopsie; after a debian upgrade last night, php took a nosedive.  I've tracked it
+down to the PAM module in php4 causing some kind of crash; so disabled that and
+Bob's your Uncle, the site's back.
+
+Looks like I'm not the only person suffering from a similar problem too; <a
+href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=294501">this</a> is where
+I found some similar issues but nothing in that bug mentions pam; I could well
+be barking up the wrong tree.

@@ -1,0 +1,28 @@
+Don't buy an MS wireless desktop
+Date: 2006-07-28 17:31:01
+Label: Blog
+
+Unless you like seeing things like <a
+href="http://xania.org/media/gofigure.JPG">this</a>.  It's driving me *mad*!
+I'm still on the phone to MS technical suport after my shiny new Microsoft
+Wireless Desktop 6000 fails to recognise about every one in 100 keypresses, and
+keeps poppin up stupid error messages like the ones in the link --- which for
+the lazy is a dialog box telling me the wireless strength is low...even though
+the Control Panel tells me it's 100%.  The receiever is literally 2 inches from
+the keyboard --- signal strength isn't an issue, even though I've succesfully
+typed from two rooms away.  I've followed every step of the FAQ and still
+repeated keypresses seem lost and some other keys just missed entirely.
+Bonkers.  If this doesn't sort it I'm back to PC World to get me one with wires.
+
+Update!
+
+The problem is now '*fixed'* --- ironically it's the wireless card in the Weebox
+that was interfering with the system:  I'm be popping back to PC World to get a
+wired version of the product.  Bugger.  I assume any wireless network card would
+affect the keyboard in the same way --- wireless packets every now and then just
+cutting out over the top of the messages from the keyboard and mouse.
+
+Bit ridiculous really; most people have wireless networking these days, I can't
+believe I'm the only one affected by this, unless it's some strange property of
+the USB network card in the weebox and/or the lack of any shielding (cardboard
+box notwithstanding) from the internals of the box.

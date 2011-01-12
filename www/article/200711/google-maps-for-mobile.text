@@ -1,0 +1,23 @@
+Poor man's GPS
+Summary: Poor man's GPS.
+Date: 2007-11-29 15:07
+Label: Blog
+
+<img width="35" height="35" style="margin: 5px; float: right;" src="/200711/blue_dot_mylocation" alt=""/>
+I know I'm a fully paid up Googlephile, but today's [Google mobile announcement][gma] is absolutely great.
+Google are providing a service in their [Google Maps][gmm] for mobile: now on the
+little maps is a blue circle showing your approximate location --- even if you don't have a GPS
+receiver.
+
+The trick is for it to use the mobile phone mast data to triangulate your position.  It's not as
+accurate as GPS, but it's accurate to within a kilometre.  Testing it here in the office and it thinks
+I'm about 800 metres from my actual position --- not amazingly accurate but quite enough to get you
+on the right track if you're totally lost.
+
+If only I'd had this at [the weekend][we], Ness and I got a bit lost on the way to Dorset with no map.
+We ended up relying on the mobile with Google Maps as our in-car navigation, (G.P.Ness?), constantly
+trying to guess where we were and find a route to our destination manually.
+
+[gma]: http://googlemobile.blogspot.com/2007/11/new-magical-blue-circle-on-your-map.html "Bloody great!"
+[gmm]: http://www.google.com/gmm/index.html "Install it now - and run up your data bill"
+[we]: http://xania.org/200711/power-cut "Last weekend"

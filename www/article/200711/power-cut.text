@@ -1,0 +1,23 @@
+A few days of downtime
+Summary: Oops, it broke...
+Label: Blog
+Date: 2007-11-26 20:00
+Status: Public
+
+The site's been down the last couple of days, due to a power cut on Friday.
+I've been away for a lovely long weekend in beautiful Dorset with my in-laws, and
+so haven't been able to fix until I got back.  We had a lovely time in a rented house
+in [Burton Bradstock][burton], although I'm aching a little from playing uncle to my
+nephews, and my head's still sore from drinking with my brothers-in-law.
+
+<p class="picture">
+<a href="/200711/lyme-regis">
+<img src="/200711/lyme-regis-thumb" width="256" height="192" alt="A nice picture of Lyme Regis"/></a>
+<br/>
+Lyme Regis on the Dorset coast
+</p>
+
+[burton]: http://www.burtonbradstock.org.uk/ "A lovely village on the south coast"
+
+Anyway, all's back to normal now, a simple reboot of the server fixed it --- I'm not quite
+sure why after the power returned the machine didn't come back on.

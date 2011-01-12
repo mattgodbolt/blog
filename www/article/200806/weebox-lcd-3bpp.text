@@ -1,0 +1,96 @@
+LCD screen hackery
+Date: 2008-06-05 14:30:00
+Status: Public
+Label: Coding
+Summary: Some ideas on improving the LCD display on the Weebox.
+
+Although I haven't touched my [Weebox][] project very much recently, I've been
+thinking about the LCD display.  It's a one-bit-per-pixel
+320&#215;64 display, with a simple controller (the [HD61830][lcdc]).  The controller has
+8KB of on-board video RAM, which is more than enough to hold the 320&#215;64&#247;8 = 2560
+bytes of screen.  The controller allows me to set and clear bits in bytes of
+screen memory, or set bytes to specific values.  It also has a register which
+controls the start of the displayed image in RAM.
+
+[Weebox]: http://xania.org/WeeBox-Project-archive "Other notes on the Weebox"
+[lcdc]: http://www.datasheetcatalog.org/datasheets2/17/177932_1.pdf "The HD61830 data sheet"
+
+My [driver code][dc] currently just points the start of screen to the beginning of the screen
+memory, and then manipulates the first 2560 bytes of the memory to draw the
+text and images.  However, I've had an idea to get something out of those remaining
+5632 bytes.
+
+[dc]: /200806/lcd-graphics.zip "very much work in progress; I plan on a proper release once it's a bit more finished"
+
+The LCD display is pretty unresponsive --- it takes a noticeable amount of time
+to go between black and white, and it occurred to me that I might be able to
+take advantage of this: If I were to quickly toggle pixels between on and off
+then I might be able to simulate shades of grey.
+
+However, writing to the screen memory is pretty slow and CPU intensive
+--- over a microsecond per byte, with the CPU managing the process of bringing
+enable lines and address lines up and down to talk to the LCD controller.
+I wouldn't be able to do much else at the same time if I were to just continuously
+flip pixels on and off individually.
+
+What I plan on doing instead is upload multiple images of the screen into
+the LCD display's memory, and then alter the start of screen to quickly
+switch between them.  For example, imagine I have two images in video RAM, and then
+I change the start of screen to show one image, and then the other, flipping between
+them say ten times a second.  Any pixel that's set to be on in both images will remain
+on all the time, and similarly any pixel that's off will remain off.  However,
+if a pixel is on in one image and off in the other, then its colour will be flipped
+back and forth between black and white ten times a second.  I'm hoping this will give
+me a kind of 50% grey shade.
+
+As it happens there's enough room to fit three screens in video memory.  Each screen
+would be like a plane in a three-bit-per-pixel [bit plane][bp] image.
+Initially I thought I'd show each screen image for the same amount of time, which
+would make the 8 possible values for each pixel correspondingly:
+
+[bp]: http://en.wikipedia.org/wiki/Bit-plane "not to be confused with biplane"
+
+<table>
+ <tr><th>Value</th><th>On/off pattern</th><th>Duty Cycle</th></tr>
+ <tr><td>0</td><td><code>___</code></td><td>0%</td></tr>
+ <tr><td>1</td><td><code>__*</code></td><td>33%</td></tr>
+ <tr><td>2</td><td><code>_*_</code></td><td>33%</td></tr>
+ <tr><td>3</td><td><code>_**</code></td><td>67%</td></tr>
+ <tr><td>4</td><td><code>*__</code></td><td>33%</td></tr>
+ <tr><td>5</td><td><code>*_*</code></td><td>67%</td></tr>
+ <tr><td>6</td><td><code>**_</code></td><td>67%</td></tr>
+ <tr><td>7</td><td><code>***</code></td><td>100%</td></tr>
+</table>
+
+Using this encoding means 1, 2 and 4 are all "stay on 33% of the time", and 3 and 6 are "stay on 67%",
+but at slightly different phases.  I imagine there would be no visible difference the phases, so this
+make this encoding pretty redundant --- I have eight values but only three possible shades.
+
+My next idea was to hold the first image for 4N units of time, the next for 2N units, and
+ther last for N units.  That way I actually get eight different amounts of "on time"
+per pixel:
+
+<table>
+ <tr><th>Value</th><th>On/off pattern</th><th>Duty Cycle</th></tr>
+ <tr><td>0</td><td><code>_______</code></td><td>0%</td></tr>
+ <tr><td>1</td><td><code>______*</code></td><td>14%</td></tr>
+ <tr><td>2</td><td><code>____**_</code></td><td>29%</td></tr>
+ <tr><td>3</td><td><code>____***</code></td><td>43%</td></tr>
+ <tr><td>4</td><td><code>****___</code></td><td>57%</td></tr>
+ <tr><td>5</td><td><code>****__*</code></td><td>71%</td></tr>
+ <tr><td>6</td><td><code>******_</code></td><td>86%</td></tr>
+ <tr><td>7</td><td><code>*******</code></td><td>100%</td></tr>
+</table>
+
+This looks great on paper -- I should be able to in theory make a one-bit-per-pixel
+display display eight different shades of grey.
+
+Except... in reality it won't work like that.  The response curve of an LCD display
+is non-linear, so I'll need to experiment with the display to work out appropriate
+settings.  For example, does being on for 14% of the time actually
+correspond to a useful "light grey"?  Also, it could be that I can't change the
+screen address often enough to make this viable.  Or having seven time steps makes the
+display too flickery.
+
+Once I get the Weebox working again, I'll run some tests and post what I find.  And
+then I need to think of what to do with the last 512 bytes of unused screen RAM...

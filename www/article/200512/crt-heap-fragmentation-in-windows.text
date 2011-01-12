@@ -1,0 +1,141 @@
+CRT Heap Fragmentation in Windows
+Date: 2005-12-07 13:57:46
+Label: Coding
+
+### Heap Fragmentation
+
+Fragmenting a heap is something I haven't worried about for years.  When you
+allocate and deallocate memory in certain patterns you can leave areas of
+unallocated memory stranded inamongst allocated memory.  This can lead to the
+situation where you have, say, 10Mb of memory free, but yet an allocation for
+256 bytes fails as although you have all this free memory, none if it is in a
+big enough continuous lump to give you your 256 bytes.  Of course on modern PCs
+the allocation won't actually fail, it will just [a] take a while as the OS
+looks through its list of free blocks for a 256 byte space, and then [b]
+allocate even more memory from the system, possibly hitting virtual memory.  Not
+great --- but not terrible, you'd think.
+
+### Background
+
+I started my programming career as a computer games programmer.  On the consoles
+we worked on, processor time and memory were always at a premium.  In the very
+early days, dynamic memory allocation was a no-no: everything was statically
+allocated.  Memory allocation routines used simple allocate-only heaps which
+were reset at the end of a level.  This made optimal use of the available
+memory, but meant the heap couldn't be used for dynamic objects at run-time.
+With no way to free the memory, allocating new objects would mean eventually the
+memory would become exhausted.  Only with the advent of the Dreamcast, Xbox and
+PlayStation 2 would developers consider using a general heap for allocation.
+Even then, allocators were hand-written for speed and frugality of memory
+overhead, and many different heaps were used for varying types of object.
+
+For [Red Dog][reddog], I used a trusty memory allocation routine I'd written in my Acorn days.
+The allocator was based loosely on one of [Donald Knuth][knuth]'s [Fundamental Algorithms][fa], and
+performed excellently.  It was also aggressive at coalescing adjacent free
+blocks in the heap, which made freeing objects and then reallocating new ones
+both fast and space efficient.  Memory fragmentation was still an issue with
+this allocator --- one of the reasons we had multiple heaps for different
+objects was to help alleviate this problem.  We tended to have one for the
+enemies' virtual machine stacks, one for particle systems, another for dynamic
+models, and so on.
+
+[reddog]: http://www.rottentomatoes.com/g/dreamcast/red_dog_superior_firepower/overview.php "Red Dog - the best Dreamcast game ever!"
+[knuth]: http://www-cs-faculty.stanford.edu/%7Eknuth/ "Donald Knuth's home page"
+[fa]: http://www-cs-faculty.stanford.edu/%7Eknuth/taocp.html
+
+This allocator made it to later games like <a
+href="http://www.swatgst.com/">SWAT</a> too.  Games were now being written in
+C++, and this made the memory allocator that much more important.  C++ does have
+a tendency to lean heavily on the allocator --- especially when you use modern
+concepts like interface-based design and pImpled objects.  In fairness I believe
+we let the built-in malloc/free-based allocator manage the majority of objects
+in SWAT, only using my custom allocator in critical areas.  This still meant
+using it for a fair few STL objects, writing an STL allocator object that
+wrapped the memory allocator, not easy to get working across two disparate tool
+sets: Xbox and PS2.
+
+### The problem
+
+So why this explanation of console memory management strategies?  Nowadays, with
+advanced operating systems able to manage fragmentation by physically mapping
+memory about (albeit in 4k pages), and processor speeds and memory sizes so
+great you'd not expect it to be an issue anymore.  Well, very recently I was
+investigating some performance issues in <a href="http://www.style-manager.co.uk">StyleManager</a>.  StyleManager has to preprocess C/C++ source
+code in order to perform its tasks; and given that #include-ing windows.h adds
+about a million symbols to your preprocessor, there's a fair amount of memory
+allocations going on.  After much general optimising, I had a great performing
+preprocessor, but then I spotted a strange issue.  If I ran the preprocessor
+multiple times, it steadily slowed down, in one case slowing down by around 40%
+each invocation.
+
+At first I was convinced my optimisations had introduced a memory leak.  After a
+few hours' investigation this proved not to be the case.  I then steadily worked
+through all the persistent state of my application, looking for anything left
+behind after a preprocessor run that could explain the situation.  I was drawing
+a total blank.  In sheer desperation, assuming it was something relating to my
+memory allocation patterns, I replaced the allocator with a simple 1Gb lump of
+memory I malloc() at startup and take each allocation from in turn, ignoring all
+deallocations.  Apart from doubling the speed of the application (quite
+shockingly!), the incremental slowdown vanished.  So then I knew it *was*
+something to do with the memory usage --- but what?
+
+### The solution
+
+If you've read this far, you've almost certainly guessed what it is --- the heap
+was getting fragmented.  Even though every single allocation I was making was
+getting freed at the end of each run, somehow the OS heap manager wasn't dealing
+very well with the allocation patterns I was using and so each time I added a
+new preprocessed token the allocator slowed.  I finally proved it to myself
+(after some lucky hits on google) by finding a Windows XP-only setting for the
+heap which sets it up as a '[Low-fragmentation Heap][lfh]' (LFH).
+Disabling my custom null memory allocator and simply adding:
+
+[lfh]: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/low_fragmentation_heap.asp "Low Fragmentation Heap details"
+
+<pre><code>ULONG HeapFragValue = 2;
+<a href="http://msdn.microsoft.com/library/en-us/memory/base/heapsetinformation.asp">HeapSetInformation</a>(<a
+href="http://msdn2.microsoft.com/en-us/library/csd157zx.aspx">_get_heap_handle</a>(),
+    HeapCompatibilityInformation,
+    &amp;HeapFragValue, sizeof(HeapFragValue));</code></pre>
+
+...to the top of my unit test's main() function not only sped the
+application up to nearly as fast as my null allocator, but the incremental
+slowdown disappeared too.  As far as I can explain, it has to be the
+fragmentation causing the issue.  I was utterly shocked by this; my
+understanding of memory management systems was that they could handle *anything*
+you threw at them nowadays, especially on say a 3.2GHz 2Gb machine!  Clearly
+not!
+
+Unfortunately the LFH is an XP- and above-only feature, so I haven't been able
+to use it generally for StyleManager.  Instead I've written a quick and dirty
+block allocator which I've added to our main memory (ab)using classes,
+specifically in this case the list of preprocessed tokens.  Even though I only
+spent a few hours honing the allocator it already vastly outperforms the
+standard heap routines and doesn't suffer from any fragmentation issues.
+
+### Conclusion
+
+Even in today's computing environment you can't ignore memory allocation
+routines.  They can be responsible for a lot of your program's wasted
+performance.  Specifically on the Windows CRT heaps, fragmentation can cause
+issues even in circumstances where you'd expect them not to.  Microsoft seems to
+have addressed this by adding support for Low-fragmentation Heaps in Windows XP
+and above.  In some cases, writing just one or two custom allocation routines
+can hugely improve your program's performance.
+
+### Subsequent notes
+
+Since writing this article I've found another way to speed up heap allocation in
+my specific application --- calling
+<code><a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vclib/html/_crt__set_sbh_threshold.asp">\_set\_sbh\_threshold</a></code>
+(set small object threshold) with a fairly small number (I used 128).  This had a similar
+speed-up to the other techniques mentioned, and is cross-Windows compatible.
+Interestingly, when I traced into the CRT code, it would appear having a non-
+zero sbh\_threshold makes the CRT use a 'Visual C 6' heap instead of its newer
+OS-level Heap.  Can it really be that the older heap technologies were actually
+better at handling StyleManager's type of situation than the fancy new ones?
+Makes you think, anyway --- and I'll be sticking with my own allocator for now.
+
+Thanks to [Malcolm Rowe][malc] for his proof-reading skills and editorial comments.
+
+[malc]: http://www.farside.org.uk/ "Malcolm Rowe's blog - farblog"

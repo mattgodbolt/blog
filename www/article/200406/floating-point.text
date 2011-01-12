@@ -1,0 +1,19 @@
+Floating point
+Date: 2004-06-14 17:22:50
+Label: Coding
+
+If you've ever worked with compilers, and floating point numbers --- you'll know
+sometimes you get very odd results...
+
+This is by and large due to the way floating point works, and how IEEE-
+compliancy is assured.  This <a
+href="http://docs.sun.com/source/806-3568/ncg_goldberg.html">excellent paper</a>
+explains why and how all those things happen, as well as being an excellent
+grounding in all things floating point.
+
+When you work on systems with retarded
+FPUs (read: ps2) this kind of thing is nice to know, even if it's actual usage
+is academic!
+
+Ok, not strictly C++ specific, but still interesting, and of relevance if you do
+any kind of work with floating point numbers.

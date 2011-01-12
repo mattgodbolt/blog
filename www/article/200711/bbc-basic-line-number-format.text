@@ -1,0 +1,56 @@
+﻿BBC BASIC binary line number format
+Status: Public
+Date: 2007-11-15 15:20
+Summary: A further look at BBC BASIC's in-memory format, specifically the line numbers.
+Label: Coding
+
+As mentioned [yesterday][], BBC BASIC stores a binary representation of line numbers instead
+of the ASCII for statements like `GOTO` and `GOSUB`.  After talking with my mate 
+Richard Talbot-Watkins I've learnt [the reason][rich] it's not stored in pure `HI/LO` binary form is so the
+interpreter can skip quickly along a line, looking for the `ELSE` token during `IF` statement
+parsing.
+
+[yesterday]: http://xania.org/200711/bbc-basic-v-format "Yesterday, all my troubles...ahem"
+[rich]: http://www.nelsonit.net/~jon/BBCMicro/2005/06/27/165311.html "Rich explains why"
+
+If the line numbers were stored naïvely in most significant byte/least significant byte (`HI/LO`)
+form, then the rather contrived line:
+
+    10 IF A=1 GOTO 139 ELSE GOTO 204
+
+would tokenise as:
+
+<p class="sidenote">Here, underscores represent spaces, and <code>ll</code> means line length.</p>
+
+    \n [ 10] ll IF  _  A  =  1  _ GOTO_ [Line139] _
+    0D 00 0A 17 E7 20 41 3D 31 20 E5 20 8F 00 8B 20
+                                              ^^
+    ELSE_ GOTO_ [line204]
+    8B 20 E5 20 8D 00 CC
+    ^^
+
+If the interpreter chose to scan forward for the `ELSE` by just looking for its token `0x8b`
+then it would trip over on the `0x8b` in the `GOTO` (marked with `^^`) --- `0x8b` in decimal is 139.
+Instead, BBC BASIC tokenises this as:
+
+    \n [ 10] ll IF  _  A  =  1  _ GOTO_ [Line  139]
+    0D 00 0A 19 E7 20 41 3D 31 20 E5 20 8F 74 4B 40
+
+     _ ELSE_ GOTO_ [line  204]
+    20 8B 20 E5 20 8D 64 4C 40
+
+The line number is spread over three bytes and kept in the range of normal ASCII
+values so the interpreter can make this short cut in skipping to the non-ASCII token `ELSE`.
+
+The algorithm used splits the top two bits off each of the two bytes of the 16-bit line number.  These bits are
+combined (in binary as `00LlHh00`), exclusive-`OR`red with `0x54`, and stored as the first byte of the 3-byte sequence.
+The remaining six bits of each byte are then stored, in `LO/HI` order, `OR`red with `0x40`.
+
+So taking the first example of line 139 --- `0x008b` --- we split the top and bottom two bits from the
+two bytes to get `0x00` and `0x80`.  Shifting these down and combining them as described above gives `0x20`, then exclusive `OR`ring
+with `0x54` gives us the first byte, `0x74`. The remaining six bits of the two bytes are `0x00` (most significant) and `0x0b` (least significant),
+`OR`red with `0x40` and stored in `LO/HI` order that gives us a final three byte sequence of `0x74 0x4b 0x40`.
+
+If you're wondering why the first byte is exclusive `OR`red with `0x54`, I go into more detail in [another article][ooh].
+
+[ooh]: http://xania.org/200711/bbc-basic-line-number-format-part-2 "So, why EOR with 0x54?  Why not OR with 0x40 like the other bytes?"

@@ -1,0 +1,45 @@
+Firefox woes - "Firefox is already running" when it's not
+Date: 2006-04-23 14:40:00
+Label: Blog
+
+Today on my lounge 'browsing' PC, Firefox stopped working.  Every time I click
+on the shortcut to launch it, I get a pop-up message box saying:
+
+*"Firefox is already running, but is not responding.  To open a new window, you
+must first close the existing Firefox process, or restart your system."*
+
+I resolved to find out what was going on, and how to fix it.
+
+Needless to say, I first tried both of the things mentioned in the error
+message.  There's no Firefox process anywhere; and restarting the machine made
+no difference.  Googling around wasn't much help, the forums I found mentioning
+this problem just suggested 'have you tried rebooting' or 'run task manager and
+kill the FF process.'  So no joy there.  The only suggestion that seemed to be
+working was deleting the .mozilla folder (on linux in your home folder, in
+Windows in the relevant user's Application Data).
+
+I'm not a fan of randomly deleting folders without understanding why it was
+needed, so I decided to investigate further.  This problem was happening on my
+Linux box, so I decided to <a
+href="http://www.liacs.nl/%7Ewichert/strace/">strace</a> the Firefox process and
+see what it was up to.  On a Windows machine I would have used <a
+href="http://www.sysinternals.com/Utilities/Filemon.html">Filemon</a> from <a
+href="http://www.sysinternals.com/">SysInternals</a>.
+
+I ran the command: **strace -o ~/ff.strace firefox** and then investigated the
+strace file.  My hunch was that one or other file lock wasn't being relinquished
+properly, perhaps from an earlier crashed firefox process.  I grepped through
+the log, looking for file opens, and eventually found this:
+
+<i>open("/home/matthew/.mozilla/firefox/2z7l4uii.default/.parentlock",
+O\_WRONLY|O_CREAT|O_TRUNC, 0666) = 4
+
+</i>
+
+Bingo!  I checked; and even with no firefox process running, this file existed.
+It was an empty lock file, so I deleted it.  That did the trick --- now FireFox
+runs again!
+
+So in summary; if you have this problem, check your .mozilla file (or the
+Windows equivalent) for any 'lock' files --- quit any mozilla applications, then
+delete the lock files and try again.  That should fix the problem!

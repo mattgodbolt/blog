@@ -1,0 +1,19 @@
+GeekLog 1.4.0
+Date: 2006-02-06 14:12:00
+Label: Blog
+
+Yay --- <a href="http://www.geeklog.net">GeekLog</a> <a
+href="http://www.geeklog.net/article.php/geeklog-1.4.0">1.4.0</a> has released
+--- xania.org has now been updated to use the full release instead of the
+release candidate.
+
+The update was pretty damn simple --- according to the <a
+href="http://www.geeklog.net/article.php/geeklog-1.4.0">instructions</a>, only a
+few files had changed and there was no database update.  The update page listed
+all the files that had changed, but I had a better idea --- I downloaded the RC2
+and 1.4.0 tars, and unpacked them.  I then made a <a
+href="http://en.wikipedia.org/wiki/Diff">diff</a> (diff -rupN) of the two
+folders, piped it through <a
+href="http://en.wikipedia.org/wiki/Patch_%28Unix%29">patch</a> on the live setup
+(with appropriate -p setting) and <a href="http://www.worldwidewords.org/qa/qa-bob1.htm">Bob's your uncle</a> --- all sorted!  The first time I've used
+diff/patch on a live system and it worked first time!

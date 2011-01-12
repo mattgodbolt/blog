@@ -1,0 +1,106 @@
+How to install the Malcolm blogging system
+==========================================
+
+MBS is a blogging system designed to allow blog posts ('articles') to
+be stored in a version control system alongside static website content,
+with the HTML and/or Atom output generated statically rather than via
+PHP or some other scripting language.  This has the advantages of being
+more efficient to serve and being easier to secure.
+
+To install MBS, you will require the following installed applications and
+libraries:
+
+  * GCC
+  * re2c (from http://re2c.org), for ETL
+  * Perl (by default, see below)
+  * APR, the Apache Portable Runtime
+  * Subversion (optional, but recommended)
+
+MBS also makes use of the following additional software, included in the
+tarball:
+
+  * ETL, the Electric Template Language (http://etl.i-want-a-pony.com/)
+  * SQLite
+  * Markdown (http://daringfireball.net/projects/markdown/)
+  * SmartyPants (http://daringfireball.net/projects/smartypants/)
+
+Markdown and SmartyPants require Perl; all three are used by default
+for article rendering, but can be replaced if necessary.
+
+
+Installation
+------------
+
+First, decompress the tarball.  The result contains the following directories:
+
+  doc/        Documentation.
+  generator/  The source for the article generator, and the configuration
+              and template files (in generator/conf/).
+  scripts/    Example post-commit and refresh scripts.
+  www/        The static website content and article text.
+              (See www/article/sample.text for a sample article).
+
+Next, compile the generator:
+
+  $ cd generator/src/
+  $ make sqlite
+  $ make etl
+  $ make
+
+Finally, run generator/generate.  This will read the article text files
+(all files anywhere beneath www/article/, even in subdirectories) and
+generate HTML output in the same directory.  By default, it will generate
+index and archive pages, and an Atom feed, all in www/, and also (index,
+archive, feed) output for articles labelled with the 'subversion' label
+(which is none by default).
+
+Take a look at these now.  The creation of these files is controlled by
+the files in generator/conf/, particularly generator.conf.
+
+The templates (also in generator/conf/) are intended to be customised
+before use, and so contain URLs that you will need to change (e.g. the
+Atom feed ID and author).
+
+
+Serving files
+-------------
+
+While you could set the www/ directory as your Apache DocumentRoot, the
+intention is that the files are served from a separate directory that
+contains only publically-accessible content.  Go to the mbs/ directory,
+and run scripts/refresh.
+
+This will create an htdocs/ directory and populate it with the static and
+generated output, but not the article text files.  Note that the script
+also combines the contents of the www/ and www/article/ directories, and
+so the sample article is actually created as htdocs/sample.html.  This is
+intended for articles placed in subdirectories (perhaps named by month,
+such as 200701/, etc); it may not be appropriate if you want the articles
+to occupy a completely separate namespace to the rest of the static files.
+
+(The script also ensures that file dates are only updated when the
+content changes, which becomes important when the www/ directory is
+under version control, as in the next section).
+
+
+Version-controlling the source
+------------------------------
+
+Posting articles by editing local files is fine if you're happy to
+bring up a terminal window on your web server, but it's a bit of a pain
+otherwise.  MBS assumes that you will solve the remote-posting problem
+by simply placing the contents of the www/ directory (and possibly
+generator/conf/) under version control.
+
+After adding www/ to version control, commits can trigger the webserver
+to update a local copy of www/ and rerun the generation.  In fact,
+the refresh script above already assumes that www/ is sourced from a
+Subversion repository and attempts to update it before generating the
+output files.
+
+For Subversion specifically, you may want to set svn:ignore properties on
+each subdirectory under www/article/ to ignore the generated HTML output.
+(Certainly, the output should not be checked in to the repository).
+You may also want to look at scripts/post-commit, which shows how a
+trivial post-commit hook can start an article refresh (in this case,
+via SSH, as the Subversion server and web server are different machines).

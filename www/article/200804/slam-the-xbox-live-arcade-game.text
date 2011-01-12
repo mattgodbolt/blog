@@ -1,0 +1,50 @@
+So that's what we've been up to...
+Date: 2008-04-23 10:00:00
+Label: Blog
+Status: Public
+Summary: In which I introduce the Xbox Live Arcade game we've been working on: Slam.
+
+For the last few months I've been hinting on and off that we at [ProFactor][] have been
+working on something we couldn't talk about.  Well, finally, I can reveal what it is --- we've
+been creating an Xbox Live Arcade game, and we now have a promotional video:
+
+[ProFactor]: http://www.profactor.co.uk/ "ProFactor, makers of fine C++ technology.  And games"
+
+<p class="picture">
+ <object width="425" height="355" type="application/x-shockwave-flash"
+         data="http://www.youtube.com/v/TnW0q1iJ8Fo&amp;hl=en">
+  <param name="movie" value="http://www.youtube.com/v/TnW0q1iJ8Fo&amp;hl=en" />
+  <param name="wmode" value="transparent" />
+ </object>
+</p>
+
+The game is called [Slam][] (a working title), and is a fast, action-packed fusion of [Breakout][] and [Tempest 2000][Tempest]
+with a dose of puzzle game in there too.  We've had an absolute blast making it, and we're now looking to see if any
+publishers will take it up.
+
+[Slam]: http://www.slam-game.com/ "Slam: A New Spin On Bat And Ball"
+[Breakout]: http://en.wikipedia.org/wiki/Breakout "Breakout - or bat and ball"
+[Tempest]: http://en.wikipedia.org/wiki/Tempest_2000 "Tempest 2000 - Minter at his best"
+
+<p class="picture"><img src="http://www.profactor.co.uk/slam/slam-game/thumbs/slam6.png" alt="Slam showoff pic" width="320" height="180"/>
+<br/>Slam: the patterned bricks are puzzle bricks and need to be hit in the right order for maximum points</p>
+
+There's a lot of depth in [Slam][], and we have 100 fiendish levels designed.  There's co-operative and competitive multiplayer too:
+
+<p class="picture"><img src="http://www.profactor.co.uk/slam/slam-game/thumbs/slam12.png" alt="Slam showoff pic 2" width="320" height="180"/>
+<br/>Slam: Competitive multiplayer</p>
+
+While we're now back in our "day job" of consultancy, we're still looking for someone to pick up Slam.  We're in talks with
+various publishers, and we think Slam would make a great game on any platform, though we've initially targeted it at Xbox 360.
+
+<p class="picture"><img src="http://www.profactor.co.uk/slam/slam-game/thumbs/slam1.png" alt="Slam showoff pic 3" width="320" height="180"/>
+<br/>Slam: Blasting through a stack of bricks with the laser powerup</p>
+
+For more details, head on over to the [Slam website][Slam].
+
+<hr/>
+
+_Updated to use valid HTML.  YouTube suck, try [this][t1] or [this][t2]._
+
+[t1]: http://alistapart.com/articles/flashsatay "The Satay method of getting Flash working"
+[t2]: http://www.robertnyman.com/2007/02/01/how-to-write-valid-htmlxhtml-code-to-include-flash/ "Getting Flash/YouTube working in valid HTML"

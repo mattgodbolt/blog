@@ -1,0 +1,62 @@
+SWAT's lighting system
+Date: 2010-03-11 07:55:00
+Status: Public
+Summary: An explanation of the lighting system used in SWAT.
+Label: Games
+
+This is part three of my game development posts, following on from my post on the [artwork in SWAT](/201003/swat-artwork).
+
+One of the most novel aspects of Okre was its treatment of lighting. We wanted to take full advantage of all the cool pixel and vertex shader technology at our disposal on Xbox, so per-pixel lighting was a given. Additionally, from a game point of view we wanted to be able to let the player shoot out the lights to plunge the enemies into darkness, so that was another consideration. Finally, we wanted a proper shadowing solution that didn't rely on the texture-based solution of the time --- lightmaps, as used in Quake and so on. We didn't think we could store all the lightmaps for a single level in memory, as our levels were outdoor and rather sprawling.
+
+With that in mind, we considered generating the static scenery shadows geometrically. Nik worked his magic and came up with a solution. In a lengthy, offline process:
+
+1. For every light in the game, find all the scenery triangles that face the light and are within that light's range.
+2. For each triangle, calculate the shadow volume that it casts. Clip all other triangles against this volume, and discard the parts that are inside it.
+3. Process and store this set of triangles as another piece of geometry, creating triangle strips and so on.
+4. This data will be used to draw the geometry lit by this light, where each light's contribution to the scene is added on one after another. This is described in detail in my [next post][next].
+
+[next]: /201003/swat-xbox-renderer
+
+<p class="picture">
+<img src="/201003/polygon-shadow-1.png" width="200" height="256" 
+ alt="A light casting a shadow"/>
+ <br/>A triangle casts a shadow onto two other triangles.
+</p>
+<p class="picture">
+<img src="/201003/polygon-shadow-2.png" width="200" height="256" 
+ alt="Shadow cut-out"/>
+ <br/>The shadow region is cut out, leaving only the areas in light.
+</p>
+
+So we end up with a lot more geometry, one piece per light per chunk of original scene geometry. This sounds simple enough but it was hugely problematic:
+
+* Double floating point precision wasn't good enough. Repeatedly clipping tiny slivers of triangles against each other can cause them to turn 'inside out', where precision errors cause an anticlockwise triangle to become clockwise. It can also leave almost infinitessimally small polygons.
+* The sheer amount of work involved: hundreds of lights in a landscape of hundreds of thousands of polygons.
+
+Nik came up with some great solutions to these problems:
+
+* Every edge was given a unique 64-bit id. During clipping this edge id was preseved and later used to discover triangle edges that were on the same original edge. These could then be welded back together after all the clipping had been performed with no loss of accuracy.
+* We distributed the geometry calculation across many machines.
+* Light geometry and its resulting shadow scape was heavily cached between conversions.  A hash of the light position and the geometry it could potentially affect was used as the cache key. An artist or designer moving one light a little, or editing a few triangles only caused the recalculation of a small area of the map.
+
+There were still a few cases where the algorithm didn't work: usually because of broken source artwork. It was left to the artists to fix up the geometry to get the level converting correctly --- removing coincident triangles, welding nearly-identical vertices, fixing non-manifold[^mani] edges.
+
+[^mani]: Non-manfold edges are where more than two polygons share the edge. A little like the pages of a book where the spine would be non-manifold.
+
+These shadows were great, being relatively cheap at runtime, but they were limited to static scenery and non-moving lights. We could vary the intensity and colour of lights at runtime, but not their position. They also lent themselves well to the PlayStation 2 engine which --- if you recall from my [earlier post][previous] --- was a bit of an afterthought.
+
+[previous]: /201002/developing-swat-gst-introduction
+
+However, Okre also supported realtime shadows on the Xbox, using a stencil-based approach. In the final cut of SWAT --- much to my and Nik's annoyance --- the character shadows were dropped due to a perceived speed problem. They _were_ expensive, particularly on the skinned, animating characters. But they weren't bad enough to drop them entirely (as far as I recall, anyway)!
+
+I'll go into how the light polygons and stencils were actually drawn in the [next post][next], where I'll cover the rest of the rendering engine too.
+
+Another cool feature of the lighting system was its simulation of a real film camera. After rendering, the entire screen was post-processed to simulate film's non-linear response to light and the "aperture" of our virtual camera. A further post-process would bleed out very bright areas. We sampled back a set of pixels near the centre of the screen every frame, and used this to adjust the aperture for the next frame, simulating auto-exposure.
+
+<p class="picture">
+<img src="/201003/outdoor-lighting-scene.jpeg" width="400" height="300" 
+ alt="Demonstration of aperture effect"/>
+ <br/>Looking out from a relatively dark area into the bright outdoors.
+</p>
+
+When the player went from a dark room to the bright outside, this would momentarily dazzle them until the aperture closed a little. Glancing back at the dark room, the player would then only see a pitch black area, just as in real life. A similar effect was also used to simulate the temporary dazzling caused by the bright light of a flashbang grenade.

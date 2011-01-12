@@ -1,0 +1,69 @@
+Setting up an Android on a UK O2 iPhone contract SIM for MMS
+Label: Blog
+Status: Public
+Summary: How to set up an unlocked Android phone to use a SIM from an iPhone on O2
+Date: 2009-07-13 17:15:00, 2009-07-21 18:30
+
+As a lucky Google employee I received an unlocked developer [Android][] phone as
+my Christmas bonus. I was previously happily using an [iPhone][] but decided to
+try out my prezzie using the O2 SIM from the iPhone.
+
+[android]: http://code.google.com/android
+[iphone]: http://www.apple.com/iphone/
+
+There's all sorts of misinformation on the net about this; and now the iPhone v3
+has MMS support, I thought I'd link here all the information needed to get an
+Android phone sending and receiving data and MMSes using an [O2][] contract
+iPhone.
+
+[o2]: http://www.o2.co.uk/
+
+You first need to set up your Access Point Names, which are like ISP account
+details for data connections. The settings for these can be found in:
+
+Settings->Wireless Controls->Mobile Networks->Access Point Names
+
+<p class="picture">
+<img src="/200907/android-o2-setup" width="400" height="180"
+     alt="Settings, Wireless Controls, Mobile Networks, Access Point Names"/>
+<br/>
+Walkthrough image
+</p>
+
+I found it easiest to delete all the pre-existing APNs from the Android at this
+point; the T-Mobile ones pre-installed are no use to you.
+
+You need to create two APNs to get everything working: one for data and one for
+MMSes. Create one called `o2` and set the following details:
+
+    Name        o2
+    APN         mobile.o2.co.uk
+    Username    vertigo
+    Password    password
+    MCC         234
+    MNC         10
+
+Leave all the other entries blank. Save that APN and create another called
+`o2 mms`:
+
+    Name        o2
+    APN         mobile.o2.co.uk
+    Username    vertigo
+    Password    password
+    MMSC        http://mmsc.mms.o2.co.uk:8002
+    MMS proxy   193.113.200.195
+    MMS port    8080
+    MCC         234
+    MNC         10
+
+Once that's set up, you need to "poke" O2 to let them know you have a v3 iPhone
+(even though you don't...). Send any old MMS message to the phone number `0101`
+and within a few minutes you should receive a text saying you're now configured
+for MMS.
+
+And that's it! I'm not even sure you need two separate APNs, but this works for
+me.
+
+If you have any problems, try using `idata.o2.co.uk` as the APN.
+
+_Updated: changed `idata.o2.co.uk` to `mobile.o2.co.uk` thanks to losing 3G and seeing this [site](http://www.bitterwallet.com/installed-30-lost-3g-heres-how-your-iphones-data-settings/13638)._

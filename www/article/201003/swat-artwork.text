@@ -1,0 +1,76 @@
+Game Development: SWAT's artwork
+Date: 2010-03-02 20:50:00
+Status: Public
+Summary: Part two of &#8220;How SWAT: GST was made&#8221;, this time it's the art pipeline
+Label: Games
+
+A continuation of my posts on SWAT, extending on [last month's post][prev].
+
+During the early stages of development of the Xbox engine, another project started up and we decided to share the rendering technology. That project was called ["Orchid"][orchid], and we named the engine we shared "Okre" for "Orchid and Kleaners Rendering Engine." Of course, a much cooler name would have been "Kore", but by the time we realised that it was too late!
+
+[orchid]: http://uk.gamespot.com/xbox/action/orchid/news.html?sid=2836766
+
+The graphics coder on that project was Nik Hemmings (with whom many years later I started [ProFactor](http://www.profactor.co.uk)). His input was critical in the development of Okre and he was single-handedly responsible for the shared animation system Okas[^okas], which was used on many other Argonaut products.
+
+[^okas]: Guess what that stands for...
+
+As is often the case with games, Orchid never amounted to anything, and eventually most of the team merged with SWAT.
+
+Other teams at Argonaut considered using Okre, but for various reasons they stuck with their own engines: [Lego Bionicle][lego], [I-Ninja][ninja] and [Catwoman][] used their own PS2 engine (from which we derived much of our PS2 code), and Carve had its own custom engine optimised for its particular needs. However, in its final incarnation, Okre was used in the SCi game [Urban Chaos: Riot Response][uc].
+
+[lego]: http://uk.gamespot.com/ps2/adventure/bionicle/index.html
+[ninja]: http://uk.gamespot.com/ps2/action/ininja/
+[catwoman]: http://en.wikipedia.org/wiki/Catwoman_(video_game)
+[uc]: http://uk.xbox.ign.com/objects/700/700816.html
+
+Art pipeline
+------------
+
+The source artwork was created in [Photoshop][] and [3D Studio Max][max]. The various textures created were saved as Targa image files (TGA), and 3D geometry was exported by our own custom plugin into a custom tagged data format called ACFF[^acff].
+
+<p class="picture">
+<img src="/201003/sef-bank-is-a-safe-bank.jpeg" width="400" height="300" 
+ alt="Image of SWAT: Global Strike Team - underground"/>
+ <br/>The underground level. The guy in the poster is Sefton Hill, the game's producer, and the caption reads "A Sef bank is a safe bank".
+</p>
+
+
+[photoshop]: http://en.wikipedia.org/wiki/Adobe_Photoshop
+[max]: http://usa.autodesk.com/adsk/servlet/pc/index?siteID=123112&id=13567410
+[^acff]: The "Argonaut Common File Format." Many years on I'd discover ACFF was very similar to Google's Protocol Buffers, except that ACFF was self-describing. We looked briefly at using XML here, but the parsing time and on-disk size was prohibitive.
+
+Textures were applied to models using a custom shader plugin, which allowed settings unique to Okre to be configured inside Max. Okre supported rich (for the time!) shaders, allowing all sorts of cool effects to be placed in a material. The shaders were little scripts written in a domain specific language, describing how textures would be blended together, how UV coordinates should be interpreted and how geometry should be modified. They compiled into bytecodes that were interpreted on the CPU, and then (on Xbox) into vertex and pixel shaders. The Xbox engine would combine up to four textures in this way to give the appearance of flickering computer screens, moving conveyor belts, etc[^tim]. On the PS2 we only supported a very simple shader system with a single texture.
+
+	::: cpp
+	// An example shader.
+	texture t0 = "badger";
+	texture t1 = "ammocrate03" {
+		uv = rotate(uv, sin (0, 1, 1, 0)) + [0,1];
+		mipmap_lod = 2 * 2;
+	}
+	texture t2 = "env_map" {
+		uv = environment();
+	}
+	return (t0 * t1 * t2) @ ((t0.a*t1.a)+sin(0,1)*t2.a);
+
+[^tim]: The shader system was much more powerful than we ever exposed in SWAT; it was a general purpose shading language, a bit like Pixar's Renderman, that was compiled down into pixel and vertex shader instructions. One of our developers, Tim Rennie (now at <a href="http://www.rocksteadyltd.com">Rocksteady</a>), was able to write a primitive space invaders game that ran in a shader!
+
+Levels were layed out in a separate tool that imported ACFF level geometry and allowed level designers to place enemies, paths, triggers, scripts and so on into the game.
+
+Before geometry could be loaded into the engine it needed to be heavily processed. Some processing was common to both Xbox and PS2 --- for example, splitting the maps into sensible chunks for culling, and generating long lists of adjacent triangles called strips --- but most was platform-specific. On PS2 we would need to generate data suitable for sending to the Graphics Synthesizer via our custom-written vector unit code. On Xbox, the output was mostly various formats of Direct3D vertex buffers.
+
+Okre loaded assets from DVD (in the case of the final game), the devkit's hard disk (for cached files), or else via a TCP connection to the developer's computer. Listening on that TCP port was a program called FileServ[^name] which converted and served data files back to the engine. It did much more than that though; FileServ also was responsible for recursively generating the assets too. The game would ask for "level4.wad[^wad]" (or similar), and FileServ would follow a dependency chain, picking up and converting level geometry, character geometry, objects, all their associated textures and shaders, sounds, music tracks and AI configuration. This data would then be cached and sent back to the engine for loading.
+
+[^name]: I'll accept blame for the boring names of all the tools. I have an imagination blindspot for application names: FileServ, ArgBuilder, ArgExport, WADMaker, and so on...
+[^wad]: We borrowed the term "WAD" from <a href="http://www.idsoftware.com">id Software</a> --- a WAD is an archive containing all the resources for a particular level.
+
+While we're here, I'd like to mention the key artists whose patience with our cranky tools and engine, and sheer skill in bringing out the best in our rendering system can't be underestimated! Cheers to Jeff Vanelle (now at [BioWare][]), Dave Hego ([Rocksteady][]) and Alex Mallinson (care in the community[^mallin])!
+
+[bioware]: http://www.bioware.com
+[rocksteady]: http://www.rocksteadyltd.com/
+[^mallin]: OK so actually he's now working as a freelancer, on various Doctor Who projects and other TV projects.
+
+In the [next instalment][next] I'll go into some details of the geometry processing, including shadow generation.
+
+[prev]: /201002/developing-swat-gst-introduction
+[next]: /201003/swat-lighting-system

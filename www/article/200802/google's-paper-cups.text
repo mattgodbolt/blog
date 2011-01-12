@@ -1,0 +1,20 @@
+Things I learnt about Google last night
+Status: Public
+Date: 2008-02-22 11:15
+Label: Blog
+Summary: The adhesive in their paper cups dissolves in alcohol.  And other things.
+
+[Last night][ln] I learnt:
+
+[ln]: http://osjam.truemesh.com/ "Google's London Open Source Jam"
+
+* They have very swish offices.
+* [People][pics] who attend these things are mostly normal.
+* Google love testing.  They have [programmer notes on testing][loos] above the urinals in the loos!
+* The adhesive in their paper cups dissolves in alcohol.  Red wine, for example.
+* Designing a [touch interface for chess][chess] is tricky.
+* It's possible to implement a webmail system using only a single monolithic MS SQL Server stored procedure.
+
+[pics]: http://www.flickr.com/groups/osjam/pool/ "see, not too bad"
+[loos]: http://joe.truemesh.com/blog//000667.html "yes, really"
+[chess]: http://chess.davidsingleton.org:8088/#_home "works best on an apple phone"

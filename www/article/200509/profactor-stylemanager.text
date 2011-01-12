@@ -1,0 +1,42 @@
+ProFactor StyleManager
+Date: 2005-09-14 12:07:00
+Label: Coding
+
+With great pleasure I can announce that our first product has been released!  <a
+href="http://www.profactor.co.uk/products.php">ProFactor StyleManager</a>, a
+highly-configurable C and C++ source code reformatter  is now available for
+download!  StyleManager is a Visual Studio.NET plugin, so you don't even need to
+leave your IDE to get the benefit of beautifully formatted code!
+
+If you're like me, messy code is more than a petty annoyance.  If I see braces
+in awkward places, not enough whitespace around or pointer types not clearly
+grouped then my poor brain has to spend that little bit longer 'getting' the
+code I'm looking at.  And that distraction is enough to cut my productivity
+considerably.  And I'm <a
+href="http://www.joelonsoftware.com/articles/Wrong.html">not the only person to
+think so</a>!
+
+Over the years I've seen some pretty *awful* code.  One guy at my previous
+employer despised all whitespace --- he preferred everything to be on one line
+where possible.  Madness --- we found a line over 500 characters long!  Even
+with dual monitors and a small font that spread off the edge of .NET!  In
+addition, these long lines would have lots of nasty side-effects hidden in them,
+like for() loops with lots of comma-separated operations --- hidden 400
+characters off the edge of your monitor!
+
+Love them or hate them, coding standards are a step in the right direction at
+least.  Someone experienced (you hope!) sits down and ordains how code should be
+laid out.  But how to enforce it?  How do you migrate any existing code to the
+standard?  What if you buy in some third-party source, or use some Open Source
+software that doesn't adhere to your new standard?
+
+That's when you need a decent <a
+href="http://www.profactor.co.uk/products.php">source code formatter</a> like
+our new product, StyleManager. You can configure it with your coding standard
+(or just your personal preferences!) and then it will reformat your code on
+demand to that standard.  It'll let you word-wrap at sensible points, it'll add
+or remove whitespace, it'll do almost *anything* to make the code look the way
+*you* want.
+
+And that means you'll spend more brainpower on understanding the meaning of the
+code.  Not trying to decipher what the syntax means.  Which is a good thing!

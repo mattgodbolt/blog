@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-GB">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="/style/site" type="text/css" media="all">
+  <link rel="stylesheet" href="/style/syntax" type="text/css" media="all">
+
+[%- if label -%]
+  <title>[%= label.name %] &#8212; Matt Godbolt&#8217;s blog</title>
+  <link rel="alternate" type="application/atom+xml"
+        title="Atom (full content), [%= label.name %] only" href="/feed/[%= label.filename %]">
+[%- else -%]
+  <title>Matt Godbolt&#8217;s blog</title>
+[%- end -%]
+  <link rel="alternate" type="application/atom+xml"
+        title="Atom (full content)" href="/feed">
+  <link rev="made" title="Matt Godbolt" href="mailto:themoog@xania.org">
+  <script type="text/javascript">
+    [%- include "updatepostingtime.js" -%]
+  </script>
+[%- include "common-headers.html" -%]
+</head>
+<body class="frontpage">
+[%- include "title.html" -%]
+
+<div id="floatholder">
+<div id="content">
+[%- for article in articles -%]
+<h2>[%= article.title %]</h2>
+
+[%= article.contentHTML %]
+
+<p class="labels">
+Filed under:
+[%- for label in article.labels -%]
+<a href="/[%= label.filename %]">[%= label.name %]</a> 
+[%- end -%]
+</p>
+
+<p id="[%= article.basenameNAME %]_postingtime" class="postingtime">
+Posted at [%= article.dateHTML %].
+</p>
+
+<p><a href="[%= article.permalink %]" class="permalink">Permalink</a></p>
+
+[%- if article.title != articles[-1].title -%]
+<hr>
+[%- end -%]
+
+[%- end -%]
+</div>
+<div id="sidebar">
+[%- include "sidebar.html" -%]
+</div>
+</div>
+
+<script type="text/javascript">
+[%- for article in articles -%]
+updatePostingTime("[%= article.basenameNAME %]_postingtime", "[%= article.dateISO %]");
+[%- end -%]
+</script>
+
+[%- include "trailer.html" -%]
+</body>
+</html>

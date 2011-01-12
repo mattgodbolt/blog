@@ -1,0 +1,500 @@
+/*
+  GodboltBlog Stylesheet.
+  
+  Heavily based on the farblog stylesheet (http://www.farside.org.uk)
+  which bears the following copyright notice:
+  
+  Copyright Malcolm Rowe, 2006
+  Licensed under the Creative Commons Attribution-NonCommercial 2.5 license.
+*/
+
+
+/* Eric Meyer's CSS reset.
+   http://meyerweb.com/eric/thoughts/2007/05/01/reset-reloaded/ */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  background-image: none;
+}
+/* remember to define focus styles!
+   (disabled; I don't agree that this should be set by the page).
+:focus {
+  outline: 0;
+}*/
+body {
+/*  line-height: 1; */
+  color: black;
+  background: white;
+}
+ol, ul {
+  list-style: none;
+}
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+}
+blockquote, q {
+  quotes: "" "";
+}
+
+
+/* Re-establish some of the common browser defaults switched off by the
+   reset script above. */
+
+pre, code, kbd {
+  font-family: monospace;
+}
+em, var {
+  font-style: italic;
+}
+strong {
+  /* This conflicts with links.  We might want to change it later. */
+  font-weight: bold;
+}
+
+ol {
+  list-style-type: decimal;
+}
+ul {
+  list-style-type: disc;
+}
+sup {
+  vertical-align: super;
+  font-size: smaller;
+}
+sub {
+  vertical-align: sub;
+  font-size: smaller;
+}
+
+
+/* General page style */
+
+html {
+  /* Serifs are so last century... */
+  font-family: FreeSans, Tahoma, sansserif;
+  /* Bow to peer pressure and step down from the default font size.
+     Typically the browser is set to 16px; this sets it to 14px. */
+  font-size: 87.5%;
+}
+
+html>body {
+  /* Everybody other than IE6 can resize pixel fonts, so re-set the font
+     size to what it would have been if the default 16px font size was used
+     above.  Not great, but it does permit control that's impossible
+     otherwise.  IE6 ignores this rule, of course. */
+  font-size: 14px;
+}
+
+p, li, dt, dd {
+  /* 21px rhythmic unit */
+  line-height: 1.5;
+  text-align: justify;
+}
+
+/* Superscript and subscript text doesn't affect the line height, and
+   neither does monospaced text within a paragraph or list (it seems that
+   monospaced fonts are enough to throw out the line-height slightly.
+
+   In all cases, we assume that there will be 'normal' body content somewhere
+   on the line (although oddly, it doesn't seem to matter - perhaps the
+   whitespace at the ends of the line is enough to establish a strut?). */
+sup, sub, li code, p code, li kbd, p kbd {
+  line-height: 0;
+}
+
+/* Block-level containers should have a top and bottom margin (that
+   is a multiple of 1.5em).  Theoretically, this should also include
+   DL, though that's only used in the Archive in practice, where it
+   immediately follows H2 (and so we don't want the margin).  We could
+   sort that out, but I can't be bothered. */
+blockquote, pre, ul, ol, p.picture {
+  margin-top: 0.8em;
+  margin-bottom: 0.7em;
+}
+
+body {
+  color: black;
+  background-color: white;
+}
+
+:link, :visited {
+  color: green;
+  background-color: transparent;
+
+  font-weight: bold;
+  text-decoration: none;
+}
+
+:link:active, :visited:active, :link:hover, :visited:hover {
+  color: orange;
+  background-color: transparent;
+
+  text-decoration:underline;
+}
+
+
+/* Title section */
+
+#title {
+  height: 60px;
+  background-image: url('/logo');
+  background-color: #444499;
+}
+#title div {
+  max-width: 45em;
+  /* Create a 12em gutter to the left.  We use the same gutter for the
+     content, footer, and legal sections. */
+  margin-left: 12em;
+  /* Trick here to let the inner components use absolute positioning. */
+  position: relative;
+}
+#title h2 {
+  float: right;
+  color: white;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: italic;
+  line-height: inherit;
+  padding-top: 4px;
+  margin: 0;
+  /* Move to the bottom right of the parent div. */
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+h1 {
+  position: relative;
+  top: 10px;
+
+  color: white;
+  background-color: transparent;
+
+  font-size: 30px;
+  font-weight: bold;
+}
+/* The anchor in the titles shouldn't look like a normal anchor. */
+#title a {
+  border: 0pt none;
+  color: white; /* IE doesn't honour "inherit" properly seemingly. */
+  font-weight: normal; /* as above */
+  text-decoration: none;
+}
+/* But it should do something on hover for feedback. */
+#title a:hover {
+  text-decoration: underline;
+}
+
+/* Floating sidebar stuff */
+#floatholder {
+  float: left;
+  width: 100%;
+  position: relative;
+}
+#sidebar {
+  float: left;
+  width: 10em;
+  margin-left: 4em;
+
+  margin-top: 1em;
+  padding-top: 0.25em;
+  
+  font-size: small;
+}
+
+#sidebar div.sidespacer {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+#google-search p {
+  text-align: center;
+}
+
+#google-ads {
+  text-align: center;
+}
+
+/* Content section */
+
+#content {
+  float: left;
+  width: 36em;
+  margin-left: 12em;
+}
+
+h2 {
+  font-size: 1.42858em; /* c. 20px */
+  font-weight: bold;
+  line-height: 1.05em; /* to bring the line-height x font-size to 21px */
+  margin-top: 1.05em;
+  color: #444499;
+  margin-left: -2em;
+}
+
+
+h3 {
+  color: #444499;
+  font-weight: bold;
+  font-size: 1.071435em; /* c. 15px */
+  line-height: 1em;
+  margin-top: 1em;
+  margin-left: -2em;
+}
+
+h4 {
+  color: #444499;
+  font-weight: italic;
+  font-size: 0.9em;
+  line-height: 1em;
+  margin-top: 1em;
+  margin-left: -2em;
+}
+
+/* Make the content a bit wee-er to prevent it wrapping quite so much. */
+#content p, #content li {
+  font-size: small;
+}
+
+/* Run consecutive paragraphs and lists together, with a wee gap. */
+#content p + p {
+  margin-top: 0.75em;
+}
+
+/* Styling HR may or may not be portable - I'm not sure.  It works in
+   Gecko, though. */
+#content hr {
+  border: 1px dotted rgb(80%,80%,80%);
+  margin: 20px 5em;
+  /* 20px top/bottom border plus 1px top/bottom border = 2 x 21px lines. */
+}
+
+
+/* Float sidenotes left of succeeding paragraphs. */
+#content p.sidenote {
+  position:absolute;
+  font-size: 75%;
+  left:2em;
+  text-indent:0pt;
+  width:12em;
+  text-align: left;
+}
+/* Inline code within a sidenote should also be smaller. */
+#content p.sidenote code {
+  font-size: 100%; /* relative to the paragraph's text, overriding the
+                      font-size specified above for code. */
+}
+
+/* Blockquotes should be marked with a bar to the left and be italic. */
+#content blockquote {
+  /* The -10px adjustment is for the left border and padding (5px each). */
+  margin-left: -10px;
+  border-left: 5px solid rgb(80%,80%,80%);
+  padding-left: 5px;
+
+  font-style: italic;
+}
+/* Italic text within a blockquote shouldn't be italic. */
+#content blockquote i, #content blockquote em, #content blockquote var, #content code {
+  font-style: normal;
+}
+
+/* Somewhat undo the unindent of blockquotes for lists */
+#content blockquote ul {
+  margin-left: 15px;
+}
+
+/* Put a background on the code */
+#content code {
+  color: black;
+  background-color: #f4f4f4;
+}
+
+div.codehilite {
+  background-color: #f4f4f4;
+  padding-top: 0em;
+  padding-bottom: 0em;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+/* Out-of-line images ("pictures") shouldn't be indented.
+   (The margin is already handled above). */
+#content p.picture {
+  text-indent: 0;
+
+  /* The content of the paragraph is the caption, if any. */
+  font-style: italic;
+  font-size: 70%;
+  text-align: center;
+
+  /* TODO: it would be nice to set line-height to zero for captionless
+           pictures, or at least work out how to suppress the strut that
+           appears. */
+}
+/* Italic text within a picture caption shouldn't be italic. */
+#content p.picture i, #content p.picture em, #content p.picture var {
+  font-style: normal;
+}
+/* 'inline' images ("side pictures") should float to the left of the
+   paragraph. */
+#content p.side {
+  float: left;
+  margin: 5px 10px 0 0;
+  /* user should set max-width to the width of the image. */
+
+  text-indent: 0;
+
+  /* The content of the paragraph is the caption, if any. */
+  font-style: italic;
+  font-size: 70%;
+  text-align: center;
+}
+
+/* The paragraph after a picture paragraph shouldn't be indented. */
+#content p.picture + p {
+  text-indent: 0;
+}
+
+/* The posting-time paragraphs should be indented differently, and they
+   should look different. */
+#content .postingtime:before {
+  content: "\2015";
+  color: rgb(80%,80%,80%);
+  padding-right: 0.25em;
+}
+
+#content .postingtime {
+  text-indent: 3em;
+
+  /* Run on to the following permalink. */
+  float:left;
+  padding-right: 1em;
+}
+#content .permalink {
+  text-indent: 0;
+}
+
+#content p.labels {
+  text-align: right;
+  font-size: small;
+}
+
+/* Footer and legal sections */
+
+#footer {
+  clear: both;
+  border-top: 2px solid rgb(75%,75%,80%);
+  border-bottom: 2px solid rgb(75%,75%,80%);
+
+  margin-top: 1em;
+  padding-top: 0.25em;
+  
+  color: black;
+  background-color: rgb(85%,85%,90%);
+}
+
+#footer > h2 {
+  display: none;
+}
+
+#footer > div {
+  max-width: 36em;
+  margin-left: 12em;
+  padding: 1em 0 1em 0;
+}
+
+#footer > div > div {
+  font-size: small;
+}
+
+#legal {
+  padding-top: 0.25em;
+  padding-bottom: 1.5em;
+}
+
+#legal > div {
+  max-width: 36em;
+  margin-left: 12em;
+}
+
+#legal > div > p {
+  font-size: smaller;
+  margin-top: 1em;
+  line-height: normal;
+}
+
+#search {
+  float: right;
+  font-weight: bold;
+}
+
+/* Per-page styles: Archive page */
+.archive #content h3 {
+  font-size: 0.857143em; /* c. 12px */
+  line-height: 1.75em; /* to bring the line-height x font-size to 21px */
+
+  /* This style is similar to 'sidenote', but right-aligned, and with a
+     tighter gutter. */
+  margin-top: 0em;
+  margin-left: -11.5em;
+  width: 10em;
+  text-align: right;
+
+  float: left;
+}
+
+/* Separate each month by a half-line. */
+.archive div.month {
+  padding-top: 0.75em;
+}
+
+#content table {
+  margin: 1em auto;
+}
+
+#content td, th {
+  text-align: center;
+  padding: 0.25em;
+}
+
+#content th {
+  font-weight: bold;
+  color: white;
+  background: #444499;
+  padding: 0.5em;
+  padding: 0.5em;
+}
+
+table.ps { border-collapse: collapse; }
+table.ps, table.ps th, table.ps td { border: 1px solid black; }
+table.ps td { width: 1.5em; text-align: center; }
+table.ps td.red { background-color: #ffaaaa; }
+table.ps td.green { background-color: #aaffaa; }
+table.ps td.blue { background-color: #aaaaff; }
+table.ps td.alpha { background-color: #aaaaaa; }
+

@@ -1,0 +1,147 @@
+Ambiguous function overloading in C++
+Date: 2007-11-23 00:12:00
+Status: Public
+Label: Coding
+Summary: C++ function overload resolution can be rather inscrutable.  I try and make sense of a particular case.
+
+The other day I was chatting to Rich Talbot-Watkins about C++ stuff and
+he sent me some example code which shows how unusual the C++ function overloading rules
+can be.
+
+Take the example code snippet:
+
+<p class="sidenote">This is a minimal form of the original code Rich had.</p>
+
+    :::cpp
+    enum MyEnum { A, B, C };
+
+    class MyClass
+    {
+    public:
+        MyClass(double) {}
+    };
+
+    bool operator == (char, MyClass)
+    {
+        return false;
+    }
+
+    int main()
+    {
+        char aChar = 0;
+        MyEnum anEnum = A;
+        return aChar == anEnum; // What happens here?
+    }
+
+
+What would you expect to happen? When compiled on Microsoft Visual Studio 2005, `main()`
+returns `true`.  The type `anEnum` is promoted to `int`, and then the enum
+value (implicitly zero as it's the first enumeration entry) compares with the zero char value.
+Nothing too surprising there, you might think.
+
+Let's see what happens on GCC:
+
+    error: ISO C++ says that these are ambiguous, even 
+           though the worst conversion for the first is
+           better than the worst conversion for the second:
+    note: candidate 1: operator==(int, int) <built-in>
+    note: candidate 2: bool operator==(char, MyClass)
+
+Ah...oh dear.  The C++ standards say that when looking for which function to call
+*all* possible conversion paths must be considered.  There are then complex and
+tricky rules as to which is the "best" choice, or even if there exists an unambiguous
+"best" choice.
+
+### More than one way to skin a cat
+
+In this case there's two ways to compare a `char` with a `MyEnum`.  The
+first is perhaps the most obvious one:
+
+<p class="sidenote">The references cited here are to sections within the C++ standard.</p>
+
+1. The first parameter gets converted:<br/>
+`char` gets converted  to `int`  ([4.5 paragraph 1][convprom].)
+2. The second parameter gets converted:<br/>
+`MyEnum` gets converted to `int` ([4.5 paragraph 2][convprom].)
+3. The built-in comparison (`operator==(int,int)`) between two integers can be used to compare the values.
+
+The second, less obvious way of comparing the two values is:
+
+1. The first parameter is left as a `char`.
+2. The second parameter is converted:<br/>
+`MyEnum` gets converted to `double` ([4.9 paragraph 2][convfpint].)<br/>
+`double` gets converted (via the constructor) to `MyClass`.
+3. The user function `operator==(char,MyClass)` can now be used to compare the values.
+
+[convprom]: http://www.zib.de/benger/C++/clause4.html#s4.5
+[convfpint]: http://www.zib.de/benger/C++/clause4.html#s4.9
+
+### Comparitively speaking
+
+Given these two choices, which is best?  This is covered in [13.3.3][overmatchbest]
+--- one of the most complex bit of standardese I've ever looked at.  This determines whether 
+one function might be better than another when choosing between them for function overloading.
+Quoting the relevant bits of the standards document here:
+
+[overmatchbest]: http://www.zib.de/benger/C++/clause13.html#s13.3.3
+
+> "Let ICS_i_(F) denote the implicit conversion sequence that converts the _i_-th
+  argument in the list to the type of the _i_-th parameter of [a function]..."
+
+> "Given these definitions, a [viable function][viable] F1 is defined to be a better function 
+  than another viable function F2 if for all arguments _i_, ICS_i_(F1) is not a [worse
+  conversion sequence][overicsrank] than ICS_i_(F2), and then...[cut for brevity]"
+
+[viable]: http://www.zib.de/benger/C++/clause13.html#s13.3.2
+
+Let's say that F1 is `operator==(int,int)` and F2 is `operator==(char,MyClass)`.  So
+by this first part of the standard, could F1 be a better choice than F2?  To find out,
+we compare the conversion sequences needed to make the actual
+types specified (`char` and `MyEnum`) fit the viable functions' expected parameters ([13.3.3.2][overicsrank]):
+
+[overicsrank]: http://www.zib.de/benger/C++/clause13.html#s13.3.3.2
+
+Parameter 1 is a `char`. F1 requires an `int`, F2 requires a `char`.<br/>
+`char`→`int` _vs_ `char`.<br/>
+The latter is an "Exact Match", and so F2 is better than F1 on the basis of this parameter.
+
+Parameter 2 is a `MyEnum`. F2 requires an `int`, F2 requires a `MyClass`<br/>
+`MyEnum`→`int` _vs_ `MyEnum`→`double`→`MyClass`.<br/>
+Both are considered to be "Conversions" but
+the latter contains a user-defined conversion (the `double`→`MyClass`) which is defined to be
+worse than the standard conversion sequence of the former.  This makes F1 better than F2 for this parameter.
+
+Given this contradiction in the parameter conversions, neither F1 nor F2 can be
+said to be better than the other, and so the call is ambiguous and the program is ill-formed.
+
+### Back to GCC
+
+So what does GCC's error message mean?  Looking at it again:
+
+    ISO C++ says that these are ambiguous, even though the
+    worst conversion for the first is better than the worst
+    conversion for the second
+
+The "worst conversion for the first" is the worst conversion for F1.  Both conversions needed to call
+F1 are considered to be of equal weighting: the `char`→`int` and `MyEnum`→`int` are both standard conversions.
+ 
+The "worst conversion for the second" is the user-defined conversion `MyEnum`→`double`→`MyClass`.
+
+Comparing these two conversions is like saying "if I _had_ to pick one, which one is the least worst?" 
+The user-defined conversion of F2 is a worse conversion than F1's
+standard conversion.  This makes F1 seem a better choice --- its worst-case choice of parameter
+conversion is better than F2's worst-case.
+
+Given this, you might imagine that choosing F1 would be the right thing
+to do --- the `operator(int,int)` that Microsoft Visual C++ picks.
+
+### In closing
+
+I'm not quite sure why the ISO committee chose to leave this case ambiguous.  Earlier
+versions of GCC don't seem to have been quite so pernickity: it would appear that this
+strict behaviour was only implemented in GCC 3.3 and above.
+
+Getting back to the original problem, in this case (and indeed in Rich's original case) 
+solving the problem is quite easy.  By making the `double` constructor in `MyClass` an `explicit`
+one, you prevent it from being used as during implicit conversion.  This leaves
+only one way to compare the `char` and `MyEnum`, which is using the built-in `operator==(int,int)`.

@@ -1,0 +1,47 @@
+List comprensions in Perl using map {}
+Date: 2007-11-12 14:47
+Status: Public
+Label: Coding
+Summary: A quick comparison of list processing in Perl and Python
+
+In an [earlier post][listpyt] I waxed lyrical about list comprehensions in Python.  As a conterpoint,
+[Justin Fletcher][gerph] mailed me and gave me a version of most my examples using Perl.  I've used
+Perl very little, but never really got on with it, so it was interesting to see how the two compared.
+
+[listpyt]: http://xania.org/200711/list-comprehension "Previously on this blog..."
+[gerph]: http://gerph.org/ "Justin Fletcher's website and diary"
+
+Justin says:
+
+    :::perl
+    # 'for item in list' syntax
+    @list = (1,4,9,16,25);
+    foreach $i (@list)
+        print "$i\n";
+
+    # arbitrary transformations
+    for $i (map { $_ * $_ } (1..5))
+        print "$i\n";
+
+    # Parse key=value file.
+    open(IN, "< file");
+    %params = map { /^(.*?)=(.*)\n$/; ($1, $2) } <IN>;
+    close(IN);
+
+He also gives an example of the reverse of the key=value example:
+
+    :::perl
+    open(OUT, "> file") || die;
+    print OUT map { "$_=$params{$_}\n" } keys %params;
+    close(OUT);
+
+The Python equivalent I'd write would be:
+
+    :::python
+    out = open('file', 'w')
+    out.write("\n".join(["%s=%s" % item for item \
+                         in params.items()])
+    out.close()
+
+Which I think is pretty similar.  As Justin says, "I like comparing how you do things in different languages. It gives you a 
+feel for strengths and weaknesses."

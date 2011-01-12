@@ -1,0 +1,24 @@
+Debian update and PHP issue
+Date: 2006-10-13 13:22:28
+Label: Blog
+
+A quick note to anyone upgrading their Debian installation on the bleeding edge
+'unstable'.  The default Debian update doesn't install the majority of the
+modules needed now in apache 2.2 the whole configuration has been made modular.
+
+So, if you have this error:
+
+    Invalid command 'AddType', perhaps misspelled or defined by a module not
+    included in the server configuration
+
+then you're missing the 'MIME' module. Do a:
+
+    a2enmod mime
+
+and all should be well --- unless you use other bits and bobs too, in which
+case you'll see more 'perhaps misspelled' errors.  For each one, look up the
+Directive on the <a
+href="http://httpd.apache.org/docs/2.2/mod/directives.html">apache website</a>,
+you'll see the 'module name' in there --- make sure you `a2enmod` each one and
+retry apache.  Keep going until it's all working and voila --- your apache will
+be up and running again in no time.

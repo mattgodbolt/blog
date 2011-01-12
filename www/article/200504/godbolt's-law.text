@@ -1,0 +1,39 @@
+Godbolt's Law
+Date: 2005-04-04 22:33:56
+Label: Coding
+
+I've been spending a lot of time over the last few days making my code run
+faster.  This is a fairly common pastime of mine, I've always enjoyed <a
+href="http://en.wikipedia.org/wiki/Optimization_%28computer_science%29">optimising</a>
+code, and sometimes the speedups you can get from innocuous changes are frankly
+amazing.  However, in my long experience of this kind of activity, I've noticed
+a pretty consistent law, which as far as I can tell nobody else has caught on
+to.  So, flame-retardant suit fully adorned, I claim my own law --- Godbolt's
+Law:
+
+
+---
+  **Godbolt's Law** --- if any single optimisation makes a routine run two or
+more times faster, then you've broken the code.
+
+
+---
+  A staggeringly potent law, I'm sure you'll agree, borne out over many long
+times where I've been carefully noting down execution times, then discovered
+that I've sped things up by a factor of three!  'Hurrah', think I, and proceed
+to dance around the room, to the amusement of my colleagues (many of whom have
+probably cottoned on to this Law already).    Excitedly I begin writing the
+check-in notes for this fantastic speed up, and then, just before I commit the
+change, I remember to actually check the results --- and yes, you've sussed it,
+the reason it's going three times faster is because I've broken it and now it's
+not actually doing *any* work at all.  Arse!
+
+In fact, oftentimes I've actually checked in code like this, so excited have I
+been about the speedup.  Premature optimisation may be the root of all evil, but
+premature checkins are the root of the root of all evil.
+
+Maybe there's some kind of way an automatic metric can be used to check this; an
+automatic build system perhaps can do performance analysis and alert management
+if suddenly things are blazing along --- either someone's done something so
+amazing they should be rewarded...or else Godbolt's Law is at work and the
+gremlins are now running amok in the source code!

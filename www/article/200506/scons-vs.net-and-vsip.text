@@ -1,0 +1,45 @@
+SCons, VS.NET and VSIP
+Date: 2005-06-28 20:55:00
+Label: Coding
+
+I've just upgraded to the latest version of <a
+href="http://www.scons.org/">SCons</a>, and in doing so I noticed my little
+patch to get it working with <a
+href="http://msdn.microsoft.com/vstudio/extend/">VSIP</a> needed reinstalling.
+This blog entry describes the problem and the little patch you need to make to
+fix it.
+
+SCons is very low-maintainance to install --- it automatically scours the
+registry for all the paths and information it needs to invoke the Visual Studio
+Compiler and all the other tools.  However, when you install the VSIP package,
+the registry scanning code throws a benny.
+
+VSIP installs an 'Experimental' (Exp) configuration of VS.NET --- so you can
+test out all your VS.NET plugins without actually breaking your own development
+environment!  By running the IDE with the '/RootSuffix Exp' switch, the IDE will
+load up from this alternative configuration.
+
+The issue is that this duplicates a bunch of registry keys, giving them a 'Exp'
+suffix.  The registry keys in question are linked to the version number of
+VS.NET you're using, HKLM/Software/Microsoft/Visual/Studio/*keyname* --- and
+SCons uses this to enumerate and find all the versions of VS.NET you have
+installed.  When it finds keys like '7.1Exp' in there, it goes belly up trying
+to make a floating point number out of it!
+
+My somewhat cheesey solution is to just ignore any keys where the number isn't a
+valid float.  A proper solution should probably take these into account --- but
+realistically the normal settings should be ok to build with all the time, not
+the crazy Exp settings your plugin development requires!
+
+To fix the issue, load up SConsToolmsvs.py and patch the
+get\_visualstudio\_versions function after the `if not p[0] in '123456789'
+or p in L: continue`
+
+    # Try converting 'p' to a floating point number.  Experimental
+    # versions of VS are named '7.0Exp' and '7.1Exp' etc.
+    # These don't fall into the numeric patterns the rest of the
+    # logic expects, so if we can't make a number from it, ignore it.
+    try:
+        float(p)
+    except ValueError:
+        continue

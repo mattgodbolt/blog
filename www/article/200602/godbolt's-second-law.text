@@ -1,0 +1,41 @@
+Godbolt's Second Law
+Date: 2006-02-06 21:16:00
+Label: Coding
+
+Hot on the heels of <a name="Godbolt's First Law of Programming"
+href="/200504/godbolt's-law">Godbolt's first law</a> comes (fanfare please!)
+**Godbolt's Second Law**!
+
+
+---
+
+
+**Godbolt's Second Law** --- If a piece of code compiles, links, runs and
+appears to work first time, then it is almost certainly flawed in some subtle
+and hard-to-find way!
+
+
+---
+
+
+Yet another amazing revelation, don't you think?   On a more serious note I
+honestly have found this to be true.  Writing code is a really tricky thing to
+do.  Even for the most trivial piece of code, one can't help but make errors.
+Usually these errors are caught by the compiler --- if they're simple typos ---
+or the linker --- if you've forgotten to include the right libraries --- or by
+an obvious crash at runtime for almost everything else.
+
+But when it all works the first time, then alarm bells should start ringing!
+"*It really can't be that easy, surely?"* you should be asking yourself!
+Whenever this has happened to me, I've almost certainly missed out some
+amazingly important boundary condition case.
+
+Usually it's some <a href="http://en.wikipedia.org/wiki/Memory_Leak">memory
+leak</a>, or a <a href="http://en.wikipedia.org/wiki/Race_hazard">threading
+issue</a>.  Something that clearly wasn't taken into account at all when bashing
+out the original code.  If I *had* taken these more difficult programming issues
+into account, then no doubt I'd've made some typos or else some completely daft
+errors.  So therein lies the heart of my second law.
+
+Does anyone else out there have any pet theories on this?  Or indeed am I alone
+in being highly suspicious of code that appears to work first time?

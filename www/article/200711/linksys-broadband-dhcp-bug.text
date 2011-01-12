@@ -1,0 +1,67 @@
+Linksys Broadband Router DHCP bug
+Status: Public
+Label: Blog
+Date: 2007-11-10 13:22:00
+Summary: In which I discover a fun bug in Linksys's DHCP implementation.
+
+After a bit of a  debugging session at home using [Wireshark][], 
+my interest in networking matters has been piqued again.   I couldn't get a decent
+connection to [PKR][] and was trying to work out why --- still no idea on that front.
+But it got me thinking that I really ought to find out more about how networks actually work.
+
+[Wireshark]: http://www.wireshark.org/ "An open source network protocol analyser"
+[PKR]: http://www.pkr.com/ "The best online poker site (cos I helped write it!)"
+
+So, just to learn a bit about such things, I installed [arpwatch][] to keep tabs on what devices
+are plugged into the office network.  I now get emails every time a new device is
+plugged in, or when a device changes IP.  Handy from a security standpoint --- I'll know
+if somebody hacks our wireless network, for example --- and just interesting to see what
+goes on at the lower levels of the network.
+
+[arpwatch]: http://en.wikipedia.org/wiki/Arpwatch "Keeps track of IP/MAC assignment pairings"
+
+Yesterday we had a couple of short power cuts.  After the power came back on, I was getting lots of "flip flop"
+warnings from arpwatch, which seems to be its way of saying two devices with different MAC addresses
+have registered the same IP address.
+
+Looking into it further, each time it was our the [VOIP boxes][linksys] we were given by our provider, [Vonage][].
+They're actually Linksys routers, but we only use them as adapters to plug a normal telephone into.  After
+a bit of investigation it would
+appear there's a bit of a stonking bug in the firmware: if I turn both boxes off, then turn them back on at
+the same time, they seem to pick up the same IP address!
+
+[Vonage]: http://www.vonage.co.uk/ "Fairly good VOIP phone provider"
+[linksys]: http://www.linksys.com/servlet/Satellite?c=L_CASupport_C2&childpagename=US%2FLayout&cid=1166859882761&pagename=Linksys%2FCommon%2FVisitorWrapper&lid=8276182761N09 "Buggy firmware"
+
+Box 1's [DHCP][] log looks like:
+
+<p class="sidenote">NB: the MAC and IP addresses used here are illustrative only.</p>
+
+[DHCP]: http://en.wikipedia.org/wiki/Dhcp "Dynamic Host Configuration Protocol"
+
+    DHCPDISCOVER from 00:13:10:4a:00:01 via eth0
+    DHCPOFFER on 10.10.10.59 to 00:13:10:4a:00:01 via eth0
+    DHCPREQUEST for 10.10.10.59 (10.10.10.200)
+        from 00:13:10:4a:00:01 via eth0
+    DHCPACK on 10.10.10.59 to 00:13:10:4a:00:01 via eth0
+
+Fairly standard stuff - it's asked for an IP, and got 10.10.10.59.
+
+Box 2's log is:
+
+    DHCPDISCOVER from 00:13:10:4a:00:02 via eth0
+    DHCPOFFER on 10.10.10.58 to 00:13:10:4a:00:02 via eth0
+    DHCPREQUEST for 10.10.10.59 (10.10.10.200)
+        from 00:13:10:4a:00:02 via eth0: 
+        lease 10.10.10.59 unavailable.
+    DHCPNAK on 10.10.10.59 to 00:13:10:4a:00:02 via eth0
+
+So box 2 asks for an address; gets 10.10.10.58, but ignores it and requests 10.10.10.59 *instead*\!  The DHCP server
+denies it with a `DHCPNAK` but the router carries on anyway.  From an ARP packet dump:
+
+    Cisco-Li_4a:00:02 ARP 10.10.10.59 is at 00:13:10:4a:00:02
+    Cisco-Li_4a:00:01 ARP 10.10.10.59 is at 00:13:10:4a:00:01
+
+Oh dear; they're both telling my network they're on the same IP.  I'm going to configure
+them both with static IPs --- it's the only way to ensure on the next power cut they don't
+do the same and leave us without working phones.

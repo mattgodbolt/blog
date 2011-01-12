@@ -1,0 +1,60 @@
+A new fan
+Date: 2006-10-11 13:50:20
+Label: Blog
+
+<img src="http://xania.org/media/zalman-wee.jpg" alt="" align="right" />I've
+always been a sucker for <a href="http://xania.org/article.php/vgafan">quiet
+fans</a>.  For my current PC I have a <a
+href="http://www.silentpcreview.com/article593-page1.html">fanless VGA card</a>,
+quiet power supply and an <a href="http://www.antec.com/uk/">Antec</a> quiet
+case.  Even with my two <a href="http://en.wikipedia.org/wiki/RAID">RAID</a>ed
+<a href="http://www.wdc.com/en/products/Products.asp?DriveID=65">Raptors</a>,
+the noise is hardly noticeable.  Well, that was until mid-last week, when
+suddenly my PC started making an ominously loud noise, akin to the turbine hall
+of a nuclear reactor.
+
+After taking the side off my case and having a listen, I deduced the standard-
+issue AMD CPU cooler was the culprit.  As I've had excellent experiences before
+with <a href="http://www.zalman.co.kr/">Zalman</a> coolers, I decided to replace
+the ailing bog-standard AMD cooler with a <a href="http://www.quietpc.com/gb-en-gbp/products/amdcooling/cnps9500-am2">Zalman quiet fan</a> from <a
+href="http://www.quietpc.com/">Quiet PC</a>.
+
+A few days after making the order the package arrived (it's so handy working
+from home when you order stuff online!)  Installation was pretty easy, as
+expected --- the hardest bit was just working out which way around to put
+everything.  After carefully checking I'd plugged everything back in where it
+should be I powered on.  Hurrah --- the fan span up, the CPU started up and all
+was well....nearly.
+
+<div align="center"><a
+href="http://picasaweb.google.com/matt.godbolt/ZalmanCPUCooler"><img
+src="http://xania.org/media/zalman1.jpg" alt="The old and new fans, side by
+side" /></a><a
+href="http://picasaweb.google.com/matt.godbolt/ZalmanCPUCooler"><img
+src="http://xania.org/media/zalman2.jpg" alt="The fully installed fan" /></a>
+
+</div>
+
+As quiet and wonderful as the Zalman cooler was...the appalling noise remained!
+I'd completely overlooked the chipset fan when identifying the source of the
+noise --- the real culprit was the cheap-and-nasty fan that cools the chipset!
+I was annoyed, but not ready to give up that easily.  I unscrewed the fan and
+took it to pieces very carefully.   After cleaning the inside bits, and applying
+liberal amounts of WD40, I reasssembled it, and then span it up to full speed in
+both directions using my Dyson vacuum cleaner to suck air across it from either
+side.  This loosened and cleared out the gunk, and when placed back on the
+motherboard the noise had gone --- yay!
+
+All in all, I'm still pleased with my new cooler, despite it not really being
+needed.  The LED lights on it are pretty cool, though they contribute
+signifantly to the light pollution in my room at night --- what with the blue
+LEDs on the motherboard, RAM chip lights and front light on the case!  This
+isn't such a problem any more since I've started actually turning the PC off at
+night.  On a related note while I'm away in New Zealand I'm planning on leaving
+it off, but using Wake on LAN to power it up remotely when I need to access it
+--- I got that working earlier in the week and it's pretty damn cool!  The
+laptop can now wake up the main PC from anywhere in the world!
+
+More pics on my <a
+href="http://picasaweb.google.com/matt.godbolt/ZalmanCPUCooler">Picasa Web
+Album</a>.

@@ -1,0 +1,71 @@
+The beginning of the end for Windows XP
+Date: 2008-06-01 23:00:00
+Status: Public
+Label: Blog
+Summary: I've finally had enough of Windows and have moved to Ubuntu Linux.
+
+On Friday last week I finally had the last straw with Windows.  Under duress
+I had installed Service Pack 3 on my main PC to try and fix an issue I was having.
+It not only didn't help the issue, but it meant my Remote Desktop stopped
+working.  I spent quite some time trying to fathom what had gone wrong, but
+to no avail.
+
+Later that day I awoke my laptop from standby and was informed
+that I had to reboot to install some critical updates.  The dialog box gave
+me two options: "Reboot Now" or "Reboot Later".  Unfortunately, for reasons
+I don't quite understand, the "Reboot Later" option was greyed out.
+
+Now I don't know about you, but at the point where a computer decides
+it knows best about whether to suddenly shut down all your open applications
+and reboot, it's time to find a new operating system.  I don't think I'm
+alone in this, it seems pretty fashionable to bash Microsoft at the moment,
+what with the cockup of the Vista launch.
+
+For some time I've been humming and harring about installing
+[Ubuntu GNU/Linux][ubuntu].  It's been around for ages, I know, and has been
+pretty well received by everyone.  My existing Linux boxes (relegated to the 
+loft) have always run [Debian][deb] --- and I've been very happy with their
+distribution ---
+but I thought I'd see what all the buzz was about and install a more
+contemporary system.
+[ubuntu]: http://www.ubuntu.com "Ooh, bunt who?"
+[deb]: http://www.debian.org "Previous favourite"
+
+Although I had ensured my [BackupPC][bpc] backups of all my data were up to 
+date, just to be paranoid I also took a [VMWare][] snapshot of my XP machine before I hosed it completely.  That took a few hours, as I was storing the data on my relatively slow file server.  It was a surreal experience to power it down,
+and then as a test bring up a virtual equivalent on my laptop.  I wouldn't
+recommend running a virtual OS's disks over Samba on a wireless network 
+though --- it took about 15 minutes to boot, and about the same to shut down,
+all I/O bound.
+
+[bpc]: http://backuppc.sourceforge.net "Splendid backup solution"
+[vmware]: http://www.vmware.com "Virtualise your PC.  Then kill it"
+
+Safely backed up, I burnt the Ubuntu installer to CD and rebooted.  First problem: my RAID setup.
+
+When I built my home computer I was sure that the majority of the time
+spent compiling was actually waiting for I/O.  To try and speed up my builds
+I splashed out on a couple of 10,000 RPM Raptor disks, and set them up in
+RAID 0 using the NVidia RAID BIOS.  I'm not entirely convinced it was worth it, although I did get some pretty benchmark graphs.
+
+The RAID turned out to be a right sticking point --- it's not supported by the
+Ubuntu installer.  A bit of trawling around turned up [this article][art],
+which was a great help, though a little out of date.  I wish I had written
+down what I _actually_ ended up doing to get everything working as I'm sure
+it would make this post a lot more useful, but it was about 3:30am that
+everything fell together and I wasn't at my most lucid.  The one thing I
+remember is that the installer let me mistakenly mark my `/boot` partition as
+being `swap`, which didn't stop it formatting it as `ext3` and installing
+everything fine, but **did** stop `grub` from installing with the very
+unhelpful error message `Grub Error 15 - Partition Table Invalid`.  So, if
+you see that during grub installation, check your partitions are marked
+as the correct type.
+
+[art]: http://ubuntuforums.org/showthread.php?t=464758 "handy for RAID installation"
+
+Anyway, cutting a long story short, I now have a very shiny Ubuntu installation.
+I'm very pleased with it so far, all the whizz-bang windowing effects aren't
+annoying me (yet), and the programs installed by default seem very good.  Bear in
+mind that although I've been using and hacking about with Linux for over ten years, this is the first time I've actually used it in a windowed environment.  My idea of a Linux box is still something you see at the end of a PuTTY terminal, so I've got a lot to learn.
+
+For now, I'm keeping the laptop on Windows, but the long-term plan is to move that over to Linux too, once I've checked Ness can still VPN into her work with it.

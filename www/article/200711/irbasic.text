@@ -1,0 +1,89 @@
+IRBasic - object-oriented BASIC
+Date: 2007-11-19 23:35
+Label: Coding
+Status: Public
+Summary: An object-oriented BBC BASIC.
+
+You've probably noticed a trend in the [last][bbc1] [few][bbc2] [articles][bbc3].  I've actually stopped waxing
+lyrical about Python, and instead I've been going on about the innards of BBC BASIC V.
+I promised that I'd talk a bit about the old programs I had discovered and decoded using the
+[BBC BASIC detokeniser][detok].
+
+[bbc1]: http://xania.org/200711/bbc-basic-v-format "BBC BASIC part 1"
+[bbc2]: http://xania.org/200711/bbc-basic-line-number-format "BBC BASIC part 2"
+[bbc3]: http://xania.org/200711/bbc-basic-line-number-format-part-2 "BBC BASIC part 3,123,444.  Ok, I lied, part 3"
+[detok]: http://xania.org/200711/BBCBasicToText.py "A python BBC BASIC to text converter"
+
+To be honest, the only program I was interested in looking at was [IRClient][] --- an [IRC][] client
+I had written for the Archimedes while at University.  IRClient was a shareware program which
+kept me in beers during my days at [Exeter Uni][almamater].  Like many IRC clients, IRClient was fully
+scriptable.  Back in those days I was far too big-headed to consider using someone else's
+scripting language; so I devised my own --- IRBasic.
+
+[IRC]: http://en.wikipedia.org/wiki/Internet_Relay_Chat "It's Really Cool"
+[IRClient]: http://web.archive.org/web/20030618153052/http://www.willothewisp.demon.co.uk/IRClient/ "Pronounced 'eye arr client' not 'irk-lee-ent'"
+[almamater]: http://www.ex.ac.uk/ "Exeter Uni.  Never build a physics department at the top of a bloody great hill"
+
+The clue's in the name, isn't it?  IRBasic was predominantly BBC BASIC V, but with a few rather
+interesting extras.  While I was supposed to be studying Physics, a lot of my friends were doing
+Computer Science, and were learning languages like Java and Javascript --- which rather influenced
+the design of IRBasic.  Conversations with Malcolm in particular shaped the language into a
+dynamically-typed, overloadable, garbage-collected, object-oriented version of BBC BASIC.
+
+<p class="sidenote">Incidentally, this error message apparently occurs if you tried to use the <code>.</code> operator
+on a non-numeric value.  Something like:<br/><code>PROC"hi".foo</code></p>
+
+I've just been looking through some of the source code, and two things strike me.  One, that the
+interpreter is an absolute mess and it's impossible to imagine how I wrote it --- pure ARM assembler
+all the way through; stupendous label names (e.g. `OhShiteNoNoNoNono`, `WombleLoopJedi2`, `MMFOOMBO2`)
+and hard-to-fathom error messages ("[Worm tablets at line 6780][worm]") to name but a few.
+
+[worm]: http://gerph.org/misc/taglines.html "Gerph's taglines, a google of which set me on this crazy quest in the first place"
+
+Secondly, the language itself was actually pretty good.  Good enough anyway for someone to notice
+it tucked away unannounced in a "Scripts" directory and then set about writing their own IRClient
+extensions.  That somebody was the rather talented [Justin Fletcher][gerph] (aka Gerph) --- a great friendship sprung
+up between us over that.  Justin was able to write an integrated web browser, FTP client and email reader
+amongst other things --- hats off to his reverse engineering skills!  Interestingly, this makes IRClient
+an example of [Zawinski's Law of Software Envelopment][zaw] --- _"Every program attempts to expand until it can read mail. Those programs which cannot so expand are replaced by ones which can."_
+
+[zaw]: http://static.userland.com/userLandDiscussArchive/msg018352.html "Cheers for the link Malc"
+
+[gerph]: http://www.gerph.org/ "Justin Fletcher, genius"
+
+So, for a quick taster of IRBasic, let's define a class.  Classes are semi-dynamic inasmuch as they're
+defined dynamically, and can be modified so long as there's no active instance of a class.
+
+<p class="sidenote">I hope Justin won't mind me using his BTree class as an example here.</p>
+
+    Class_BTree = FNRegisterClass("BTree")
+    PROCAddField(Class_BTree,"data")
+    PROCAddField(Class_BTree,"less")
+    PROCAddField(Class_BTree,"more")
+    PROCAddField(Class_BTree,"compare")
+
+As you can see, classes are defined using functions and procedure calls.  The Class_BTree is then
+a "handle" to the metadata of a class, and an instance can be created and used via code like:
+
+    tree = NEW Class_BTree
+    PROCtree.Add("test")
+
+Method calls are specially named procedures.  For a class `XX`, a method call of `YY` on an instance
+of `XX` is equivalent to calling `XX_YY` --- with the exception that within `XX_YY` there's a magic "this"
+pointer `@`.  There's also a constructor `XX_Construct` and destrutor `XX_Destroy`, for example:
+
+    DEF PROCBTree_Construct
+    @.compare = FNnewString("BTree_CompareNumbers")
+    ENDPROC
+
+As mentioned above, IRBasic is garbage collected; so there's no need to explicitly free any object.  In fact,
+IRBasic reference counts every object and then also has a mark/sweep garbage collector to free circular
+dependencies.
+
+Functions can be overloaded too.  If a function with the same name as another is defined, the most recently-defined
+function will be called.  However, that function may call its "parent" function, with a call to `PROC@`.  IRClient
+used this facility extensively to allow user-defined overloads on core functionality.
+
+Overall, I was pretty impressed with how sophisticated IRBasic was.  However, I do remember one bad thing about it ---
+it was incredibly slow, about 4--5 times slower than vanilla BBC BASIC.  Nevertheless, it was a fun project, and it
+was really quite interesting to take a look at my ten-year-old code again!

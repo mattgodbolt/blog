@@ -1,0 +1,21 @@
+Land of spare disk space
+Date: 2004-03-16 09:48:06
+Label: Blog
+
+Never take anything for granted...
+
+Well, today I was investigating xania.org's dodgy disk.  So I ran fdisk and
+checked out the partition table on both drives (hda is the main / and /usr
+drive, hdb is the 'home' disk).
+I had completely and utterly forgotten my machine's past --- it used to be a
+work machine, and while perusing both drives I discovered no less than 6 other
+partitions, including a full windows installation still there!
+hda is a 10Gb drive and I'm currently only using 1.6Gb of it... hdb is a 3Gb
+disk and I'm using 2Gb of it --- there's another 1Gb ext-2 formatted, blank
+partition on it!
+Mad, I feel such a wally.  I'm going to back up the relevant data on the windows
+drives and then I might try and move everything onto hda, and use ext3 or
+something l33t.  Then I can use hdb as a pure backup device or similar.
+I still haven't worked out the SMART imminent failure thing though --- I guess
+I'm still hoping that'll 'go away' magically.  So far on 2.6.4 no maddening
+kernel messages about things going breast-up though at least!

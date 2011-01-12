@@ -1,0 +1,39 @@
+Launching a debugger automatically
+Date: 2008-02-19 13:32
+Label: Coding
+Status: Public
+Summary: Automatically launching the debugger for a particular executable.
+
+I'm spending a fair amount of time [debugging][prev] at the moment.
+The particular application I'm looking at is a suite of related server processes which
+spawn each other and are very multithreaded.  
+
+[prev]: http://xania.org/200802/things-I-didn't-know-about-visual-studio's-debugger "more debugging things"
+
+I've been looking for was a way of 
+getting my debugger "in" right at the start of the one of the servers, even when it was
+launched by another server process.  Ideally, I'd just put a `DebugBreak()` somewhere at the beginning of the server, and use JIT
+debugging to attach at that point.
+
+Unfortunately, for some reason that wasn't working; by the
+time the debugger had attached, the call stack was out in the uncaught exception handling code.
+Not very useful.
+
+After some searching around, I found something in Windows I'd never heard of before, which I
+thought might be the perfect thing.  Apparently, with the right registry keys, you can make
+Windows automatically debug a given executable.  The details are on [MSDN][launch].
+
+[launch]: http://msdn2.microsoft.com/en-us/library/a329t4ed(VS.71).aspx "launching the debugger automatically"
+
+This seemed like a perfect solution.  Whenever the server is run, the debugger is launched
+with the parameters to debug the executable.  However, a fresh new IDE is started every time,
+and the process isn't started automatically.
+
+By the time I've started the process myself --- annoyingly forcing a save of the solution file, with all
+the attendant dialogs that requires --- the server which spawned the process has timed it out and started another copy.
+That timeout, coupled with the plethora of new IDEs popping up everywhere made this approach unusable.
+
+In the end I rolled my own solution, querying the [relevant registry key][regkey]
+myself, launching the JIT debugger in code and then awaiting its attachment using `IsDebuggerPresent()`.
+
+[regkey]: http://support.microsoft.com/kb/103861 "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AeDebug\Debugger"

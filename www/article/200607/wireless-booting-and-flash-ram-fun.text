@@ -1,0 +1,134 @@
+Wireless booting and flash RAM fun
+Date: 2006-07-07 10:18:00
+Label: WeeBox Project
+
+After my uncharacteristically non-verbose entry yesterday (<a
+href="/200607/display">Display!</a>), I'm going to post a little more content
+today.  Yesterday I got the LCD display working with my little Python program
+prototyped on the PC earlier in the week, which got me rather overexcited.  The
+first thing I noticed was that the sound was stuttering playing OGG files ...
+maybe the Python idea was a bit pie-in-the sky.  Luckily changing an internal
+polling interval to be a quarter of a second instead of a tenth fixed that;
+though I'm now rather doubting that Python is the best idea.
+
+One of the other arguments against Python is the fact it's not easy for it to
+talk directly to hardware.  In order to program the LCD display I need to poke
+directly into physical RAM.  Currently I'm doing this in a server process that
+I've knocked up in C by modifying Embedded ARM's sample code.  The server
+listens on port 4000 and with fairly minimal logic sends any incoming data on
+that port to the LCD device.  This has worked well enough to get the Python
+process running; and has the nice side effect of meaning I can write a simple
+LCD emulator Windows program (again, in Python) and develop on the PC first.
+The music player library I'm using --- MPD --- supports generic control over
+TCP/IP; so I can pretty much prototype the whole thing on Windows with the sound
+coming out of the Weebox using this method.
+
+Although this is working OK for now, in the future I'll want to be able to put
+various other status messages on the LCD display (e.g. during boot) .  A quick
+skirt around the internet finds <a href="http://lcd-mod.sourceforge.net/index.php">lcdmod</a>, a kernel module to control a
+HD44780-compatible device connected to a PC's parallel port.  This creates a
+/dev/lcd device which is then easily accessible from shell scripts etc via
+simple 'echo "Message" &gt; /dev/lcd' commands.  Of course, my LCD display isn't
+attached to the parallel port, nor indeed does the Weebox *have* a parallel
+port!  One idea I'm toying with is modifying the code to work using the memory-
+mapped hardware registers, it shouldn't be too difficult to get working, and
+could be a good way to reintroduce myself to kernel-space, being my first kernel
+modifications since about <a
+href="http://kernel22.sourcesdb.com/r.php?num=1177">1996</a>!
+
+As well as playing with the LCD controller, I also managed to get the wireless
+driver working.  Embedded ARM supply their own 'zd.o' kernel module, but that's
+built for an older kernel, and so moans about invalid kernel versions when I
+insert it.  That kind of thing annoys me, so I wanted to build my own from
+scratch.  This turned out to be fairly straightforward --- I grabbed the <a
+href="http://zd1211.ath.cx/download/">source</a> from the home page and modified
+the Makefile to build for 2.4.* kernels (it defaults to 2.6.*).  All built
+nicely, but there was an unresolved kernel symbol:
+
+
+    zd1211.o: zd1211.o: unresolved symbol do_div64
+
+A bit of hunting around on the Internet and I discovered that do\_div64 is
+implemented in the kernel library only, which doesn't seem to get linked in.  My
+somewhat cheesey solution was to copy the div64.S file from
+linux/arch/arm/lib/div64.S into the driver's folder, and then patch the Makefile
+to build and link with that file too.  (I've made a <a
+href="http://xania.org/media/zd1211-arm.patch">patch</a> for this, which can be
+installed with patch -p1 &lt; path\_to\_patch\_file from within an unpacked
+driver folder.  You'll still need to edit the Makefile to edit for your kernel
+version and location as appropriate.)
+
+With a working wireless connection, I wanted to test the unit booting up without
+its RJ45 umbilical cord.  With this in mind I wanted to get the Weebox files and
+configuration setup I'd been experimenting with over NFS copied to the flash
+drive on the unit.  My first thoughts were to mount the MTD linux device and
+copy the files across.  So I duly typed 'mount /dev/mtdblock/1 /mnt' and
+expected to be able to modify things in /mnt appropriately.  But...problem!  The
+mount command just hung!
+
+Traipsing through the output of dmesg, I spotted:
+
+
+    Using static partition definition
+    Creating 3 MTD partitions on "NAND 128MiB 3,3V 8-bit":
+    0x00000000-0x00004000 : "TS-BOOTROM"
+    mtd: partition "TS-BOOTROM" doesn't end on an erase block -- force read-only
+    0x00004000-0x07d04000 : "Linux"
+    mtd: partition "Linux" doesn't start on an erase block boundary -- force
+read-only
+    0x07d04000-0x08000000 : "RedBoot"
+    mtd: partition "RedBoot" doesn't start on an erase block boundary -- force
+read-only
+
+...oh dear!  Have I corrupted my flash RAM somehow?  I began to panic, wondering
+quite what I had done.
+
+Well, luckily I hadn't blown up my expensive device; I had missed a footnote in
+the instructions: The TS7250 boards with 128MB NAND flash RAM use the <a
+href="http://en.wikipedia.org/wiki/YAFFS#YAFFS2">YAFFS2</a> file system instead
+of the YAFFS file system.  Unbeknownst to me, YAFFS *thinks* it can read YAFFS2
+partitions, but really can't --- giving the cryptic results I was experiencing.
+When I originally configured the kernel, I used the 7250 configuration.  Upon
+later investigation I realise there's a 7250-2k configuration too --- this is
+the one I should have used.  The '2k' refers to the physical page size of the
+flash RAM device --- the larger flash uses this larger size compared to 512
+bytes on smaller devices.  It's important to use YAFFS2 on such a system to
+prevent too much page wastage, and to improve performance.
+
+At this point I needed to get a new kernel built, with the right version of the
+flash file system installed.  This time round, bored of my overnight builds, I
+decided to try out the cross-compiler.  NFS mounting the Weebox's root partition
+from within a Scratchbox session, I was able to compile the kernel in-place, but
+on my faster 733Mhz x86 linux box.  Once all built, I ran 'make
+modules\_install' on the Weebox itself to get the relevant kernel modules
+installed in the right place.
+
+Things to note about building YAFFS and YAFFS2: You can't have both of them
+installed!  YAFFS2 is backwards-compatible, so it's an either-or situation with
+them, which I learned the hard way.  If you get duplicate symbols in the final
+link, make sure you've only got one or the other selected.  Also to note, if you
+decide to compile either YAFFS into the kernel directly (instead of as a module)
+then you **must** compile MTD support directly into the kernel too.  I had
+initially had MTD support as a module, and YAFFS2 as built-in --- you get
+unresolved symbols for get\_mtd\_device.  Just compile them both in directly.
+
+With an appropriately-built kernel I was then ready to mount the flash RAM image
+and populate it with all the libraries, executables and configuration files for
+ALSA, the USB soundcard, wireless drivers, and MPD.  At about 7pm last night I
+was able to boot wirelessly into the weebox and play tunes over the wireless
+network --- hooray!  I was very pleased with myself, and when Ness came in I
+couldn't help frothing about it all.  Bless her, she thinks I'm nuts.
+
+One thing booting up like this told me was that I really need to solve the input
+issue.  It's all very well having a music playing box, but it's not exactly
+user-friendly to have to ssh into it to change tracks!  With this in mind this
+morning I've ordered some bits from <a href="http://rswww.com/">RS
+Electronics</a> which will hopefully allow me to detect and decode my remote
+control handset's signals.  This will mean a bit more kernel fiddling --- in
+order to read the IR detector pulses I need to be able to plug it into an
+interrupt handler.  Luckily, it would seem someone else using the 7200-series
+board has the same ideas, and the replies to his questions on the <a
+href="http://groups.yahoo.com/group/ts-7000/message/1725">7200 mailing list</a>
+were extremely useful.  One more kernel driver to write though!
+
+Phew, what a long post.  And no pictures to break it up either!

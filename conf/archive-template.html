@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-GB">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="/style/site" type="text/css" media="all">
+
+[%- if label -%]
+  <title>[%= label.name %] Archive &#8212; Matt Godbolt&#8217;s blog</title>
+  <link rel="alternate" type="application/atom+xml"
+        title="Atom (full content), [%= label.name %] only" href="/feed/[%= label.filename %]">
+[%- else -%]
+  <title>Archive &#8212; Matt Godbolt&#8217;s blog</title>
+[%- end -%]
+  <link rel="alternate" type="application/atom+xml"
+        title="Atom (full content)" href="/feed">
+  <link rev="made" title="Matt Godbolt" href="mailto:themoog@xania.org">
+[%- include "common-headers.html" -%]
+</head>
+<body class="archive">
+[%- include "title.html" -%]
+
+<div id="floatholder">
+<div id="content">
+<h2>Archive</h2>
+[%- for article in articles -%]
+[%- if article.dateMonthPrev != article.dateMonth -%]
+[%- if article.dateMonthPrev != "" -%]
+</dl>
+</div>
+[%- end -%]
+<div class="month">
+<h3>[%= article.dateMonth %]</h3>
+<dl>
+[%- end -%]
+<dt><a href="[%= article.permalink %]">[%= article.title %]</a></dt>
+[%- if article.summary != "" -%]
+<dd>[%= article.summary %]</dd>
+[%- end -%]
+[%- end -%]
+</dl>
+</div>
+</div>
+<div id="sidebar">
+[%- include "sidebar.html" -%]
+</div>
+</div>
+
+[%- include "trailer.html" -%]
+</body>
+</html>

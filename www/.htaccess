@@ -1,0 +1,9 @@
+AddType image/vnd.microsoft.icon .ico
+AddType application/atom+xml .atom
+Options MultiViews
+
+ExpiresActive On
+ExpiresDefault "access plus 4 hours"
+ExpiresByType image/jpeg "access plus 1 week"
+ExpiresByType image/png "access plus 1 week"
+ExpiresByType text/css "access plus 1 week"

@@ -1,0 +1,32 @@
+Compiling MPPE support into debian
+Date: 2005-01-11 16:22:00
+Label: Blog
+
+After a powercut, I had to rebuild my kernel --- I needed MPPE support for VPN,
+and I have here a collection of handy links.
+
+Yup, something which took me the best part of three days the first time to get
+working now has a fair set of useful links.
+
+* Visit Adam Hooper's [setup guide][adamhooper] to prepare a patched kernel (I used 2.6.10 with no ill effect).
+* The official pptpclient page also has [debian MPPE patch][pptpclient] instructions, 
+  though I found them a bit more wordy than I would have liked.
+* A godsend, the [fault tree][pptpdiagnosis] on the pptpclient page.
+
+[adamhooper]: http://www.adamhooper.com:4242/mcgill-vpn-mppe/ "Adam Hooper's MPPE Setup Guide"
+[pptpclient]: http://pptpclient.sourceforge.net/howto-debian-build.phtml "pptpclient debian MPPE patch"
+[pptpdiagnosis]: http://pptpclient.sourceforge.net/howto-diagnosis.phtml "pptp fault tree"
+
+The main thing that gets me is the ridiculously over-complicated make-kpkg part.  I'm so used
+to just rolling my own kernels I never did quite get with the debian 'helpful'
+tool to do it.  But, when in Rome...
+
+I ended up using this:
+
+    make-kpkg --added-patches mppe --append-to-version mppe --config menuconfig configure
+    make-kpkg --added-patches mppe --append-to-version mppe --config menuconfig kernel_image
+
+For those lost in the mess of kernel configs, the main ones to worry about are
+in Device Drivers/Networking support then scroll to PPP.
+
+I'm now back with a working MPPE VPN setup, and in no time at all!

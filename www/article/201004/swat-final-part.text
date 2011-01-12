@@ -1,0 +1,116 @@
+SWAT: the last few bits
+Date: 2010-04-16 19:05:00
+Status: Public
+Summary: Tieing up the loose ends, collision system, AI and the like.
+Label: Games
+
+This is the last post in my series on how SWAT: Global Strike Team was made. See the [first article][first] for more information on these posts.
+
+[first]: /201002/developing-swat-gst-introduction
+
+In this post I'm going to blast through the remaining parts of the code. I was less involved with these so apologies for the vagueness; it's been quite a while since I've thought about them.
+
+Collision System
+----------------
+
+A collision system's job is to determine quickly and effectively when dynamic objects intersect the scenery and each other and prevents you being able to walk through walls and so on. Importantly for a game like SWAT, our collision system also allowed us to trace rays through the scene and work out what they hit --- used in the dynamic shadow calculation as well as to work out where all the bullets end up hitting.
+
+The collision system and maths library used in SWAT were developed by Alex Clarke (now working at Google a few desks along from me). Thanks to Alex for helping me put this section together.
+
+The collision mesh was typically the same geometry as the visible world geometry. It went through a simplification preprocess where co-planar (or very nearly coplanar) triangles were merged into concave polygons. This typically created larger polygons than were in the original source data as material changes could be ignore.
+
+A [KD tree][kd] (a way of cutting up the world into manageable pieces) was then constructed from these concave polygons, with partitions selected to reduce the number of edges introduced while trying to avoid cutting too finely. The resulting polygons were triangulated by [ear cutting][ear] before being stored as triangle strips. On PS2 these were quantized to 16 bit coordinates. The run-time code that processed them ran on VU0 in hand-coded assembler. On Xbox the implementation was a mixture of assembler and C++, the latter using lots of intrinsics.
+
+[kd]: http://en.wikipedia.org/wiki/Kd-tree
+[ear]: http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm2.html
+
+Dynamic objects were modelled using a collection of spheres which were stored alongside the normal geometry. To account for their motion and to ensure fast moving objects can't "tunnel" out through walls, spheres were effectively swept along a line into "capsules" (the same shape as a pill or a sausage) before being intersected with the landscape. It turns out the maths behind intersecting a capsule against a triangle is really complex. We actually extruded each triangle by the sphere radius, turning it into two larger triangles and three capsules, one for each edge. We would then intersect the ray corresponding to the line segment in the centre of the original capsule  against this expanded world.
+
+<p class="picture">
+<img src="/201004/collision-1.png" width="300" height="112" 
+ alt="Line art picture of collision"/>
+ <br/>An object (on the left), moves to a new position on the right. There is a solid object (the line) in between them, so we need to find the collision point (shown as a red circle).
+</p>
+
+<p class="picture">
+<img src="/201004/collision-2.png" width="300" height="112" 
+ alt="Line art of swept sphere"/>
+ <br/>In order to find the collision point we sweep the object from the start to its end point and collide this swept sphere (shown here in 2D as a swept circle) with the solid object.
+</p>
+
+<p class="picture">
+<img src="/201004/collision-3.png" width="216" height="194" 
+ alt="Transformed collision"/>
+ <br/>For simplicity, the motion of the object is considered to be a line, and the solid object is expanded out by the radius of the moving object. The line is then intersected with this expanded object to find the centre point of the collision.
+</p>
+
+If the ray intersected the expanded world, a new direction vector parallel to the intersected surface was computed and a new ray recast in that direction from the intersection point. in the case of multiple collisions the line was never allowed to curl back on itself.
+
+Collision was performed in two passes; a broad and a narrow phase. In the broad phase, large areas of potential collision were quickly found (the leaves of the KD tree). In the narrow phase the individual triangles were tested for intersection against the rays and spheres.
+
+There were some batch optimizations too --- for a bunch of related ray casts (e.g. multiple shots from a shotgun), we passed all rays through the broad phase, then for each KD leaf we would run ray-triangle intersections. More ray-triangle intersections would be made than were actually needed, but as the setup cost for each node was high compared to the intersection calculations it was a win overall.
+
+Physics System
+--------------
+
+The physics system determines how objects move as a result of the forces applied to them. In SWAT objects moved with fake scripted physics or with very simple ballistics.
+
+In SWAT 2 (which became Urban Chaos: Riot Response) we used the commercial [Havok][] library for dead bodies and ballistic objects). This was fairly painless (minus a few nasty memory leak problems on our side of things), though we dedicated an engineer (Mustapha Bismi --- now at [DarkWorks][dw]) to making sure everything integrated nicely and worked well in the game.
+
+[havok]: http://www.havok.com/index.php?page=havok-physics
+[dw]: http://www.darkworks.com/
+
+Portal System
+-------------
+
+The Xbox's pixel counting system in the Z stamp pass turned out not to be quite effective enough. Plus, the PS2 didn't have that technology, so a quick way to work out what chunks of the map were potentially visible from a given camera location was needed. Jon Forshaw (now at [PKR][]) implemented a portal system to help. Each region of map had its "prtal" areas tagged --- these being areas which had line of sight through to another area of map.
+
+Imagine two rooms separated by a long, thin corridor. We would break the map into three regions (the two rooms and the corridor) separated by two portals (the doorways between the rooms and the corridors). The portals were rectangular regions covering only the doorway area.
+
+At run time we would find out which region the camera was in, then see if any of the portals were visible. We would only draw the map region on the "other side" of the portal if it was. We'd then check that region's portals --- clipping them against the viewable area of the original portal --- and only draw them if they were visible too.
+
+This meant in the room example:
+
+* If you were in one room facing away from the corridor, we'd quickly work out only to draw the room you're in.
+* If you were in one room and you could see the corridor entrance, but not all the way through the corridor to the other room, we'd just draw the room and corridor.
+* Only if you could see through the corridor all the way to the end and into the other room would we draw all three regions.
+
+Judicious use of "dogleg" corridors in between large sections of map could drastically reduce the amount of map drawn.
+
+[PKR]: http://www.pkr.com/
+
+Voice Recognition
+-----------------
+
+One of SWAT's unique selling points was the ability to order your two buddies around with voice commands. We investigated writing our own voice recognition stuff, but frankly it was a bit outside our area of expertise. We ended up buying in solutions: (ScanSoft's [GSAPI][] on PS2 and [Fonix Speech][fonix] on Xbox.
+
+[gsapi]: http://www.igda.org/node/1004405
+[fonix]: http://www.fonixspeech.com/
+
+However, the ground work we did in voice recognition (phoneme recognition) was picked up and used to help do lip synch in some other games, so the effort wasn't completely wasted.
+
+Artificial Intelligence and Scripting
+-------------------------------------
+
+Our AI system was developed in house by Chris Haddon (now at Microsoft) and Matt Porter (now at Sony Cambridge). It was a multi-layered system where the lowest level was responsible for things like scheduling animations to be played --- "start running" animation followed by "run loop" animation, for example. A goal seeking layer in the middle chose which of potentially several goals were best to attempt given the current situation. Running on the top was a script system which our level designers could interact with to set the goals in the first place.
+
+There was a huge amount of complexity in the AI system, but unfortunately I really don't know much more.
+
+Regrets and Conclusion
+----------------------
+
+Bit of a miscellaneous thing to add on, but having thought about it I thought I'd mention what I thought we did wrong:
+
+* Shaders. I spent ages developing the shader compiler, interpreter and optimiser. I had a whale of a time, but ultimately the power of the shaders was never used; partly as the tools made it hard (and our artists didn't have time to learn my made-up shader language), and partly as we had to support the PS2 engine which had none of the loveliness available to it.
+* Tools. As cool as it was, FileServ's file-server-cum-makefile-system-cum-converter-cum-kitchen-sink approach probably wasn't wise. In a lot of cases we ended up making requests to it, and then stealing the converted resources out of its cache. Having the asset build system separate might have been more sensible.
+* Global Illumination. Looking back at the screenshots I can't help wondering if we really made the right decision about our lighting. I love our razor-sharp shadows and the ability to monkey with the lighting settings in realtime, but it would have been even better if we could have factored some global illumination ([radiosity][] or [photon mapping][photonmap]) into the renderer somehow.
+* Technology Sharing. There was some amazing tech in Argonaut at the time which we could have potentially used. One thing was Alex Clarke's cool resource system, which could have allowed us to do dynamic editing and given the artists and designers better tools to generate assets with. We had some primitive "fast reload" for models and shaders, but Alex's system could allow individual models to be swapped out and replaced while the game ran.
+
+[radiosity]: http://en.wikipedia.org/wiki/Radiosity_(3D_computer_graphics)
+[photonmap]: http://en.wikipedia.org/wiki/Photon_mapping
+
+Having spent a lot of time on these blog posts, and finding some code snippets of Okre around, I'm still immensely proud of what the team produced. Making SWAT was one of the best times in my life, and although it was only lukewarmly received, I still think it's a fun game.
+
+Maybe some other time I'll bang on about my favourite game to work on --- [Red Dog][reddog].
+
+[reddog]: http://uk.gamespot.com/dreamcast/action/reddogsuperiorfirepower/review.html

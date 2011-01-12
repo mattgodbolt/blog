@@ -1,0 +1,22 @@
+The future of communications!
+Date: 2005-03-04 12:35:32
+Label: Blog
+
+<p class="picture"><img width="379" height="480"
+src="http://xania.org/media/future_of_comms_1.jpg" alt="atrocious picture" /></p>
+
+Ok...so just the beta of <a href="http://messenger.msn.com/beta/download/">MS Messenger
+7.0</a>, but made me chuckle anyway.  Even if they've spoilt messenger by
+putting a **DIRTY GREAT AD** on almost every menu and window!  It was bad enough
+with just the one advert on the main window, now if you accidentally click too
+low on the chat window you get a poxy 'Blue Mountain' link.  Aaargh, let's hope
+someone finds a way of bypassing that, it's already driving me mad.
+
+Bizarrely too, my router took several nosedives today; suspiciously relating to
+me installing the beta...I've now disabled the 'voice/whiteboard/video' NAT ALG
+(stupid terminology) on my router, and it seems ok.  I'm always suspicious of
+such things; especially when my D-Link router is about a billion years old and
+there's no recent firmware updates.  God knows how shonky that code is.  If I
+get half a mind later on I might run Ethereal and try and suss out what's
+causing the problem.  For now though I can live without the ALG; most decent
+clients seem to wiggle through the NAT without too much issue.

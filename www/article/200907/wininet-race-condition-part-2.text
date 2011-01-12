@@ -1,0 +1,152 @@
+Solving the threading problem in WinInet
+Date: 2009-07-07 17:55:00
+Summary: One possible solution to the problem of cancelling a WinInet request in a thread-safe manner.
+Label: Coding
+Status: Public
+
+In my [previous post][pp], I introduced a simple asynchronous HTTP request API
+which suffered from a quite major problem: it was impossible to cancel an
+in-progress request in a thread-safe manner. As it happens, the
+[Windows Internet][wininet] library suffers the same problem: though it's
+hidden as desktop Windows doesn't re-use handle values. However, Windows CE and
+Windows Mobile do; and so this problem does affect these embedded OSes.
+
+[pp]: /200907/wininet-race-condition "previously on Godboltblog..."
+[wininet]: http://msdn.microsoft.com/en-us/library/aa383630(VS.85).aspx
+
+Take a look at this code snippet, designed to show up the problem:
+
+    :::cpp
+    volatile int handle = -1;
+    void ThreadA() {
+      handle = StartRequest("http://google.com/");
+      int result = WaitForRequest(handle);
+      if (result >= 0) {
+        // We got the request ok. Process it here...
+        CloseRequest(handle);
+        handle = -1;
+    }
+    
+    void ThreadB() {
+      Sleep();  // Wait a bit (gives Thread A a chance to run)
+      CloseRequest(handle);  // Cancel Thread A's request
+      handle = StartRequest("http://yahoo.com/");
+      // ... process this request instead ...
+      CloseRequest(handle);
+    }
+
+It's pretty clear that the two threads will race on `handle`. As discussed
+before, with the interface we have to work with, there's no way of introducing a
+mutex that protects `handle` without making it impossible to cancel an
+in-progress request.
+
+However, assuming that the API reliably gives an error if an invalid handle is
+passed to it or an invalid operation is carried out on an existing handle,
+there's a workaround:
+
+    :::cpp
+    using std::set;
+    set<int> active_handles;
+    // Tries to register a handle as being in-use. Returns true
+    // if the handle is safe to use, and false if the handle is
+    // already in use by another thread.
+    bool TryRegisterHandle(int handle) {
+      LockMutex();
+      if (active_handles.find(handle) != active_handles.end()) {
+        // Although the system has given us 'handle' as a valid
+        // new handle to use, another thread currently believes
+        // it owns this handle. It is not safe for the current
+        // thread to use the handle.
+        UnlockMutex();
+        return false;
+      }
+      // It's safe to use this handle: prevent any other threads
+      // from using it for the duration this thread believes it
+      // has ownership by keeping a note of this handle in the
+      // active set.
+      active_handles.insert(handle);
+      UnlockMutex();
+      return true;
+    }
+
+    void UnregisterHandle(int handle) {
+      LockMutex();
+      active_handles.remove(handle);
+      UnlockMutex();
+    }
+
+The idea here is that we keep track of which handles __we__ think we own and
+can safely use, regardless of the handle the system gives us.  If we get a
+handle that another thread of ours is already using, we back off and try again.
+Writing a couple of utility functions to hide this gives something like:
+
+    :::cpp
+    void SafeStartRequest(const char* url) {
+      int new_handle = -1;
+      // Loop forever until we get a handle we can use.
+      for (;;) {
+        new_handle = StartRequest(url);
+        if (TryRegisterRequest(handle)) {
+          // Safe to use; break out of the loop.
+          break;
+        }
+        // Another thread thinks it owns this handle even though
+        // we got it fair and square from the system. It's not
+        // safe to use it! Do not close the request - the thread
+        // that thinks it owns it will close it. Sleep a bit to
+        // give other threads a chance to run, then loop around
+        // and get a fresh new handle, hopefully not one another
+        // thread thinks it owns.
+        Sleep();
+      }
+      return new_handle;
+    }
+    
+    // Close the handle, then mark it as available to other
+    // threads. Should only be called by the owner of the handle.
+    void SafeCloseRequest(int handle) {
+      CloseRequest(handle);
+      UnregisterRequest(handle);
+    }
+
+It's certainly not elegant, and is non-obvious. It doesn't even save you from
+all possible problems --- what if the handles are system-wide and another
+program which doesn't know about your registration system is running?
+What if the first thread has just created a new handle when the cancellation
+happens? If it gets caught at just the right time, the firstthread gets the
+second thread's handle and uses it without error, oblivious to the fact that it
+should have been cancelled[^canc].
+
+[^canc]: This eventuality (and similar ones) can be covered with judicious use
+    of a thread-safe variable storing "am I cancelled", checked and acted upon
+    before any handle usage. But this article is already long enough!
+
+Experience has shown that this is usually "good enough". The original code
+becomes:
+
+    :::cpp
+    volatile int handle = -1;
+    void ThreadA() {
+      handle = SafeStartRequest("http://google.com/");
+      int result = WaitForRequest(handle);
+      if (result >= 0) {
+        // We got the request ok. Process it here...
+        SafeCloseRequest(handle);
+        handle = -1;
+      }
+    }
+    
+    void ThreadB() {
+      Sleep();
+      // Cancel thread A's request.
+      // NB this does not use SafeCloseRequest as we don't "own"
+      // the handle.
+      CloseRequest(handle);  // Cancel Thread A's request
+      handle = SafeStartRequest("http://yahoo.com/");
+      // ... process this request instead ...
+      SafeCloseRequest(handle);
+    }
+
+Ideally though, you'd go back to the drawing board with your design and separate
+the cancellation from the closing of handles. Unfortunately, if you're using the
+Windows Internet library on a mobile device, you're stuck with this workaround.

@@ -1,0 +1,43 @@
+This week, I have mostly been...
+Date: 2008-04-10 16:42:00
+Label: Blog
+Status: Public
+Summary: The worst kind of blog post - a generic update.
+
+When I restarted my blogging a few months ago my intention was to not just post random little
+snippets of "what I've been doing recently".  Well, the road to hell is paved by good intentions[*][star]
+so here's my first general, rather boring dump:
+
+[star]: #star "See below"
+
+* Ness is now 26 weeks pregnant, and is blooming.  We're still so very excited about becoming parents.
+Decent names still elude us, but we're hoping to think up some semi-decent ones soon.  I'm starting to
+idly wonder what my kids will make of all this in years to come --- assuming [archive.org][] still keeps
+a copy of all this in fifteen years' time.
+* [Google app engine][gae] --- looks to be the best toolkit going, combining all the convenience
+of a [TurboGears][]-like environment with the backing of Google's scalability technology.  Have spent
+a couple of evenings mucking about with it (using Malc's [OSJam][] stuff as a starting point), and
+can't really fault it.  Well, ok, I'd prefer a more [Kid][]-like template system by default, but there's
+nothing to stop me from using Kid with App Engine.
+* [What Every Programmer Should Know About Memory][mem] --- nuff said.
+* Mark Russinovich's "[The Case of the Unexplained...][russ]" --- how to debug your PC when it misbehaves.
+Or perhaps more likely, how to find the suspicious virus-like program on your Dad's PC that he
+claims he never installed.
+
+[archive.org]: http://archive.org "My what a lot of disk space you have"
+[gae]: http://code.google.com/appengine/docs/whatisgoogleappengine.html "Splendid stuff"
+[TurboGears]: http://turbogears.org "Cool Python web toolkit"
+[OSJam]: http://www.farside.org.uk/200804/hosting_jam
+[kid]: http://turbogears.org/about/kid.html "IMO the best-looking HTML template system around"
+[mem]: http://people.redhat.com/drepper/cpumemory.pdf "If you code; read it.  Or at least skim it.  A bit"
+[russ]: http://www.microsoft.com/emea/spotlight/sessionh.aspx?videoid=722 "Never again will you say 'Why is my PC booting so slowly'"
+[PKR]: http://www.pkr.com "Online Poker - evolved"
+
+Work's going well, the last few months I've been consulting for [PKR][], which is good fun.  Lots of
+SQL nonsense, with a splash of C++ and Python for good measure.
+
+That's about it really.  I told you it was boring, didn't I?
+
+<a name="star"></a><i>* Or frozen door-to-door salesmen, if you believe [some sources][go].</i>
+
+[go]: http://en.wikipedia.org/wiki/Good_Omens "My favourite book, too."

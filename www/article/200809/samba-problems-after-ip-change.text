@@ -1,0 +1,44 @@
+Samba PDC problems after changing server IP
+Date: 2008-09-10 22:15:00
+Status: Public
+Label: Coding
+Summary: A strange problem with Samba PDCs if their IP addresses change.
+
+<p class="side" style="max-width:150px;">
+<a href="http://www.flickr.com/photos/zimpenfish/385384577/">
+<img src="/200809/samba" width="150" height="187" alt="Some maraccas.  Samba, geddit?"/>
+</a>
+</p>
+
+[Samba][] is great, but is a real pain to configure, and very hard to diagnose problems.  There's
+plenty of log information to plough through once you've remembered how to enable it, but whenever
+I find myself having to change anything about my setup, I'll spend at least a couple of hours
+scratching my head wondering what on earth is going on.  In the interest of saving somebody else
+from this pain...if you find yourself banging your head against a wall primary domain controller (PDC)
+having weird symptoms like:
+
+[samba]: http://www.samba.org/ "brilliant; but awkward to configure"
+
+* Long hangs in Windows when browsing the domain.
+* Logins fail intermittently.
+* Trying to joining a machine to the domain fails with the error "domain unavailable" even though the domain
+  is definitely there.
+
+And you see errors in `log.nmbd` of the form:
+
+    domain_master_node_status_fail:
+    Doing a node status request to the domain master browser
+    for workgroup PROFACTOR at IP 192.168.200.220 failed.
+    Cannot sync browser lists.
+
+...then there might be a simple explanation.  If you've recently changed your server's IP address, there are
+a number of places where the old IP will still be lurking, possibly causing the issues above.
+
+`nmbd` caches browse master information in `/var/cache/samba/browse.dat` --- your PDC's old IP
+address will be listed here, and when `nmbd` starts up, it sees it as an existing, distinct 
+domain master browser that then doesn't respond to it any more.   Stop `nmbd` and then delete the
+file.
+
+In a similar way the WINS resolution system caches IPs --- delete `/var/lib/samba/wins.dat`.
+
+Restart the samba servers, and hopefully all will be well.

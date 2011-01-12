@@ -1,0 +1,165 @@
+Next Generation Consoles - Part One
+Date: 2005-05-17 23:39:55
+Label: Blog
+
+Today the last of the three main next-next-generation consoles were announced at
+<a href="http://www.e3expo.com/">E3</a>, the Electronic Entertainment Exposition
+in the US.  Traditionally, the consoles are announced at E3, but <a
+href="http://www.microsoft.com/">Microsoft</a> broke with tradition by
+announcing the <a href="http://www.xbox360.com/">Xbox 360</a> on <a
+href="http://www.mtv.com/">MTV</a> on a half-hour special program.
+
+<a href="http://www.sony.com/">Sony</a> were next up, announcing the PlayStation
+3, and then <a href="http://www.nintendo.com">Nintendo</a> followed up, with a
+small announcement of their Revolution console.
+
+So, what do I think?  Well, having worked directly on the predecessor consoles
+PlayStation 2 and Xbox, I must first admit   a predilection towards Microsoft's
+offerings.  There are sound reasons for this, but first I should do a quick
+comparison between   the new systems.  Information on the Revolution is thin on
+the ground, so this compares the Xbox 360 and the PlayStation 3.
+
+### Processor
+
+<table border="1"> <tr><th>Feature</th><th>Xbox 360</th><th>PlayStation
+3</th></tr> <td>Core speed</td><td>3.2GHz</td><td>3.2GHz</td> <tr><td>Number of
+main processing cores</td> <td>3</td><td>1 PPC core + 7 SPEs</td></tr> <tr>
+<td>Hardware threads</td><td>6</td><td>8</td> </tr> <tr> </table>
+
+So, what to make of this?  I've deliberately **not** quoted any of the
+meaningless 'dot products per second' or   'GFLOPS' that have been touted
+around, for the simple reason that in my experience they're really not
+representative of the   games-playing power of a machine.
+
+The first thing that springs to mind is that the realities of modern chip
+production are making themselves known --- the raw   clock speed of both
+machines, while much faster than the previous generation, is not a gigantic
+leap.  Instead, the way these   machines are pushing the boundaries is by
+increasing the number of execution units.  On paper, this is a great improvement
+--- having 8 cores running at 3.2GHz in theory is equivalent to a 25.6GHz
+machine.  Great!
+
+But...there's a hitch!  In order to make use of all those cores, you need
+several pieces of work to do.  And those pieces of   work need to be able to run
+concurrently, that is they need to be independent pieces of work which don't
+interfere with each   other and don't rely on each others' results.  Typically,
+good <a href="http://en.wikipedia.org/wiki/Parallel_computing">parallelism</a>
+is achieved by one of three ways: 
+
+1 You have a lot of data which needs to be processed in the same way (<a
+  href="http://arstechnica.com/articles/paedia/cpu/simd.ars">SIMD</a>).  Examples
+  of this are large maths   problems like <a href="http://www.seti.org/">SETI</a>,
+  or indeed some vector operations like transforming triangles and
+  suchlike.
+2 You have totally independent 'processes' of execution like in Windows where each 
+  running program is separate.
+3 You can pipeline up the work, just like in a real life production line.  Each core would perform a piece
+  of work on the whole   product before passing it to the next core, which
+  performed the next bit while the original core starts work on the next item and
+  so on.
+
+In a games environment, it's pretty hard to get parallelism through the first
+method without treading on the toes of the   graphics processor, which itself is
+the embodiment of parallel processing by this approach.  There isn't much work
+left that   could take advantage of SIMD at the scale where individual cores
+could do useful work, though each core of both Xbox 360 and   PS3 are capable of
+small-scale SIMD operations.
+
+Games are also fairly thin on the ground when it comes to separate processes.
+As there's only one game running at once,   splitting tasks up has to be at the
+level of whole independent subsystems.  Usually when you see this kind of thing
+explained   on <a href="http://slashdot.org">Slashdot</a>, people tout the ideas
+that you put the game login on one core, the rendering on   another core, the
+physics on yet another and so on.  Breaking the game code up like this *is*
+possible, but very hard.  In   order to make this separation, each process needs
+to be totally independent, which gets tricky when you realise that the   physics
+system needs to find all the objects in the world and move them about, while
+simultaneously the game logic core is   trying to force them to move as a result
+of the AI and player inputs, and the rendering core is trying to pin down where
+everything is to draw it!  The best way I can think of this working in a real-
+world environment is to separate off the higher-level   rendering component to
+another core, and the sound processing to another core.  These tasks are fairly
+discrete and so are   amenable to running concurrently, with the minimum of
+information travelling between cores and that which does travel is   usually
+one-way traffic.
+
+Pipelining looks a good bet to start with; and indeed you could do wonders if
+you could find a way of separating the   processing of the game into pipelinable
+tasks.  The general process of a game loop goes something like: 
+1 Read input
+2 Update player position
+3 Run AI on current positions
+4 Update physics using current positions and forces etc calculated by AI and
+  player controls
+5 Draw the environment and objects to an offscreen buffer
+6 Wait for the next screen refresh
+7 Transfer the offscreen buffer to the onscreen buffer
+8 Lather, rinse repeat
+
+In modern engines, one tends to overlap the 'wait for screen refresh' step with the
+input/update/AI part of the next frame.  Indeed on <a
+href="http://www.swatgst.com/">SWAT:GST</a> we used graphics unit in parallel
+with the main CPU to process   and draw simultaneously with the CPU running the
+AI and updates.  Ostensibly one could place each of the steps outlined   above
+on a separate core and pipeline the whole thing, but there's a lot of data
+flying around, and possibly more importantly   pipelining introduces *latency*.
+Latency is the total time it takes a single object to pass through the pipeline.
+For   example, on a modern car production line, each day 10 cars roll off the
+production line (this is called the *throughput*).    This seems amazingly fast,
+but of course for an individual car itself the journey from the beginning of the
+production line to the   end may take months.  This is the latency; and in games
+it can be crippling.  Given a 30 frames-per-second game (as most   are
+nowadays), you can *just about* get away with a 3 frame latency, but really 3 or
+more frame latency makes it feel like   you're playing through treacle --- the
+lag is terrible.  Again taking SWAT as an example, the processes of rendering
+one frame   while processing the next used to run in individual frames; which
+when taking into account the screen buffering led to a 3 frame   latency.  This
+didn't 'feel' very good; so after a fair bit of tinkering we were able to get
+the rendering part starting about halfway   through a frame while the CPU
+continued processing, and this was enough to get the latency down to two frames.
+
+So, phew, where does this leave us?
+
+My conclusion from the point of view of parallelism is that games are pretty
+damn tricky to get onto multiple cores.  I   reckon 3-5 'threads' is about the
+maximum you could ever sensible split a game up into.  Of course, for spot
+effects I can think   of uses for multiple cores (like particle systems etc),
+but for the core game itself only 3-5.  Given this, both Xbox 360 and
+PlayStation 3 have enough core power (with the hardware threads on Xbox 360) to
+support the maximum parallelism I can   dream up.  However, the Playstation 3
+has a few more processing units for special effects on top.  So, does that make
+the   PS3 the winner?
+
+Well, not really.  So far I've been assuming all the cores are equivalent.  This
+isn't the case; the PS3's main core is a PowerPC, but the other 7 cores are
+'SPE' cores with 256Kb of RAM.  While details are sketchy, if it's anything like
+the PS2 then these SPE cores won't have full access to the main RAM of the
+machine; instead they must make do with scrabbling around in their little on-
+board RAM, relying on either the main CPU or the DMA system to push new data
+into them.  This makes life very much more tricky than just straight
+programming.  Lots of algorithms and processes require an awful lot more than
+256Kb of working set memory (indeed more than the 128Kb which you'd most likely
+have to separate the RAM into for effective DMAing).  I believe the PS3's 7
+cores will be crippled by this, that they will be too limited to do anything too
+complex, and thus they'll be limited to special graphical effects.  This *might*
+not be such a bad thing given the ridiculous number of effects and polygons the
+next-next-generation of games will be expected to put on screen, but people also
+expect world-changing AI and physics; which will be very difficult to achieve on
+the PS3's secondary cores.
+
+On the other hand, the Xbox 360's processing cores are symmetric, which makes
+them all equally equipped to deal with any programming problems thrown at them.
+So I reckon splitting the whole games process up into separate processes will be
+achievable on Xbox 360, but not PS3.
+
+One additional point to make --- programming for multiple threads is pretty damn
+awkward.  Debugging them effectively is even worse.  Sony had terrible tools on
+PS2; Microsoft's tools were very good.  So, I don't have a lot of confidence in
+Sony's ability to make their very multiprocessor machine even slightly
+debuggable!  I'd rather take the Xbox 360; less cores to worry about, rational
+debugging tools and excellent support too!
+
+Well, it's nearly midnight now, and I'm not even halfway through this
+comparison; I haven't mentioned the memory speeds and layouts, or the graphics
+system, or Nintendo's Revolution either!  I'm going to have to carry on another
+night, so this becomes 'Part 1'.!

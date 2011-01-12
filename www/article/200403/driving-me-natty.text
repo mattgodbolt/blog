@@ -1,0 +1,54 @@
+Driving me NATty
+Date: 2004-03-22 10:16:54
+Label: Coding
+
+What is it with computers?  No matter how many years you've been using them they
+can still surprise you as to just how awkward they can be.  This weekend, I
+tried to bridge my upstairs and downstairs networks using wireless....fat
+chance.
+
+You'd think that getting a relatively obscure wireless ethernet card working on
+Linux would be a pain.  It's not supported directly in the kernel, so I had to
+grab some <a href="http://acx100.sourceforge.net/">additional drivers</a>.  I
+was not holding out much hope, to be honest --- but amazingly it all worked
+first time.  Within a few minutes of downloading the driver, it was all up and
+running.  However, this lulled me into a false sense of security...
+
+Upstairs
+I have a DLink 604+ ADSL router which acts as my NAT and modem.  There's
+currently a long self-installed RJ45 cable winding its way down the stairs to
+the kitchen where my 3 PCs live (don't ask).  I was hoping to use the wireless
+card to replace the cable with an invisible link and thus win the favour of my
+girlfriend.
+
+So, I duly configured downstairs as being 192.168.1.* and
+upstairs as 192.168.0.*.  I added the relevant routes to each subnet, with the
+linux box (with both a normal ethernet connection and the wireless) as the
+gateway between them.  I rejoiced as I disconnected the upstairs/downstairs lead
+and yet I was still able to ping the router from my windows boxes downstairs ---
+all was working!
+
+Until...I realised I couldn't access the Internet from the
+windows boxes.  Try as I might, the router was rejecting packets from the
+downstairs subnet, giving me 'network unreachable' ICMP replies.  It would seem
+that the router only NATs outgoing packets from its local subnet --- 192.168.1.*
+it wouldn't touch with a bargepole.  No amount of misconfiguring netmasks got me
+anywhere --- except one moment when I thought I had it working only to discover
+I'd plugged the up/downstairs cable back in...outgoing packets were getting
+upstairs via wireless, but back down the wire.  Arse.
+
+I also tried bridging
+the two segments with the ethernet bridge kernel configuration...but sadly that
+caused massive loopback problems; effectively the router itself (which has both
+RJ45 and wireless) is already an ethernet bridge it would seem --- whenever I
+bridged the two nets downstairs I'd get a slew of packets pinging back and forth
+upstairs/downstairs and still no access to the internet.
+
+The only way I
+could think of doing things was to re-NAT on the linux box so all the packets
+appear to come from it --- then the router will happily NAT outbound again ---
+but that's a right old pain that I don't want just yet.
+
+All in all, a bit of
+a nightmare.  Something that seemed simple, turned out to be a right pain.
+Don't you just love computers?

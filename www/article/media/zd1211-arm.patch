@@ -1,0 +1,89 @@
+diff -x '*.o' -Nur zd1211-driver-r80/Makefile zd1211-driver-r80-arm/Makefile
+--- zd1211-driver-r80/Makefile	2006-07-07 10:36:02.000000000 +0100
++++ zd1211-driver-r80-arm/Makefile	2006-07-07 10:38:15.000000000 +0100
+@@ -153,7 +153,8 @@
+     $(SRC_DIR)/zddebug.o \
+     $(SRC_DIR)/zdtkipseed.o \
+     $(SRC_DIR)/zdmic.o \
+-    $(SRC_DIR)/zdusb.o 
++    $(SRC_DIR)/zdusb.o \
++    $(SRC_DIR)/div64.o
+     OBJECTS += $(SRC_DIR)/zd1211.o
+ 
+ CFLAGS=-O -Wall -Wstrict-prototypes -pipe # -Wa,-a,-ad -g
+@@ -202,8 +203,10 @@
+ 	chmod -x $(MODULE)
+ 
+ %.o: %.c
+-	$(CC) -static $(CFLAGS) $(INCLUDES) $(DEFINES) $(DEBUG) -c $< -o $@                              
+-    
++	$(CC) -static $(CFLAGS) $(INCLUDES) $(DEFINES) $(DEBUG) -c $< -o $@     
++%.o: %.S
++	$(CC) -c $< -o $@ -D__ASSEMBLY__
++	
+ endif
+ both:
+ 	make ZD1211REV_B=0
+diff -x '*.o' -Nur zd1211-driver-r80/src/div64.S zd1211-driver-r80-arm/src/div64.S
+--- zd1211-driver-r80/src/div64.S	1970-01-01 01:00:00.000000000 +0100
++++ zd1211-driver-r80-arm/src/div64.S	2006-07-06 12:57:01.000000000 +0100
+@@ -0,0 +1,59 @@
++#include <linux/linkage.h>
++
++#ifndef __ARMEB__
++ql	.req	r0			@ quotient low
++qh	.req	r1			@ quotient high
++onl	.req	r0			@ original dividend low
++onh	.req	r1			@ original dividend high
++nl	.req	r4			@ dividend low
++nh	.req	r5			@ dividend high
++res	.req	r4			@ result
++#else
++ql	.req	r1
++qh	.req	r0
++onl	.req	r1
++onh	.req	r0
++nl	.req	r5
++nh	.req	r4
++res	.req	r5
++#endif
++
++dl	.req	r3			@ divisor low
++dh	.req	r2			@ divsor high
++
++
++ENTRY(do_div64)
++	stmfd	sp!, {r4, r5, lr}
++	mov	nl, onl
++	movs	nh, onh			@ if high bits are zero
++	movne	lr, #33
++	moveq	lr, #1			@ only divide low bits
++	moveq	nh, onl
++
++	tst	dh, #0x80000000
++	bne	2f
++1:	cmp	nh, dh
++	bls	2f
++	add	lr, lr, #1
++	movs	dh, dh, lsl #1		@ left justify disor
++	bpl	1b
++
++2:	movs	nh, onh
++	moveq	dl, dh
++	moveq	dh, #0
++	movne	dl, #0
++	mov	ql, #0
++	mov	qh, #0
++3:	subs	ip, nl, dl		@ trial subtraction
++	sbcs	ip, nh, dh
++	movcs	nh, ip			@ only update if successful
++	subcs	nl, nl, dl		@ (repeat the subtraction)
++	adcs	ql, ql, ql		@ C=1 if successful, shift into
++	adc	qh, qh, qh		@ quotient
++	movs	dh, dh, lsr #1		@ shift base high part right
++	mov	dl, dl, rrx		@ shift base low part right
++	subs	lr, lr, #1
++	bne	3b
++
++	mov	r2, res
++	ldmfd	sp!, {r4, r5, pc}

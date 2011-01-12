@@ -1,0 +1,26 @@
+Comments in code
+Date: 2008-07-24 09:13:00
+Label: Coding
+Status: Draft
+Summary: TBD
+
+Wtf? Why would someone write this comment?
+
+    :::cpp
+    // This is much easier to understand as being the opposite of
+    // if (mShuttingDown == kSSTNotShuttingdown
+    //     || (mShuttingDown == kSSTShutdownRingRundownTrn
+    //         && tableTemplate.mTableTypeId == TT_TOURNAMENT))
+    if (mShuttingDown != kSSTNotShuttingdown 
+        && (mShuttingDown != kSSTShutdownRingRundownTrn
+            || tableTemplate.mTableTypeId != TT_TOURNAMENT))
+        return false;
+
+Surely:
+
+    :::cpp
+    bool stillAlive = (mShuttingDown == kSSTNotShuttingdown
+                       || (mShuttingDown == kSSTShutdownRingRundownTrn
+                           && tableTemplate.mTableTypeId == TT_TOURNAMENT));
+    if (!stillAlive)
+        return false;

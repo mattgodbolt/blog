@@ -1,0 +1,98 @@
+It's Alive! (again!)
+Date: 2006-08-12 22:51:00
+Label: WeeBox Project
+
+Well, it's been a while since I've had time to work on the Weebox --- and part
+of that's due to the lack of a working LCD screen (covered amply in <a
+href="/200607/a-frustrating-evening">A frustrating evening</a>).  Yesterday
+morning this all changed with the arrival of the new, working, negative voltage
+generator.
+
+I've bought an LCD negative voltage generator evaluation board from Maxim IC.
+Rather than try and solder on all the tiny and hard-to-find components needed, I
+plumped for the cheating method of getting Maxim to do it for me.  All I had to
+do was solder on the +5V, GND, Shutdown and Output wires --- which even with my
+hamfisted soldering skills wasn't too hard:
+
+<a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject/photo#4962392282887749650"><img
+alt="" src="/media/maxim.jpg" /></a>
+
+With the new board in place, I excitedly connected everything up, carefully
+ensuring the shutdown pin was low until initialisation had finished...then I ran
+my test program...
+
+<a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject/photo#4962317779113345042"><img
+src="/media/first-working.jpg" alt="" /></a>
+
+Looks like it's working....kinda...but what's with all the gaps?  A quick look
+through the code and in my frustration the other night at it not working I'd
+introduced so many bugs it wasn't even slightly working.  A bit of fixing...and
+then a bit of fiddling in the <a href="http://www.gimp.org">GIMP</a>, and I
+suddenly had this:
+
+<a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject/photo#4962317807055011858"><img
+alt="" src="/media/weebox-display-working.jpg" /></a>
+
+Hallelujah!  After many months of bug-hunting, breaking things with too much
+solder heat, blowing up components, ordering the wrong things, paying import
+duty, swearing and cursing I finally had a working, graphical, 320 x 64 LCD
+screen.
+
+I was over the moon!  I then spent the rest of the day making up a bit of
+breadboard with the components on instead of the mess of wires in the prototype
+board.  Although in doing so I overheated the IR detector and fried that ---
+oops it was all going a bit too well, another one's in the post though.  Once it
+was all settled in I turned to software matters again.
+
+The LCD driver I was writing was in C++, but the Weebox stuff is in Python.  I
+was tempted to rewrite the lot in C++, but the flexibility of Python is too hard
+to resist.  A chat with a friend who suggested an RSS news ticker confirmed
+this: It would be a few lines of Python but reams of C++.  However, I couldn't
+implement the LCD driver in Python, it's just not fast enough.  So I had to
+bridge the two languages with <a href="http://www.swig.org">SWIG</a> --- which
+turned out to be almost totally painless.  After a few blind alleys I had a
+python-callable module that could initialise and clear the display and draw
+pixels, lines and filled rectangles.
+
+By this time the poor 200MHz ARM wasn't cutting it for compiling, the C++ code
+was taking minutes to build.  An hour invested in getting SCons and the Arm
+cross compilation setup working on my PC was very well invested --- the
+turnaround time now is seconds.  I have the Weebox's NFS root mapped as a Samba
+drive, so I directly edit and compile the code onto the Weebox's disk in Visual
+Studio.  Much faster, just F7 and an alt-tab to the Putty shell on the weebox is
+all it takes.  Marvellous.  With a bit of tweaking I could set the 'debug
+executable' on VS to be an rexec of the weebox, but that's enough for now.
+
+Latterly I started thinking about fonts.  I was originally going to draw my own
+just like I always did on the Spectrum and Beeb all those years ago.  However, I
+had a thought: 320x64 is enough for pretty decent-sized letters...why not use
+TrueType fonts?  Within a few minutes I'd read the <a
+href="http://freetype.sourceforge.net/">FreeType</a> <a
+href="http://freetype.sourceforge.net/freetype2/docs/tutorial/step1.html">tutorials</a>
+and I was ready to go.  After a few false starts and a strange 1bpp bug (if you
+render a space in 1bpp mode FreeType seems to do a divide by zero on ARM), I had
+this:
+
+<a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject/photo#4962495809742962706"><img
+src="/media/weebox-truetype.jpg" alt="" /></a>
+
+As it's just gone 11pm and I've not stopped since about 10am, I think I'm going
+to stop here.  I need a good long think about how it's all going to fit
+together, and how I'm going to optimise the TrueType rasteriser (which currently
+runs with uncached glyphs and plotting each pixel individually! yuck!)  But it's
+looking very promising.  If only I hadn't blown the bloody infra-red detector
+up, I'd have 'final hardware' at last.  Oh well, should arrive on Tuesday, and
+then I'll have a completed Weebox, just lacking in software.
+
+*Update: next day the new IR detector came...and in installing it I noticed that
+I'd put +5V and GND the wrong way round on my circuit plan...oops...I probably
+hadn't toasted it after all.  Anyway, I now have a 'working' final hardware
+Weebox, playing music, displaying stuff onscreen in pretty fonts and receiving
+commands from the IR display.  Sadly I reckon Python's not going to cut it after
+all, running just the screen screen at the moment is taking 30% CPU with nothing
+else going on, and that's not enough to get OGG playback without clicks every
+now and then.  Oh well!*

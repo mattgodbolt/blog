@@ -1,0 +1,37 @@
+A frustrating evening
+Date: 2006-07-31 23:09:13
+Label: WeeBox Project
+
+This morning I was yet again rudely awakened by the DHL man.  This time he
+brought me a DC-DC converter, to jump my 5V down to -12V ready for use in the
+screen.
+
+My idea of electronics is somewhat out of kilter with the Universe's, it would
+seem.  So I'm researching on more alternatives to get my -9.1V that I need.  The
+only <a href="http://www.maxim-ic.com/cookbook/powersupply/pdfs/CB3.pdf">circuits</a> that I've seen use Maxim
+ICs, which RS don't seem to sell, so I'm a bit stuck.  I've found <a
+href="http://www.relec.co.uk/fixed_input_regulated.html">this</a> but the issue
+is the 0V.  When I measured my NMA0512S's output at its three terminals (marked,
+-12V, 0V and 12V) relative to ground, I got 0V, 20V and 40V.  I put a bit of a
+load on the system, and I couldn't fathom out any kind of relationship between
+the voltages and the load...and when I got it nearly right (about -10V) plugging
+the LCD screen in immediately took the voltage back up to 2-3V.  Aargh!
+Unfortunately, after some further mucking about I managed to blow the stupid
+thing, burning my fingers in the process (yes, they get really hot if you short
+them out...doops).
+
+I'm sure this is obvious stuff, so I've resolved to go and buy an electronics
+book or two tomorrow and try and work out where I'm going wrong.
+
+At least during all my experimentation I got a few pixels lighting up (or rather
+going black) on the screen, so hopefully *that's* not entirely broken.  I still
+do worry that I've cooked the screen though, and it's going to take me ages to
+find that out, as I'm still no nearer a cheap, simple, easy, dependable -9.1V
+supply.
+
+Update: Later that night I revisited Maxim's website and noticed I could get
+free samples ... so rather cheekily I've ordered a couple of MAX759s to play
+with and hopefully with their application circuit (which is specifically
+designed for LCDs) I'll get some success.  Scary how many capacitors and
+inductors there are on their <a href="http://pdfserv.maxim-ic.com/en/ds/MAX736-MAX759.pdf">circuit</a> though, I need to get a shedload
+more components!

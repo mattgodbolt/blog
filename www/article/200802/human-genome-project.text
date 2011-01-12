@@ -1,0 +1,45 @@
+Challenges, and bits and bobs
+Date: 2008-02-07 22:50:00
+Label: Blog
+Summary: An excellent description of the challenges faced by the Human Genome Project.  And some miscellaneous other bits.
+Status: Public
+
+My friend [Thomas][] pointed me in the direction of this excellent comment on the Human Genome Project
+(from [challenges in the Human Genome Project][umdnj]):
+
+[umdnj]: http://www.esp.org/umdnj.pdf
+[thomas]: http://waveseed.com/ "Mssr Thomas Busser"
+
+> Consider the 3.3 gigabytes of a human genome as equivalent to 3.3 gigabytes of files on
+the mass-storage device of some computer system of unknown design. Obtaining the sequence
+is equivalent to obtaining an image of the contents of that mass-storage device.
+Understanding the sequence is equivalent to reverse engineering that unknown computer system
+(both the hardware and the 3.3 gigabytes of software) all the way back to a full set of design
+and maintenance specifications.
+
+> Reverse engineering the sequence is complicated by the fact that the resulting image of the
+mass-storage device will not be a file-by-file copy, but rather a streaming dump of the bytes
+in the order they occupied on the device and the files are known to be fragmented. 
+In addition, some of the device is known to contain erased files or other garbage. Once the garbage
+has been recognized and discarded and the fragmented files reassembled, the reverse engineering of
+the codes must be undertaken with only a partial, and sometimes incorrect understanding of the CPU
+on which the codes run. In fact, deducing the structure and function of the CPU is part of the
+project, since some of the 3.3 gigabytes are known to be the binary specifications for the
+computer-assisted-manufacturing process that fabricates the CPU. In addition, one must also
+consider that the huge database also contains code generated from the result of literally
+millions of maintenance revisions performed by the worst possible set of kludge-using,
+spaghetti-coding, opportunistic hackers who delight in clever tricks like writing self-modifying
+code and relying upon undocumented system quirks. 
+
+Absolutely spot on.
+
+Totally unrelated, but by far the best "wow factor" link I've had in ages, have a look at what
+can be done with [a single sheet of A4 paper][paper].
+
+[paper]: http://www.petercallesen.com/index/index2.html "it's amazing what you can do with just a sheet of A4"
+
+Finally, I've found a little free clipboard tool which really ought to be built into windows ---
+persistent multiple clipboard entries of all types.  Have a look at [clipx][]; you won't be
+disappointed.
+
+[clipx]: http://www.clipx.org/ "indispensible Windows tool"

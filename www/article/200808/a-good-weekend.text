@@ -1,0 +1,28 @@
+A good weekend
+Date: 2008-08-03 22:44:04
+Status: Public
+Label: Blog
+Summary: In which I try to be more twitter-like.  And fail miserably at: A rather long summary of my weekend.
+
+A short post this, more of a [twitter][]-style entry.  I've had a great weekend:
+
+[twitter]: http://www.twitter.com "Microblogging site.  Sadly the usernames I normally use are taken, else I'd get an account"
+
+ * I've had tons of time to spend with my lovely baby son.  He's 7lb 12oz now, so I'm a very happy Daddy.
+ * I've rewired my house's ADSL and ethernet setup.  My modem is now in the lounge instead of in a
+   cupboard upstairs. I re-used the cable that used to connect the master phone socket in the lounge
+   to the cupboard as an Ethernet cable.  In the process I learnt that Ethernet only uses [two twisted pairs][tp]
+   out of the 8 that are in [CAT5][] --- just as
+   well as the dodgy cable the BT engineer installed only had three twisted pairs in it.
+ * I've taken three carloads of crap harvested from the loft to the dump.  I've boarded out a load more loft giving
+   me even more storage space.  It's now ready to consign even more stuff to a prolonged attic purgatory.
+   In doing so I managed to bring xania.org down (which lives in a corner up there).
+   The downtime was due to me accidentally unplugging it to power in a drill, exacerbated by the stupid BIOS which requires a keyboard
+   to be plugged in to be able to boot --- else it says "`Keyboard error - hit F1 to continue`" (I kid you not!)
+
+[CAT5]: http://en.wikipedia.org/wiki/Category_5_cable
+[tp]: http://en.wikipedia.org/wiki/Ethernet_over_twisted_pair "Pairs 1/2 and 3/6"
+
+Lots of cool things to look forward to [at work][work] this week too.
+
+[work]: http://www.pkr.com "bigger and better things for PKR"

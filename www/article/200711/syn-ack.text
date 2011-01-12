@@ -1,0 +1,12 @@
+The three way handshake of understanding
+Date: 2007-11-20 12:30
+Status: Public
+Label: Coding
+
+**Matt:** Right?<br/>
+**Malcolm:** Right.<br/>
+**Matt:** Right!<br/>
+**Matt:** [SYN / SYN ACK / ACK][syn]<br/>
+**Malcolm:** I see a blog post in its entirety.
+
+[syn]: http://en.wikipedia.org/wiki/Transmission_Control_Protocol#Connection_establishment "Three way handshake"

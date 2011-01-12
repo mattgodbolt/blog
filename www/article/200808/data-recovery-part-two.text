@@ -1,0 +1,54 @@
+Another weekend and some more data recovery
+Status: Public
+Date: 2008-08-18 22:20
+Summary: More fiddling in trying to get NTFS disk data back for my Dad.
+Label: Coding, Blog
+
+This weekend:
+
+* I became a year older --- boo.  I got some lovely presents --- yay!
+* My son smiled at me for the first time --- yay!
+* I was able to find an O2 shop that had a 16GB iPhone in stock --- yay!
+* I set up my Dad's new PC, and it seems to work --- yay!
+* I was able to recover his data from his [old broken disk][prev] --- 
+yay!
+* I took an extra day off (today!) to spend more time with my family --- 
+yay!
+
+[prev]: /200808/ntfs-data-recovery-on-linux "a sorry tale"
+
+So, all in all, pretty damn funky weekend.
+
+The data recovery was achieved in the end by booting a '[backup][]' 
+Windows 2000 
+ISO on [QEMU][], and then buying [R-Studio Data Recovery][rs] and 
+running that on the data.  A bit of a disappointment, but I ran out of 
+time either rolling my own or getting either [ScroungeNTFS][] or 
+[testdisk][] to work.
+
+[backup]: http://thepiratebay.org "saved me a drive to the office to blag the MSDN version"
+[QEMU]: http://bellard.org/qemu/index.html "worked amazingly well - better than VMWare"
+[rs]: http://www.data-recovery-software.net/ "worked well, and relatively inexpensive"
+[ScroungeNTFS]: http://memberwebs.com/stef/software/scrounge/ "good, but no support for compressed files, and faults on files larger than 2GB"
+[testdisk]: http://www.cgsecurity.org/wiki/TestDisk "nice - recovered my boot sector automatically, but unable to read all the files"
+
+As I write this I'm now waiting for a 150GB file copy from the virtual 
+disk to a cleanly formatted 1TB drive to give to my Dad.  Because I'm an 
+idiot, I originally recovered the data onto the virtual disk, and not 
+the final destination.
+
+To add extra fun, rather than copy the data out somehow from the virtual 
+booted Windows 2000, I'm copying using:
+
+* A [network block device server][qemu-nbd] to read the data 
+block-by-block from the virtual disk.
+* The network block device client mounting that image as `/dev/nbd0`.
+* `kpartx` to get the partition out from the raw block device as 
+`/dev/mapper/nbd0p1`.
+* Finally, mounting `/dev/mapper/nbd0p1` as an NTFS disk (natively in 
+Linux), and copying using nautilus. _(Though [Malc][] points out rsync 
+might 
+have been a better choice.)_
+
+[qemu-nbd]: http://hg.codemonkey.ws/qemu-nbd "qemu-nbd"
+[malc]: http://www.farside.org.uk/ "google bloke"

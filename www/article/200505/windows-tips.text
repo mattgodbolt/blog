@@ -1,0 +1,87 @@
+Windows Tips
+Date: 2005-05-14 15:04:00
+Label: Blog
+
+After writing the '<a href="http://xania.org/article.php/tynkaw1">Things you
+never knew about Windows</a>' blog entry, it got me thinking.  There are loads
+of little subtleties to Windows that seem not to have been mentioned anywhere
+comprehensive, so I've taken it upon myself to collect a guide together.
+
+### Windows-key tips
+
+Pressing the windows key on its own brings up the Start Menu --- quite handy if
+you're not too fond of the mouse (like me!).  However, there are some other
+tricks you can do with the Windows key, by using it as a control key in
+combination with other keys.  By using it as a control key I mean you press and
+hold the Windows key, then press the other key, then release the Windows key,
+just like you do when you press 'control S' or similar.  NB these combinations
+are all valid on Windows 2000, and most likely Windows XP too; though XP might
+have additional buttons --- let me know if you find any!
+
+<table border="1"><tbody><tr><th>Key combination</th><th>Effect</th></tr>
+<tr><td>Windows key-D</td><td>Hides all windows, and shows the desktop (like
+clicking the 'Show Desktop' icon on the taskbar if you have that enabled).
+Pressing Windows key-D again unhides all the windows.  Very handy as a 'boss
+key'!</td></tr> <tr><td>Windows key-E</td><td>Opens a new copy of
+Explorer.</td></tr> <tr><td>Windows key-F</td><td>Opens the 'Search for Files
+and Folders' window.</td></tr> <tr><td>Windows key-M</td><td>Minimises all
+windows.</td></tr> <tr><td>Windows key-shift-M</td><td>Restores all windows (the
+opposite of minimise all).</td></tr> <tr><td>Windows key-R</td><td>Opens the
+'Run' box (same as Start-&gt;Run...).  Possibly the most useful key combination
+ever; I use this all the time to open folders and run programs.  See the tips
+below.</td></tr> <tr><td>Windows key-U</td><td>Opens the Utility Manager, which
+allows you to configure Windows's Accesibility functions like the Narrator and
+Magnifier.</td></tr> <tr><td>Windows key-Tab
+
+Windows key-Shift-Tab</td><td>Places the focus on the task bar at the next (or
+with shift, the previous) application.  A bit like ALT-Tab, but instead of
+cycling in most-recently-used order, cycles in window order.  Also once the
+focus is on the task bar you can then release the Windows key and use the arrow
+keys to move around, then the return key to select.</td></tr> <tr><td>Windows
+key-F1</td><td>Brings up the Windows 2000 help</td></tr> <tr><td>Windows key-
+Pause/Break</td><td>Brings up the System properties window.  Very useful for a
+quick keyboard-only way of getting to the hardware configuration of your
+machine, if for example your mouse packs in at an inoppurtune moment.</td>
+</tr></tbody></table>
+
+### Other keyboard tips
+
+* Ctrl-Shift-Escape brings up the Windows Task Manager.
+
+### Run dialog tips
+
+A few tips with the 'Run' dialog mentioned above:
+
+* Typing a path into the Run box opens an explorer window at that path.
+  E.g. Windows key-R then 'c:' opens explorer at your c: drive.  Very handy when
+  used in conjunction with the auto-completion, means you can quickly open folders
+  you work with a lot.
+* If you add the desktop folder to your system PATH, then you can run all the shortcuts and files you have on your desktop.  I use
+  this a lot, I have all my most used programs shortcutted on my desktop, and then
+  (for example) I can run <a href="http://www.editpadpro.com/">EditPad</a> by just
+  Windows key-R then editpad.  Of course, anything on your path will run, but by
+  putting the desktop in the path you can quickly add programs to your search path
+  simply by placing shortcuts on your desktop.
+
+### Explorer tips
+
+A few quick tips for Explorer:
+
+Mouse tips:
+
+* Double-clicking on a file in explorer with the ALT key held down brings
+  up the property window for that file.
+* Right-clicking on the system window box (the top left of the explorer window gives the context menu for the
+  containing folder.
+
+Keyboard tips:
+
+* Alt-Enter brings up the property window for the selected file(s).
+
+If I'm not too lazy, I'll be adding to this list as and when I remember the
+other myriad little tips that make using Windows that bit more manageable.
+Please also send in any tips you might have yourself, and I'll add them here
+too.
+
+Thanks to <a href="http://www.farside.org.uk/">Malcolm Rowe</a>
+and Nick Wright for their help in compiling this guide.

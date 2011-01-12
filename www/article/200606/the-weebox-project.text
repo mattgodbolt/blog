@@ -1,0 +1,66 @@
+The Weebox Project
+Date: 2006-06-25 16:22:04
+Label: WeeBox Project
+
+For some time I've been looking for a fun computer-related project to work on in
+my spare time.  I've now decided what to do --- the <a
+href="http://weebox.org">Weebox</a>.
+
+For a while I've been cursing and swearing at the piles of audio CDs that stack
+up around the hi-fi in the lounge.  Not only are they a mess, but they're
+picking up scratches like nobody's business, and with my aging hi-fi's CD player
+being rather sensitive to scratches and bangs (even walking near it tends to
+upset it), most of our music ends up being given the CD-player techno re-re-re-
+re-re-re-mix.  Then a few weeks ago I stumbled on the <a
+href="http://www.slimdevices.com/">Squeezebox</a> on my friend <a
+href="http://gerph.org/diary/index.html">Gerph's blog</a>.  This fantastic
+device is a high-quality wireless mp3 player which plays music served by its
+server software running on a host PC.  It plugs into a hi-fi and essentially
+gives that hi-fi access to the music collection stored on your PC.  As almost
+all of my music resides in MP3 and OGG form on my file server, this sounded
+absolutely brilliant.
+
+With my 30th birthday looming in the next month or so, it seemed like a sensible
+thing to ask for.  Except...a nagging sensation at the back of my mind..."I
+could build my own, surely?".  Thus, the <a href="http://weebox.org">Weebox</a>
+was born.
+
+I'm planning on building my own Squeezebox-like device from an <a
+href="http://www.arm.com">ARM</a> single-board computer from <a
+href="http://www.embeddedarm.com/epc/prod_SBC.htm#arm">Technologic Systems</a>,
+using Open Source Software where possible, and maybe writing my own stuff to
+glue it all together into one unit.  If I get anywhere near complete, I plan on
+making any source available under a free software license, but that seems a long
+way off yet.
+
+What I'm hoping to achieve is:
+
+* A small, silent, self-contained unit that won't look out of place on my
+  hi-fi or even on top of the hi-fi unit in the lounge.</li><li>MP3 and OGG
+  playback, reading from an NFS-mounted drive.
+* <a href="http://last.fm">last.fm</a> support, in particular the streaming
+  stations.
+* Decent LCD or VFD screen display.
+* Remote control, either a new one or somehow using my existing hi-fi
+  remote control.
+
+Initially, I plan on getting the TS-7250 or TS-7260
+base unit, with a USB wifi card and USB sound dongle and an LCD display.  From
+there I hope to get <a href="http://www.underbit.com/products/mad/">madplay</a>
+and the integer OGG player working.  The ARM boards aren't too good at floating
+point, though the ARM unit in the TS boards has a basic FPU, hence the integer
+playback.  200Mhz should be plenty enough power for such a wee box.
+
+I hope to keep track of what I'm up to on my blog here, so anyone else
+contemplating making such a device can learn from my mistakes, or just come and
+laugh at my naive grasp of electronics!  I'm really looking forward to the
+challenge --- not least because I'll get to play with ARM chips again after a
+break of around ten years!
+
+So far in preparatory work I've gotten madplay cross-compiled for ARM using the
+excellent <a href="http://www.scratchbox.org">Scratchbox</a> cross-compilation
+system (spot the -box theme here!), and I've taken a quick look at the last.fm
+player and gotten a simple <a href="http://www.python.org">Python</a> script to
+log in to last.fm and get the radio streams.  I can't wait to get my hands on
+some actual hardware to start proper development; I'm planning on ordering it
+tomorrow!

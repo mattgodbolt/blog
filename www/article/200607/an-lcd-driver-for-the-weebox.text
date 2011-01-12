@@ -1,0 +1,69 @@
+An LCD driver for the Weebox
+Date: 2006-07-08 11:48:46
+Label: WeeBox Project
+
+Yesterday I mostly spent learning about Linux kernel module development.  I
+decided to bite the bullet and modify <a href="http://lcd-mod.sourceforge.net/">lcdmod</a> to support the TS7200-series LCD panel.  It
+turned out to be fairly simple in the end.
+
+I firstly created a new configuration define 'TS7200_CONFIG' which switched
+between the default parallel port behaviour of lcdmod and the memory-mapped
+hardware approach the Weebox needs.  Then I refactored the LCD sample code from
+Embedded ARM to have a rational API, replacing the ARM-specific code with kernel
+equivalents (mostly ndelay() calls).  With appropriate #ifdefs in the lcd.c to
+call the TS7200 support routines, and a patched Makefile, it built fine.  A bit
+of debugging ensued (and a fair number of reboots!) until I had everything
+working --- the stupidest bug being me getting the parameters to writel() the
+wrong way around at first, so instead of writing 0x38 to address 0x8084004c, I
+was writing 0x8084004c to address 0x38 --- boom!
+
+In modifying the driver I discovered a crash bug in the implementation which
+probably doesn't manifest itself on the PC (well, I guess not as seemingly
+nobody's noticed it before!)  Upon reprogramming the user-defined graphics, the
+virtual cursor was left at '-1, -1' (to invalidate the current cursor position).
+This is all sensible and good...except the next character write reads and
+updates a virtual display array at array[-1][-1] --- CRASH.  The UDG reprogram
+code really should have moved the *hardware* cursor position --- then in the
+character write code the driver spots the actual and virtual cursors are out of
+synch and resets the hardware cursor position.  I've submitted a patch to the
+author, though with no activity on the driver since August 2004 there's a chance
+the author may have moved on.
+
+While I was at it I put support for <a
+href="http://en.wikipedia.org/wiki/Devfs">devfs</a> in so I didn't need to make
+a /dev/lcd node myself, I let the OS do it.  To be complete I need to put
+support for <a href="http://en.wikipedia.org/wiki/Udev">udev</a> in too, but as
+my kernel's 2.4.26 that's not something I can test just yet.  Once I'm happy
+I've got all the bugs out, and pending a reply from the author, I'll either
+submit my patch to him or make a new lcdmod distribution with my changes in.
+For now I've made a <a
+href="http://xania.org/media/lcdmod-1.0.2-ts7200.tar.bz2">snapshot of the
+current code</a> available.
+
+With my nice new shiny LCD module installed and working, I made the
+modifications to my prototype Python Weebox code to talk to /dev/lcd.  During
+this process I had a thought: Currently on the Windows development version I'm
+using TCP to talk to a Tkinter window emulating an LCD display.  Until now this
+has meant implementing an LCD emulator, which I've only cursorily attempted.
+However, now I have a /dev/lcd device on the Weebox, I realised I could use <a
+href="http://netcat.sourceforge.net/">netcat</a> to make the Weebox's LCD
+display accesible from the network!  By running 'nc -l -p 4000 &gt; /dev/lcd' on
+the Weebox, and modifying the display driver on the Windows machine to send LCD
+commands to port 4000 of the Weebox I could get the Windows machine to easily
+control the actual LCD device!  Much easier; and means the difference between
+the Weebox version and the Windows version is kept to the bare minimum.
+
+This morning I've been tinkering with input.  I've drawn out a diagram of the
+Xbox DVD remote control that I'm planning on using and I'm sketching out ideas
+for menus and similar.  I've put in a very quick 'Input' layer which on Windows
+maps keyboard presses to remote control buttons, and I've got the simple stuff
+(play, pause, stop, next, previous, seek) wired in, so I can actually control
+the Weebox now.  In doing so I spotted a few simple optimisations in the Python
+code, and now Weebox.py 'only' takes 5-10% CPU on the Weebox.
+
+I'm getting dangerously close to a working prototype --- all that's missing now
+is the infra-red decoder logic, which I'm hoping will turn up on Monday.
+However, I expect development on the Weebox to slow down a bit now as I'm off to
+a wedding this weekend and I'm back to work next week so I'll only be Wee-
+developing in the evenings.  I can't wait though, I haven't had so much fun with
+computers in a very long time!

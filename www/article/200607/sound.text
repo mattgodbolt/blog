@@ -1,0 +1,91 @@
+Sound!
+Date: 2006-07-06 09:46:22
+Label: WeeBox Project
+
+Getting the sound working was my next priority.  The guys at Embedded ARM build
+and supply their own wireless drivers so I wasn't too worried about getting that
+working, but the section of their setup document on sound was simply 'TODO'.  It
+turned out to be a bit more of a faff than I was hoping!
+
+First up, I needed a kernel which had the soundcore installed --- the ts11
+kernel that was supplied on the board has no sound support compiled in at all.
+That meant building and installing my own kernel.  Linux kernel building isn't
+usually a problem nowadays; but I had to get the patched kernel tree from
+Embedded ARM, get that building, and then get it installed on the system.
+
+First up, finding the patched kernel was a bit of a game of hide-and-seek: The
+website only talks of ts9 kernels.  A bit of digging around and I found the <a
+href="ftp://ftp.embeddedarm.com/linux24-ts11.tar.gz">ts11 kernel tree</a> on
+their ftp server.  Unpacking this directly onto my NFS root disk, I planned to
+compile it on the Weebox itself (no cross compilation yet, one more thing to go
+wrong!)  I quickly realised a bit of modification was needed --- the Makefile
+needs editing to *not* force cross-compilation.  Then off we went, usual
+configuration (after a make ts7250\_config to get a valid configuration), then
+building.  Gosh I've forgotten how slow computers used to be --- the build took
+about an hour.
+
+In the meantime I was reading up on how I might actually install the image when
+finished.  The ts7200 series boards use the Open Source boot manager <a
+href="http://ecos.sourceware.org/docs-latest/redboot/redboot-guide.html">RedBoot</a>, which thankfully has a fair amount of well written
+documentation.  As it turned out, installing the kernel image was a doddle --- I
+needed to get a tftpd server running to serve the kernel image, then from within
+RedBoot I could download the image and store it into flash RAM in two simple
+commands.
+
+Miraculously, the kernel worked first time, and booted up with sound support.
+Next step, getting the ALSA drivers for USB Audio working.  I had already
+installed the Debian ALSA library and tools, I just needed the kernel modules.
+I unpacked the modules, and followed <a href="http://www.alsa-project.org/alsa-doc/doc-php/template.php?module=usb-audio">these steps</a> to configure ALSA for
+usb audio alone.  All went well, but then 'make' failed with some compilation
+issues.  Firstly, the ALSA libraries seem not to support the kernel version
+2.4.26.  There are some kernel support structures (work_queue) that seemingly
+came in some version of 2.5.*, but apparently have been back ported into 2.4.26.
+A quick modification of the conditional compilation in include/acore.h and
+acore/misc.c fixed this.  Another problem was the file 'memalloc.c' which needed
+to know which bus to allocate contiguous RAM from.  As the Weebox doesn't have
+either a PCI bus or an SBUS, the code #errors out with 'Need a bus for
+dma\_alloc\_coherent()'.  Throwing caution to the wind, I blatantly lied and
+changed the conditional if to always assume there was a bus, and all compiled!
+
+With the module installed, and my shiny new kernel running, I loaded up the
+module, plugged in some headphones, and fired up alsamixer.  ALSA correctly
+found my USB sound card --- yay --- so I turned the volume down to a manageable
+level (the USB dongle seems to be extremely loud and I didn't want to destroy my
+Sennheisers!)  Next, with baited breath I ran mpd and started playing some
+music....
+
+No sound!  Wahh!  Ah, the volume in mpd is set to zero...let's try
+20%...nothing...50% nothing...oh dear.  I was just about to give up and start
+diagnosing the code when I had a moment of doubt about the port I'd plugged the
+headphones into.  Yup, that was it --- plugging the headphones into the
+*headphone* socket on the USB dongle helps!  I had glorious sound playing
+through my Weebox!
+
+Very excited I experimented a lot more with it.  MP3 playback using the MAD
+library takes around 5% cpu, not bad at all I thought!  I remember with my
+ARM7-based machine having to offline 'render' mp3s to a WAV file to listen to
+them.  How things have moved on!  Next up, I tried OGG files...no sound, and MPD
+spinning at 100% cpu.  Ah, yes of course.  The MPD I was using was the one
+direct from Debian, which doesn't use the integer-optimised OGG library, Tremor.
+I'd have to build my own MPD.
+
+I really do need to sort out this cross-compiling lark.  The binaries I make in
+Scratchbox just don't seem to have the dynamic libraries configured correctly, I
+really need to learn about this some more, because building MPD natively took
+the rest of the day.  Admittedly, in my excitement I had completely forgotten to
+install all the support libraries needed for MPD, which forced me to
+continuously have to reconfigure and rebuild.  Indeed, only this morning (I left
+it building overnight) was I able to finally get my own MPD installed and
+running.
+
+As I type I'm listening to an OGG file (Way Out West --- Introvert / Seaside
+Floater) and it sounds great.  OGG decode does rather take up more CPU though:
+
+
+    PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND
+    5820 mpd      19   0  3132 3132 2796 R 60.3  5.1  27:26.34 mpd
+
+Still, the Weebox won't be doing anything other than playing sound, so 60% isn't
+really a worry!  Hooray!
+
+Next up: getting the LCD panel displaying the song details.

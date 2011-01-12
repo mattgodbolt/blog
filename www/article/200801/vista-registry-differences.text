@@ -1,0 +1,83 @@
+Differences in the registry between Vista and XP
+Date: 2008-01-14 22:42
+Label: Coding
+Summary: A Vista gotcha.  That's really an XP gotcha.
+Status: Draft
+
+When Windows Vista came out last year, it was clear Microsoft had had a bit of a think about
+permissions.  One of the key differences between Vista and its predecessor, XP, was the idea
+that users no longer run as Administrator on their own machines.  As most pre-Vista programs
+rely on being able to read and write to disk areas and registry keys that a non-privileged
+user has no access to, Microsoft came up with a [solution][uac]: to virtualise aspects of the [registry][virtreg]
+and some [areas of the disk][virtdisk].
+
+[uac]: http://en.wikipedia.org/wiki/User_Account_Control "User Account Control"
+[virtreg]: http://msdn2.microsoft.com/en-us/library/aa965884.aspx "Registry Virtualization in Windows"
+[virtdisk]: http://blogs.msdn.com/vishalsi/archive/2006/10/04/Where-are-files-virtualized-in-Vista_3F00_.aspx "File system virtualization"
+
+All rather clever, and in most cases XP programs which previously required Administrator access
+will just run.  We weren't quite so lucky with ProFactor's product line --- as a Visual Studio
+Addin, our products inherit the configuration settings of Visual Studio --- which explicitly
+turns off virtualization.  So, we had to bite the bullet and do things properly, ensuring all
+configuration files are stored in `Docs and Settings\Username\Application Data\...`, and that
+user settings are stashed only in `HKEY_CURRENT_USER`.
+
+We made the appropriate changes and then tested everything...but something still wasn't working
+right.  After a lot of debugging, we tracked it down to the some code similar to:
+
+    ::: cpp
+    bool RegSetString(HKEY iKey, const char *iKeyName,
+                      const std::string &iValue)
+    {
+    	size_t valueLength = iValue.length();
+    	LONG res = RegSetValueEx(iKey, iKeyName, 0, REG_SZ, 
+                       reinterpret_cast<const BYTE*>(iValue.c_str()),
+                       valueLength);
+    	return (res == ERROR_SUCCESS);
+    }
+
+Can you spot the problem?  The clue's in the [RegSetValueEx][rsve] help page, where it talks about
+what the "cbData" parameter is all about (that's the last one in the list):
+
+[rsve]: http://msdn2.microsoft.com/en-us/library/ms724923(VS.85).aspx "RegSetValueEx help"
+
+    cbData
+
+    The size of the information pointed to by the lpData
+    parameter, in bytes. If the data is of type REG_SZ,
+    REG_EXPAND_SZ, or REG_MULTI_SZ, cbData must include
+    the size of the terminating null character or characters.
+
+Oops!  We're off by one on the length parameter - the terminating null character is missed out.
+But the interesting part is that this is treated differently on Windows Vista than on previous
+versions of Windows.  In the instance where we set an empty `""` string to the registry, the
+code succeeds on Windows XP, but fails on Vista with the error LOOK THIS UP.
+
+Obviously the code's wrong, but it's interesting to note that Vista considers an unterminated 
+empty string to be an error condition, whereas XP does not.  One to watch out for.
+
+    // RegMonkey.cpp : Defines the entry point for the console application.
+    //
+    
+    #include "stdafx.h"
+    
+    bool RegSetString(HKEY iKey, const char *iKeyName,
+    				  const std::string &iValue)
+    {
+    	size_t valueLength = iValue.length();
+    	LONG res = RegSetValueExA(iKey, iKeyName, 0, REG_SZ, 
+    		reinterpret_cast<const BYTE*>(iValue.c_str()),
+    		valueLength);
+    	return (res == ERROR_SUCCESS);
+    }
+    
+    
+    int _tmain(int argc, _TCHAR* argv[])
+    {
+    	HKEY key;
+    	RegCreateKeyA(HKEY_CURRENT_USER, "Software\\ProFactor\\StyleManager", &key);
+    	bool ok = RegSetString(key, "Testy", std::string("Dirigible"));
+    	RegCloseKey(key);
+    	return 0;
+    }
+    

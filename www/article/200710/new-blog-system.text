@@ -1,0 +1,28 @@
+A new blogging system
+Date: 2007-10-18 23:05:00
+Label: Blog
+
+Another six months pass and no updates --- I haven't forgotten about this site, honestly.
+I'm still hugely busy at [ProFactor][pf], working on an exciting new project.  It's all
+still rather secret, but pending some contracts being signed I should be able to talk at
+least a little bit about it soon.
+
+Over the past few months my inbox is flooded with spam from the Geeklog blogging system.
+More and more automated spam attacks are targeting it, both in terms of comment spam and vulnerabilities.
+Geeklog also eats lots of CPU and disk space with all its many features; none of which I really use
+either. Luckily, my good friend [Malcolm Rowe][malc] has been working on a very simple and effective
+little blogging system, based on [MarkDown][md], [SmartyPants][sp], the [Electric Template Language][etl]
+and some glue code of Malc's.  Malc is one of the developers of [Subversion][svn], and it shows: the system
+is designed to use a source control system as its database.  Obviously it works well with Subversion.  Indeed,
+posting an article is as simple as checking in an article file.
+
+Anyway, hopefully I haven't broken anything --- all the URLs have changed (to more well-designed ones),
+but there should be redirects for all the previous links.  Do let me know if anything's broken, and hopefully I'll be
+able to post more about ProFactor's latest project soon.
+
+[pf]: http://www.profactor.co.uk/
+[malc]: http://www.farside.org.uk/ "Malcolm Rowe's blog"
+[md]: http://daringfireball.net/projects/markdown/
+[sp]: http://daringfireball.net/projects/smartypants/
+[etl]: http://etl.i-want-a-pony.com/
+[svn]: http://subversion.tigris.org/

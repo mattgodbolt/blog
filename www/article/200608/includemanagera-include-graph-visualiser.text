@@ -1,0 +1,26 @@
+IncludeManager - a #include graph visualiser
+Date: 2006-08-23 09:05:00
+Label: Coding
+
+<a
+href="http://www.profactor.co.uk/screenshot_im.php?p=IncludeManager&amp;s=1"><img
+src="http://www.profactor.co.uk/images/project_graph-small.jpg" alt="[A project
+graph]" align="right" height="NaN" width="256" /></a>It's been a while since
+ProFactor have had such an exciting announcement but today I'm pleased to say we
+can change that:  We're very proud to announce our next product, <a
+href="http://www.profactor.co.uk/includemanager.php" name="IncludeManager --- A
+C/C++ #include graphing addin for Visual Studio">IncludeManager</a>!
+
+IncludeManager is a sophisticated #include graphing package for Visual Studio,
+allowing you to keep tabs on your C++ dependency graphs, find elusive build
+bottlenecks and much more.  It plugs into the Visual Studio IDE and updates in
+real time as you edit your code, drawing an attractive graph of how the physical
+design of your code is layed out.
+
+There's much more information over at the <a
+href="http://www.profactor.co.uk/includemanager.php">IncludeManager product
+page</a> where it's also possible to sign up to be a beta tester.  We anticipate
+a full release in the next month or so.
+
+I'm so excited, it's such a cool product to have been working on, and I'm so
+glad we can finally announce it!

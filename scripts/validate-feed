@@ -1,0 +1,24 @@
+#!/bin/sh
+# Validate the feed at http://www.farside.org.uk/feed, and return a non-zero
+# exit code if it's not as expected.
+
+ACTUAL=`tempfile`
+EXPECTED=`tempfile`
+
+svn up -q ~/feedvalidator
+~/feedvalidator/src/demo.py http://www.farside.org.uk/feed AAA > $ACTUAL
+cat > $EXPECTED << EOF
+Validating http://www.farside.org.uk/feed
+ Response is not compressed
+EOF
+
+DIFF=`tempfile`
+diff -u $EXPECTED $ACTUAL -L expected -L actual > $DIFF
+if [ $? == 1 ]; then
+  cat $DIFF
+  rm $ACTUAL $EXPECTED $DIFF
+  exit 1
+else
+  rm $ACTUAL $EXPECTED $DIFF
+  exit 0
+fi

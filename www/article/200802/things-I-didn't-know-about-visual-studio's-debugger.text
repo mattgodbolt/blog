@@ -1,0 +1,23 @@
+Things I didn't know about Visual Studio's Debugger
+Date: 2008-02-18 17:42
+Label: Coding
+Status: Public
+Summary: Discussing debugger pseudovariables for accessing GetLastError return values.
+Via: http://www.codeproject.com/KB/debug/pseudoregister.aspx
+
+I've used Visual Studio in its various incarnations since version 5.0, and
+I'm still finding cool little things out about it.  Today, while Googling
+about for debugger-related things, I stumbled across a [CodeProject][]
+post which contains a real gem.  It's possible to create a watch on the
+value of `GetLastError()` --- the pseudovariable `@ERR` reflects the value
+of the last error generated.
+
+[CodeProject]: http://www.codeproject.com/ "a handy programming site"
+
+Additionally, the format specifier `hr` formats the number as an `HRESULT` style
+identifier, so putting `@ERR, hr` in a watch pane shows values like `S_OK`.  Previously I've
+only known about the number formats (e.g. `12` to show 12 elements of an array) and `x` to show stuff in hex.
+
+Dead handy stuff, and worth checking out the [original article][oa] for even more pseudovariables.
+
+[oa]: http://www.codeproject.com/KB/debug/pseudoregister.aspx "why didn't I know about this before?"

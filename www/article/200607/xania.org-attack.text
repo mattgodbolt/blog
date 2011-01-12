@@ -1,0 +1,20 @@
+Xania.org attack
+Date: 2006-07-20 20:07:40
+Label: Blog
+
+Well, that wasn't much fun at all.  I've just reinstalled xania.org from scratch
+as a result of some git hacking it.  Luckily I happened to spot the hacking
+attempt as it happened, but sadly not before my intruder had gotten halfway into
+installing a root kit.
+
+The intruder got in through a <a href="http://www.geeklog.net/article.php/exploit-for-fckeditor-filemanager">GeekLog vulnerability</a>, then was able to
+use a 2.6 kernel /proc race condition exploit to get root.  After that the
+intruder started covering his tracks with a utmp and log wiper, and was in the
+process of installing a root kit (replacing ifconfig and netstat) when I kicked
+him off and locked down the site.
+
+In its new guise, xania.org has the latest patches all installed, latest kernel
+and some increased compromisation detection tools installed.  I do hope this
+time I'm more secure.  After 7 years of being up, this is the first time
+someone's gotten in -- though my luck is more due to obscurity than security, I
+might add.

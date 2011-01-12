@@ -1,0 +1,107 @@
+IO Completion Ports
+Date: 2008-07-17 11:15:00
+Status: Public
+Label: Coding
+Summary: One of the better features in Windows.  Sadly, very awkward to use correctly.
+
+<p class="side" style="max-width:128px;">
+<img src="/200807/matt's-pkr-avatar" width="128" height="128" alt="My PKR avatar"/>
+</p>
+
+At the place I'm [currently working][pkr], I spend a lot of time working on Windows servers.
+The servers are very heavily multithreaded to deal with loads of clients simultaneously.
+However, as the received wisdom is that having one thread per connection is bad, we use a thread pool
+to better distribute work amongst threads.
+
+[pkr]: http://www.pkr.com/ "PKR - the best online 3D poker there is"
+
+One of the issues with using thread pools is the [thundering herd][th] problem --- lots of threads
+in a pool all waiting for some work, and then when that work turns up, they all jump on it.  Only
+one can win, but in the mean time you have a great big fightas they all try to acquire
+the exclusive lock.  Eventually it all settles down, but you've probably thrown away any performance 
+gained from pooling right there in the dusty cloud of context switching.
+
+[th]: http://en.wikipedia.org/wiki/Thundering_herd_problem "Moooo"
+
+On Windows, a solution to this problem lies in the interesting concept of "IO Completion Ports."
+These are queue objects (represented as a `HANDLE`) which can be associated with file or network `HANDLE`s,
+upon which many threads can wait.
+When an input or output operation on an associated `HANDLE` completes (for example a network write),
+one (and only one) of the waiting threads is woken up to deal with the event.  Additionally, user events can be enqueued
+on the port, so the waiting threads can be made to do non-IO specific operations too.
+
+I don't know of an equivalent analogue on a non-Windows
+operating system, but then I'm a little out of touch --- my last venture into internet programming on Linux
+was for my [MUD][] back at university.
+
+[MUD]: http://www.topmudsites.com/forums/mudinfo-TheMoog.html "Aah for the old days"
+
+This is all great, and they're pretty easy to use --- once you've worked out their many subtleties.  Firstly, the
+[documentation][doc] is *rubbish*.  There's no decent overview documentation, and some of the reference material
+is plain misleading.  After some email nagging from me, they've improved it a little, but they seem to have changed
+[the way they document return values][rv], making them almost as [confusing][conf] as they used to be.
+
+[doc]: http://msdn.microsoft.com/en-us/library/aa365198(VS.85).aspx
+[rv]: http://blogs.msdn.com/oldnewthing/archive/2008/06/18/8612930.aspx "Honestly, it's so confusing"
+[conf]: http://blogs.msdn.com/oldnewthing/archive/2008/06/18/8612930.aspx "See the 'Return Value' bit"
+
+There are some unusual edge cases you need to deal with.  The [GetQueuedCompletionStatus][rv] function blocks
+a thread until there's work for it to do.  Based on the return value, the number of bytes and the overlapped structure,
+there's a lot of possible "reasons" for the function to have returned.  Deciphering all the possible cases:
+
+<table>
+<tr><th>Return value</th><th><code>OVERLAPPED</code></th><th>number of bytes</th><th>Description</th></tr>
+<tr>
+    <td>zero</td><td><code>NULL</code></td><td>n/a</td>
+    <td>The call to GetQueuedCompletionStatus failed, and no data was dequeued from the IO port.
+This usually indicates an error in the parameters to GetQueuedCompletionStatus.</td>
+</tr>
+<tr>
+    <td>zero</td><td>non-<code>NULL</code></td><td>n/a</td>
+    <td>The call to GetQueuedCompletionStatus failed, but data was read or written.  The thread must deal
+with the data (possibly freeing any associated buffers), but there is an error condition on the underlying <code>HANDLE</code>.
+Usually seen when the other end of a network connection has been forcibly closed but there's still data in the send or receive queue.</td>
+</tr>
+<tr>
+    <td>non-zero</td><td><code>NULL</code></td><td>n/a</td>
+    <td>This condition doesn't happen due to IO requests, but is useful to use in combination with 
+<a href="http://msdn.microsoft.com/en-us/library/aa365458(VS.85).aspx">PostQueuedCompletionStatus</a> as
+a way of indicating to threads that they should terminate.</td>
+</tr>
+<tr>
+    <td>non-zero</td><td>non-<code>NULL</code></td><td>zero</td>
+    <td>End of file for a file <code>HANDLE</code>, or the connection has been gracefully closed (for network connections). 
+The <code>OVERLAPPED</code> buffer has still been used; and must be deallocated if necessary.</td>
+</tr>
+<tr>
+    <td>non-zero</td><td>non-<code>NULL</code></td><td>non-zero</td>
+    <td>"num bytes" of data have been transferred into the block pointed by the <code>OVERLAPPED</code> structure. 
+The direction of the transfer is dependant on the call made to the IO port,
+it's up to the user to remember if it was a read or a write (usually by stashing extra data in the <code>OVERLAPPED</code> structure).
+The thread must deallocate the structure as necessary.</td>
+</tr>
+</table>
+
+That's about as succinct as I can get it.  Hopefully that will be useful to somebody somewhere --- I know I didn't
+find the Microsoft documentation much use.
+
+Though their name seems to suggest they're all about IO requests, IO Completion Ports can also be used for general purpose
+thread pools.  By creating an IO Completion Port unassociated with any sockets, files or so on, one can schedule "work"
+by calling [PostQueuedCompletionStatus][pqcs] on the port, passing in anything you like in the `OVERLAPPED` structure, number of bytes and
+completion key.
+
+[pqcs]: http://msdn.microsoft.com/en-us/library/aa365458(VS.85).aspx
+
+One final gotcha, and a bit of a "[wtf][]" moment:  When creating unassociated IO Completion Ports, watch out for the parameters to
+[CreateIoCompletionPort][cicp].  The first `HANDLE` you pass has to be `INVALID_HANDLE_VALUE`, whereas the second has to be `NULL`.
+You'd think if both `HANDLE`s were basically saying "no handle", convention would have it that they'd be the same, but no.  The
+only thing I can think of is that the second parameter is marked as "optional", so `NULL` is more appropriate, but it does make you
+wonder why `INVALID_HANDLE_VALUE` isn't `NULL`.  Seems it's [legacy reason][leg].
+
+[wtf]: http://thedailywtf.com/ "Source of many a good laugh"
+[cicp]: http://msdn.microsoft.com/en-us/library/aa363862(VS.85).aspx
+[leg]: http://blogs.msdn.com/oldnewthing/archive/2004/03/02/82639.aspx "More MS apologies from Mr Chen"
+
+Ironically, after all the work on IO Completion Ports, one of our major components _does_ use a
+one thread per connection model, and has scaled beautifully.  A reminder to check your assumptions
+before embarking on a lengthy new implementation.

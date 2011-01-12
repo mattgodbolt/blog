@@ -1,0 +1,35 @@
+LIRC and a driver
+Date: 2006-07-15 09:50:12
+Label: WeeBox Project
+
+Last night I built a <a href="http://www.lirc.org">LIRC</a> driver for the
+Weebox's infra red detector.  Full credit to the LIRC guys, this was very easy,
+barring one unfortunate problem (isn't there always!)
+
+The LIRC source comes with a serial port driver, which uses an infra-red
+detector plugged into the serial port directly, and uses interrupts from the DCD
+line to note when infra-red pulses come in.  I used this as reference; with one
+main modification: The EP9302 can detect both rising *and* falling edges on its
+IO pins.  The serial port can't and so the serial driver sits in the interrupt
+routine waiting for a falling edge after it has been interrupted with a rising
+edge.  As this can be a fair few milliseconds, this is a waste of valuable
+kernel time for my embedded box.
+
+During my investigations I came across a very nasty bug which initially I
+thought was a compiler bug.  No really, it was one of those ones where inserting
+a printf() fixed the problem, or indeed moving the code about very slightly or
+changing the optimisation settings fixed it too.  In the end --- pretty much as
+ever --- it turned out to be an actual programming bug: a zero-sized array was
+being written to (through a fairly obfuscated set of steps).  I've mailed the
+LIRC guys and hopefully they can put it right in the main line.
+
+After finding this I was finally able to get my driver up and running, and the
+Xbox remote control being detected properly --- hooray!
+
+<a
+href="http://picasaweb.google.com/matt.godbolt/TheWeeboxProject/photo#4951899869970300946"><img
+src="/media/ir-detector.jpg" /></a>
+
+Next up I need to tidy up the mess of code I've made while hunting that array
+bug, and then I'll get a patch for this driver published somewhere: I've already
+had one email from an interested party!

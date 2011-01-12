@@ -1,0 +1,43 @@
+Python sqlite3 gotchas
+Date: 2007-11-04 16:35
+Label: Coding
+Summary: A caveat for sqlite3 in Python - if your databases don't fill with data, this might be why.
+
+If you're using [sqlite3][] for [Python][] be aware it uses transactions by default.
+I didn't realise this, and it caught me out a treat.  So, if you want to save yourself
+a few hours of debugging, take note!
+
+Before every `INSERT/UPDATE/DELETE/REPLACE` statement, Python's sqlite3 implicitly opens
+a transaction.  It automatically commits before a non-query statement, e.g. before a `CREATE TABLE`
+or similar.  This is pretty cool, as if an exception or whatever's thrown while
+you're inserting data, the database state won't be affected.
+
+But it's not so cool when you do something like:
+
+    :::python
+    import sqlite3
+    # Create and populate a database
+    db = sqlite3.connect('temp.db')
+    db.execute("CREATE TABLE IF NOT EXISTS test(id int, \
+                data text)")
+    db.execute("INSERT INTO test(id, data) VALUES(1, \
+                'hello')")
+    db.close()
+
+    # Reopen the database and read out all the rows
+    db = sqlite3.connect('temp.db')
+    print db.execute("SELECT * FROM test").fetchall()
+    db.close()
+
+Doing this will have you scratching your head going, "Why is my database empty?  I'm sure I 
+put something in it!"  Indeed you did, but because you didn't commit the data (or have Python
+automatically do it for you), the data is rolled back and lost.
+
+So the lesson here is either `db.commit()` manually at the relevant points (before closing the database in this case), 
+or create the connection with a `None` isolation_level:
+
+    :::python
+    db = sqlite3.connect('temp.db', isolation_level=None)
+
+[sqlite3]: http://www.sqlite.org "A simple file-based integrated database solution"
+[python]: http://www.python.org "Python.  Not a snake"

@@ -1,0 +1,48 @@
+Geeklog 1.4.0rc2 and stuff
+Date: 2006-01-25 09:37:00
+Label: Blog
+
+Last night, xania.org achieved a whole year's uptime!  Hooray!
+
+Rather embarrasingly I had had the year uptime anniversary in my diary, and
+celebrated by updating the <a href="http://www.geeklog.net">GeekLog</a> blog
+system I use on GodboltBlog to the latest release candidate --- <a
+href="http://www.geeklog.net/article.php/geeklog-1.4.0rc2">GeekLog 1.4.0rc2</a>.
+
+The new version sports several nice new features --- trackback and pingback with
+spam filter support, an <a href="http://www.fckeditor.net/">advanced HTML
+editor</a>, better syndication support and a more modular design with the <a
+href="http://xania.org/polls/index.php">poll system</a> and the <a
+href="http://xania.org/links/index.php">links system</a> now being plugins.
+
+The installation went fairly well --- because I had previously patched my
+geeklog with trackback and pingback support (prior to the spam support that is),
+my database tables were already partially fixed up.  As a result, the first
+upgrade hosed the database completely, and I had to restore from backup.  I
+strongly recommend that you do backup (like the installer says!) before
+attempting an upgrade!
+
+Even with some hasty MySQL administration fiddling, I couldn't quite get the SQL
+update script doing what I needed; so I resorted to manually editing the SQL
+script to cater for my modified database schema.  It didn't take more than ten
+minutes in total.
+
+Getting my modified layout was also involved.  I've always manually updated the
+CSS and thtml files used in GeekLog, but this time around I used <a
+href="http://www.araxis.com/merge/index.html">Araxis Merge</a> to perform a
+three-way merge from the original unadulterated geeklog 1.3 source, my modified
+1.3 layout, and the 1.4 layout.  This proved very successful, I would recommend
+trying it yourself.  Ideally I would have used <a
+href="http://tortoisesvn.tigris.org/">TortoiseMerge</a>, but sadly that doesn't
+(yet?) support 3-way directory diffs.
+
+As a result of the upgrade, I've not yet reinstalled the stats or forum plugins.
+I'm fairly tempted to not install either; the forums were woefully underused and
+the stats package merely bloats the database backup with an enormous volume of
+information that I no longer use.  I don't use it any more because xania.org
+doesn't have the processing power necessary to churn through and generate the
+relevant pages in real time.  Instead, I've been using <a
+href="http://www.google.com/analytics/">Google Analytics</a> instead, which I
+notice has just sent out <a
+href="http://www.google.com/analytics/progress.html">some more beta
+invitations</a>.

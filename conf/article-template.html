@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-GB">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="/style/site" type="text/css" media="all">
+  <link rel="stylesheet" href="/style/syntax" type="text/css" media="all">
+
+  <title>[%= title %] &#8212; Matt Godbolt&#8217;s blog</title>
+[%- if summary != "" -%]
+  <meta name="description" content="[%= summary %]">
+[%- end -%]
+  <link rel="alternate" type="application/atom+xml"
+        title="Atom (full content)" href="/feed">
+  <link rev="made" title="Matt Godbolt" href="mailto:themoog@xania.org">
+  <script type="text/javascript">
+    [%- include "updatepostingtime.js" -%]
+  </script>
+[%- include "common-headers.html" -%]
+</head>
+<body class="article">
+[%- include "title.html" -%]
+
+<div id="floatholder">
+<div id="content">
+<h2>[%= title %]</h2>
+
+[%= contentHTML %]
+
+<p class="labels">
+Filed under:
+[%- for label in labels -%]
+<a href="/[%= label.filename %]">[%= label.name %]</a> 
+[%- end -%]
+</p>
+
+<p id="[%= basenameNAME %]_postingtime" class="postingtime">
+Posted at [%= dateHTML %].
+</p>
+
+<p><a href="[%= permalink %]" class="permalink">Permalink</a></p>
+
+<!-- Include the Google Friend Connect javascript library. -->
+<script type="text/javascript" src="http://www.google.com/friendconnect/script/friendconnect.js"></script>
+
+<!-- Define the div tag where the gadget will be inserted. -->
+<div id="div-1228907940949" style="width:382px;border:1px solid #cccccc;"></div>
+<!-- Render the gadget into a div. -->
+<script type="text/javascript">
+var skin = {};
+skin['BORDER_COLOR'] = '#cccccc';
+skin['ENDCAP_BG_COLOR'] = '#e0ecff';
+skin['ENDCAP_TEXT_COLOR'] = '#333333';
+skin['ENDCAP_LINK_COLOR'] = '#0000cc';
+skin['ALTERNATE_BG_COLOR'] = '#ffffff';
+skin['CONTENT_BG_COLOR'] = '#ffffff';
+skin['CONTENT_LINK_COLOR'] = '#0000cc';
+skin['CONTENT_TEXT_COLOR'] = '#333333';
+skin['CONTENT_SECONDARY_LINK_COLOR'] = '#7777cc';
+skin['CONTENT_SECONDARY_TEXT_COLOR'] = '#666666';
+skin['CONTENT_HEADLINE_COLOR'] = '#333333';
+skin['DEFAULT_COMMENT_TEXT'] = '- add your comment here -';
+skin['HEADER_TEXT'] = 'Comments';
+skin['POSTS_PER_PAGE'] = '5';
+google.friendconnect.container.setParentUrl('/' /* location of rpc_relay.html and canvas.html */);
+google.friendconnect.container.renderWallGadget(
+ { id: 'div-1228907940949',
+   site: '04744169045391418992',
+   'view-params':{"scope":"PAGE","allowAnonymousPost":"true","features":"video,comment"}
+},
+  skin);
+</script>
+
+</div>
+<div id="sidebar">
+[%- include "sidebar.html" -%]
+</div>
+</div>
+
+<script type="text/javascript">
+updatePostingTime("[%= basenameNAME %]_postingtime", "[%= dateISO %]");
+</script>
+
+[%- include "trailer.html" -%]
+</body>
+</html>

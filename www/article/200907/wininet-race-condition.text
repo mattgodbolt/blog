@@ -1,0 +1,171 @@
+Threading issues in the Windows Internet API
+Date: 2009-07-03 23:12:00
+Summary: A problem with threading that looks simple but turns out to be a headache.
+Label: Coding
+Status: Public
+
+Imagine you were making a simple asynchronous HTTP request API. If you were
+coding in C you might sketch out something a little like:
+
+<p class="sidenote">
+For brevity I've ignored the actual reading of HTTP data, and any form of error
+handling.
+</p>
+
+    :::cpp
+    // Starts an asynchronous HTTP fetch of the given url.
+    // Returns a positive integer request handle to be used
+    // to identify this request.
+    int StartRequest(const char* url);
+
+    // Blocks waiting for a request to complete. Returns the
+    // number of bytes received.
+    int WaitForRequest(int handle_id);
+
+    // ... APIs to read data from the request here ...
+
+    // Note that we're done with a handle, freeing up resources
+    // associated with it, and returning the handle to the pool
+    // of available handles.
+    void CloseRequest(int handle_id);
+
+All is good until you realise that sometimes you need to be able to cancel an
+in-progress request. Say for example, a user hits the cancel button in a web
+browser. You tinker around with your implementation, and then realise you can
+reuse `CloseRequest` --- you clarify this in the comment:
+
+    :::cpp
+    // Note that we're done with a handle, freeing up resources
+    // associated with it, and returning the handle to the pool
+    // of available handles. If the request is still
+    // in-progress, it is cancelled. Any threads blocked on
+    // this request will be released: WaitForRequest will
+    // return -1 to indicate the cancellation.
+    void CloseRequest(int handle_id);
+
+Cool! We now have a simple API. But wait - there's a threading problem waiting
+to bite us later on. Have a quick look and see if you can spot it.
+
+Got it? If so --- congratulations, go to the top of the class.
+
+If not, don't fret as you're in good company: Microsoft missed this in their
+[Windows Internet][wininet] (WinInet) API design too.
+
+[wininet]: http://msdn.microsoft.com/en-us/library/aa383630(VS.85).aspx
+
+To see where the problem lies, consider this situation:
+
+    :::cpp
+    // Cancelling example.
+    int handle = -1;  // an invalid handle
+    // Fetches a URL, waits for it to download, then does some
+    // form of (unspecified) processing on it.
+    void ProcessUrl(const char* url) {
+      handle = StartRequest(url);
+      int error = WaitForRequest(handle);
+      if (error >= 0) {
+        // ...process data here...
+        CloseHandle(handle);
+        handle = -1;
+      } else {
+        // cancelled!
+      }
+    }
+
+    // Assume this is called on receipt of a UI event,
+    // asynchronous to the fetching of HTTP requests.
+    void BrowseToUrl(const char* url) {
+      if (handle >= 0) {
+        // Cancel any existing connection.
+        CloseHandle(handle);
+        handle = -1;
+      }
+      // Create a new thread to process this URL.
+      StartNewThread(ProcessURL, url);
+    }
+
+"Aha," you might say, "there's no lock on the `handle` variable so there's a
+race there. Where's my prize?" And indeed you'd be right. There's no locking
+there.
+
+But how would you add a lock?
+
+    :::cpp
+    // Thread-safe version?
+    void ProcessUrl(const char* url) {
+      LockMutex();
+      handle = StartRequest();
+      int error = WaitForRequest(handle);
+      UnlockMutex();
+      ...
+    }
+
+    void BrowseToUrl(const char* url) {
+      LockMutex();
+      if (handle >= 0) {
+        CloseHandle(handle);
+        handle = -1;
+      }
+      UnlockMutex();
+      ...
+    }
+
+Job done. Except...you're now unable to cancel an in-progress request!
+
+The mutex is locked for the duration of the whole `StartRequest` and
+`WaitForRequest` calls. If `BrowseToUrl` is called on another thread it will
+be unable to cancel the existing request: It requires the mutex that the
+requesting thread holds --- a mutex that will be held for the duration of the
+request!
+
+There is no place you can place the lock and not end up with a race during
+cancellation. The only way you can do this is to have an atomic
+`UnlockMutexAndWaitForRequest` function[^condvars]. In the absence of such a
+function, the best you can do is something like:
+
+    :::cpp
+    // Supports cancellation. Very nearly thread safe.
+    void ProcessUrl(const char* url) {
+      LockMutex();
+      handle = StartRequest();
+      int temp_handle = handle;
+      UnlockMutex();  // fingers crossed we don't yield here.
+      int error = WaitForRequest(temp_handle);
+      ...
+    }
+
+The race is still there, but it's now just at the point between unlocking the
+mutex and starting the request. Another thread could cancel the request between
+us taking a copy of the handle in `temp_handle` and starting to wait on it.
+
+[^condvars]: This type of operation is similar to the locking approached used in
+    Java when calling <code>wait</code>.
+
+I mentioned before this is a problem in the Windows Inet library. So now to the
+really interesting bit: why is this not picked up by more people?
+
+The key is that the handles provided by WinInet are not recycled - a unique
+handle (modulo the number of possible values of handles there are) is given out
+every time. In the race condition described above, that means in the worst case
+we try to `WaitForRequest` on an invalid handle, and provided the implementation
+is rigourous in checking the validity of handles, we'll just get an "invalid
+handle" type of error.
+
+This hides the problem --- it's still there, but the non-recycled handles
+prevent it from ever biting.
+
+Unfortunately, on Windows Mobile devices, the handles are aggressively
+reused[^handle]. In the case described above, that could mean that between us
+taking a copy of the handle in `temp_handle` and us waiting on it; another
+thread could have cancelled our request, started a new one --- receiving the
+__same handle__ that the original thread thinks it owns. When the scheduler
+allows the original thread to run, we will call `WaitForRequest` on the other
+thread's handle --- with disastrous results.
+
+[^handle]: They seem to be actually pointers to an underlying set of limited
+    global resources.
+
+So is there a way around this? Thankfully, yes --- though it's not perfect.
+More on this in [another post][ap], though!
+
+[ap]: /200907/wininet-race-condition-part-2

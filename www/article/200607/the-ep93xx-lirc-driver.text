@@ -1,0 +1,69 @@
+The Ep93xx LIRC driver
+Date: 2006-07-15 14:04:00
+Label: WeeBox Project
+
+As promised, I'm posting a patch here for LIRC to support an IR detector plugged
+into the EP93xx processor's IO ports.
+
+To apply the patch you'll need to be able to build from <a
+href="http://www.lirc.org/cvs.html">LIRC's CVS repository</a>.  Grab the latest
+lirc down and then get this <a
+href="http://xania.org/media/ep93xx.patch.gz">gzipped patch</a>.  From there,
+apply the patch and build lirc.  Detailed instructions:
+
+
+    weebox:/home/matthew/build/lirc# zcat ../ep93xx.patch.gz | patch -p1
+    patching file configure.in
+    patching file drivers/Makefile.am
+    patching file drivers/lirc_dev/lirc_dev.c
+    patching file drivers/lirc_ep93xx/Makefile.am
+    patching file drivers/lirc_ep93xx/lirc_ep93xx.c
+    patching file setup.data
+    weebox:/home/matthew/build/lirc# ./autogen.sh
+    processing /home/matthew/build/build/lirc
+    Running libtoolize...
+    ...lots more output, takes a very long time...
+    daemons/Makefile.am: installing `./compile'
+    daemons/Makefile.am: installing `./depcomp'
+    Running autoconf ...
+    Creating setup-driver.sh ...
+    weebox:/home/matthew/build/lirc# ./setup.sh
+    [Choose Driver configuration / Other / EP93xx IO driver]
+    [Configure the software as you see fit]
+    [Save configuration &amp; run configure]
+    setup.sh written by Karsten Scheibler, 1999-JUN-28
+    If you have problems or questions please consult the mailing list
+    Configuration: .setup.config, executable shell script: configure.sh
+    ...lots more output, takes a fair while....
+    config.status: executing depfiles commands
+    You will have to use the lirc_ep93xx kernel module.
+    Now enter 'make' and 'make install' to compile and install the package.
+    weebox:/home/matthew/build/lirc# make
+    make  all-recursive
+    make[1]: Entering directory `/home/matthew/build/lirc'
+    Making all in drivers
+    make[2]: Entering directory `/home/matthew/build/lirc/drivers'
+    Making all in lirc_dev
+    make[3]: Entering directory `/home/matthew/build/lirc/drivers/lirc_dev'
+    ...lots more stuff...
+    make[2]: Nothing to be done for `all-am'.
+    make[2]: Leaving directory `/home/matthew/build/lirc'
+    make[1]: Leaving directory `/home/matthew/build/lirc'
+    weebox:/home/matthew/build/lirc# make install
+    ... lots of installation stuff...
+    weebox:/home/matthew/build/lirc# modprobe lirc_ep93xx
+    weebox:/home/matthew/build/lirc# mode2
+    [point remote at detector and press buttons]
+    pulse 459815
+    space 3943
+    pulse 606
+    space 900
+    pulse 597
+    space 1898
+    pulse 604
+    ...and so on...
+
+
+The infra-red receiver should be plugged onto IO pin 0 (though this is
+configurable at module load time).  Please let me know how you get on if you try
+this, I'll aim to deal with any features needed or bugs found.

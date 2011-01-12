@@ -1,0 +1,48 @@
+Easy Installation with ez_setup
+Label: Coding
+Date: 2007-11-05 15:00
+Summary: ez_setup: the quick and easy way to install new python libraries.
+
+A follow on from my previous "[cool things about Python][prev]", there's another cool thing
+you might not have known about.  Almost all python packages are available at the
+[Cheeseshop][] in Python EGG files (geddit?), and the easiest way to install them is using
+[setuptools][]'s [ez_setup.py][ezsetup] bootstrap script.
+
+[prev]: http://xania.org/200710/cool-python-things "previously on 'why Python is so great'"
+[cheeseshop]: http://pypi.python.org/pypi "the Python Cheeseshop.  It doesn't sell cheese"
+[setuptools]: http://peak.telecommunity.com/DevCenter/setuptools "setuptools extensions to distutils"
+[ezsetup]: http://peak.telecommunity.com/dist/ez_setup.py "the ez_setup.py bootstrap file"
+
+This little 8K Python file is a little package manager a little like [Red Hat's][rh] [yum][] tool, or
+[Debian's][deb] [apt-get][apt] tool --- it will download, install and configure each python package you need.
+
+[rh]: http://www.redhat.com/ "A big linux distro"
+[yum]: http://fedoraproject.org/wiki/Tools/yum "Yum package manager"
+[deb]: http://www.debian.org/ "Another big linux distro"
+[apt]: http://www.debian.org/doc/manuals/apt-howto/ "apt-get package manager"
+
+To use it, save the [ez_setup.py][ezsetup] file somewhere, then run it with python, and the package name.  So,
+for example, to install the [Python Time Zone (pytz)][pytz] package, run:
+
+[pytz]: http://pytz.sourceforge.net/ "Python World Times made easy with pytz"
+
+    python ez_setup.py pytz
+
+Within a very short amount of time you'll have pytz ready and available to import and use.
+
+Incidentally, pytz is a pretty damn cool little timezone library --- if you've ever had to do any 
+manipulation of dates and times across daylight saving times or time zone boundaries in Python, I 
+recommend you take a look.  
+
+Quick caveat on using it though --- to create a local time from a "non-localised"
+time, don't be tempted to just construct a default `datetime(blahblah, tzinfo=myTimeZone)`.  Instead
+make sure you use the `localize()` method of the timezone.  This will then take into account daylight
+saving time boundaries appropriately.  I use something like:
+
+    :::python
+    myTimeZone = pytz.timezone('Europe/London')
+    nonLocal = datetime(2007, 10, 1, 1, 18, 0)
+    local = myTimeZone.localize(nonLocal, is_dst=None)
+
+The `is_dst=None` part means in the ambiguous hour as the clocks go back, raise an exception.  The other
+choices are `True` or `False` to break the ambiguity by assuming it _was_ DST or not.

@@ -1,0 +1,69 @@
+BBC BASIC V file format
+Date: 2007-11-14 11:35, 2007-11-15 15:20:01
+Label: Coding
+Status: Public
+Summary: Exploring the BBC BASIC V file format.  It's pretty damned clever.
+
+In my opinion, one of the best programming languages of its age was [BBC BASIC][basic].
+The other day I was looking through some old disks _(or should that be 'discs'?)_ and found some programs I'd
+written for the [Acorn][] [Risc PC][rpc] in BASIC, and wanted to have a reminisce by looking at them.
+
+[basic]: http://en.wikipedia.org/wiki/BBC_BASIC "BBC BASIC --- the finest BASIC"
+[acorn]: http://www.acorncomputers.co.uk/ "Acorn.  Staggering they're still going, in any form"
+[rpc]: http://en.wikipedia.org/wiki/Risc_PC "Ahh, 32-bit computing at its best.  Well, rose-tintedly"
+
+Unfortunately the files are stored in a tokenised binary format, and the details of the format aren't
+easy to find.  There are a few [sites][] around which purport to tell you the format,
+but they're eiher out of date, or wrong, or for spin-off commercial versions
+like R.T. Russell's [BBC BASIC][rtr]. These have almost identical
+token lists, but when I tried using them, a few of the more advanced tokens in BASIC V
+didn't come out right.
+
+[rtr]: http://www.bbcbasic.co.uk/ "R.T.Russell's BBC BASIC"
+[sites]: http://www.tofla.iconbar.com/tofla/bas/018/index.htm "Some info on the BASIC format"
+
+After a little further searching, I found that the source code of BBC BASIC V is available
+as part of [RISC OS Open][roo].  I downloaded it and spent a few happy hours re-reading
+ARM assembler to derive the format.
+
+[roo]: http://www.riscosopen.co.uk/content/ "RISC OS Open - shared source for RISC OS"
+
+Each line is stored as a sequence of bytes:
+
+    0x0d [line num hi] [line num lo] [line len] [data...]
+
+The line number is as you'd expect --- the line number --- with one exception.  The maximum line
+number is 65279 (`0xfeff`) as the special marker `0x0d 0xff` is used to signify the end of the program.
+The line length includes the three preceding bytes, making the maximum length of a line 251 bytes.
+
+The line data itself is tokenised.  The original BBC BASIC treated any character with the top bit set as
+a token (with one exception), and a table of 128 tokens was used to determine this.  In BBC BASIC V, 
+any character value greater or equal to `0x7f` is interpreted as a token, and there are three 
+"extended" tokens (`0xc6`, `0xc7` and `0xc8`) which use the next byte to select further tokens.
+
+The exception mentioned above --- which applies to both original BBC BASIC and BBC BASIC V --- is that
+`0x8d` is used to signify "there's a line number reference coming up."  In both versions of BASIC it was
+still _de rigeur_ to use `GOTO` and `GOSUB` --- which require line numbers --- and as an optimisation the
+line number is stored in a 3-byte binary format instead of the equivalent ASCII digits.
+This format is described in more detail in [another blog post][goto].
+
+[goto]: http://xania.org/200711/bbc-basic-line-number-format "The binary format that GOTO/GOSUB line numbers are encoded with"
+
+The tokens are broken into four categories:
+
+1. The main token list, holding all the main keywords.  These values start at `0x7f` and are 
+   looked up for all values except `0xc6`, `0xc7`, `0xc8` and `0x8d`.  _(See the Python implementation
+   below for the list of all tokens.)_
+2. Extended function tokens.  These follow a `0xc6` byte and start at value `0x8e`. There 
+   are only two tokens, `SUM` and `BEAT`.
+3. Extended command tokens.  These follow a `0xc7` and start at value `0x8e`, and include
+   `RENUMBER`, `EDIT` and `HELP`.
+4. Extended statement tokens.  These follow a `0xc8` and also start at value `0x8e`.
+   These include keywords like `CASE`, `MOUSE` and `SYS`.
+
+Putting this all together, I was able to write a quick Python script to decode my old BASIC programs,
+which is available [here][py].
+
+After all that effort, my old programs were...interesting --- more on them another time.
+
+[py]: http://xania.org/200711/BBCBasicToText.py "BBC BASIC V to text converter, written in Python"

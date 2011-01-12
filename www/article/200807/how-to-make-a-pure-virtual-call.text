@@ -1,0 +1,92 @@
+How to make a pure virtual call
+Date: 2008-07-23 13:50:00
+Status: Public
+Label: Coding
+Summary: More of an anti-pattern than a how to - avoiding and/or diagnosing pure virtual function calls.
+
+If you're staring at the run-time error "Pure virtual function call" you might be wondering what's happened.
+Usually, this is due to calling pure virtual functions from a constructor or destructor.  Consider the following
+code:
+
+<p class="sidenote">Yes, another totally contrived example.</p>
+
+    :::cpp
+    class AllocBase
+    {
+    public:
+      AllocBase() : allocated_(false) {}
+      virtual ~AllocBase() { Shutdown(); }
+    
+      void Initialise() {
+        if (!allocated_) {
+          Alloc();
+          allocated_ = true;
+        }
+      }
+    
+      void Shutdown() {
+        if (allocated_)
+          Dealloc();
+        allocated_ = false;
+      }
+    
+      // Overridden by subclasses:
+      virtual void Alloc() = 0;
+      virtual void Dealloc() = 0;
+    
+    private:
+      bool allocated_;
+    };
+    
+    class AllocClient : public AllocBase
+    {
+    public:
+      AllocClient() : data_(0) {}
+      virtual void Alloc() { data_ = new char[10]; }
+      virtual void Dealloc() { delete[] data_; }
+    
+    private:
+      char* data_;
+    };
+    
+    int main(int, char**)
+    {
+      AllocClient alloc_client;
+      alloc_client.Initialise();
+
+      return 0;
+    }
+
+Looks fairly innocuous at first glance --- the destructor calls `Shutdown()` if it hasn't already
+been called.  `Shutdown()` itself isn't virtual, but it does call through to the pure virtual `Dealloc()`.
+This is where the error lies.  During construction and destruction, [virtual functions are prohibited][ref].
+To see why, consider the case of destruction of the `AllocClient` object.  The compiler must
+runs code similar to:
+
+[ref]: http://www.artima.com/cppsource/nevercall.html "Mr Meyers probably says it better than me"
+
+    :::cpp
+    obj->~AllocClient(); // call the AllocClient's destructor
+    obj->~AllocBase(); // call the base class's destructor
+
+So by the time `~AllocBase()` is called, the `AllocClient` aspect of the object has already been
+destroyed.  Any virtual calls it makes would potentially run code defined in the `AllocClient` part
+of the object --- which is doomed to fail as it will expect the `AllocClient` members to be in a usable state.
+
+So how does this generate a pure virtual function call error?  Well, what the compiler usually actually
+runs is:
+
+    :::cpp
+    obj->~AllocClient(); // call the AllocClient's destructor
+    // Ensure any virtual function calls in ~AllocBase route to
+    // AllocBase functions, and not any derivee's
+    obj->__vtable__ = AllocBase::__vtable__;
+    obj->~AllocBase(); // call the base class's destructor
+
+From here it's easy to see how the pure virtual calls come about.
+
+In some cases the compiler will catch these at compile time --- if you directly call a virtual function
+in the destructor or constructor, for example.  However, GCC and Microsoft's compiler aren't smart enough to
+notice nested calls (and in general it would be [extremely hard][halt] to prove they actually get called).
+
+[halt]: http://en.wikipedia.org/wiki/Halting_problem "About this hard"

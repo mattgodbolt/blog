@@ -1,0 +1,25 @@
+Things I didn't know about Python, part 1
+Date: 2007-10-30 12:40
+Status: Public
+Label: Coding
+
+My favourite scripting language by far is [Python][].  I'm always finding cool things
+in the language that I didn't know were there.  Even though I've been writing scripts 
+in it for years, today I discovered that you can use maths-style ranges in comparisons.
+
+[python]: http://www.python.org "Python - my favourite scripting language"
+
+Whereas in most languages to check a value `x` is within a range (say, 5 or more but less than 20),
+you might do:
+
+    // In C:
+    if (x >= 5 && x < 20) { ... code ... }
+
+    # In Python (without using the cool thing)
+    if x >= 5 and x < 20: # code
+
+In Python, you can write the more mathsy:
+
+    if 5 <= x < 20: # code
+
+Just a little thing I never realised.

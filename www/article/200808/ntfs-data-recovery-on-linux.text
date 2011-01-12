@@ -1,0 +1,38 @@
+NTFS data recovery on Linux
+Date: 2008-08-12 11:30:00
+Status: Public
+Label: Blog
+Summary: Aargh!  A broken NTFS filesystem, and recovering it on Linux.
+
+My Dad's PC hard disk died at the weekend.  Well, as far as I can tell, the hard disk is
+fine, but the boot sector and master file table of the NTFS filesystem on it are broken.
+Windows doesn't recognise it as an NTFS file system.
+
+As my main PC is now an Ubuntu Linux box, I'm in a bit of trouble recovering the data.
+Certainly the NTFS file system drivers for Linux have as much trouble as Windows in
+recognising the data.
+
+After an awful lot of playing with `dd` and Googling about, I found that the boot sector
+of the partition had been hosed.  Luckily, there's a backup copy of the boot sector. 
+Some [documentation][backup] says it's at the end of the partition, but I found it at
+the centre.  A bit of [bash shell maths][malc] later and I had the bootsector `dd`ed
+out.
+
+[backup]: http://www.geocities.com/Athens/6939/asm/mbr/NTFSBR.htm#BSback "An otherwise very helpful document"
+[malc]: http://farside.org.uk/200805/stupid_unix_tricks
+
+I transplanted the backup back in the first sector of the disk...and...the NTFS drivers
+recognise it as an NTFS partition!  Yay!  But boo...the MFT is corrupt.  I tried
+`CHKDSK` on Windows, but that says the same thing.  Even though there's supposedly a backup to the
+MFT on the disk somewhere too (I've yet to find it).
+
+Latterly I found [Scrounge NTFS][scrounge], which compiled cleanly, and was able to read the MFT, and some file data too.
+
+[scrounge]: http://memberwebs.com/stef/software/scrounge/ "Looks promising..."
+
+However, it doesn't seem to work 100% reliably.  It faulted out halfway through (on the `PAGEFILE.SYS` on the
+drive).  Additionally, it doesn't support compressed files.
+
+Looks like I _should_ be able to coerce it into working though, with a bit of hackery.  But first I need to
+get some spare disk space to try it out in.  I'll post if and when I get the data off...and whether I have
+to resort to some payware Windows tools in the end!

@@ -1,0 +1,102 @@
+What were they thinking?
+Date: 2005-01-11 17:18:00
+Label: Coding
+
+Today I discovered one of the ugliest parts of the C++ standard ---
+declarations.
+
+We all know that C++ is an ugly language.  Indeed, several times over, people
+have tried to reinvent it, ranging from new languages (MS's C#) to entirely
+compatible, but novel grammars (see <a
+href="http://citeseer.ist.psu.edu/787.html">SPECS</a>).
+
+I've always suspected that such attempts are more an attempt to steal publicity
+from C++ rather than any more altruistic goal of fixing the language; indeed I
+think it's almost impossible to fix something as weighed down by legacy as C++.
+
+However, today I discovered some truly odd bits of the C++ standard in the
+declarations.  You or I might consider:
+
+<code>typedef int i;</code>
+
+and
+
+<code>int i;</code>
+
+to be perfectly sensible things to write, and in some way I mentally separate
+the two --- one is a type definition with no direct side-effect, the other is
+defining and instantiating an object.  however, from the language's point of
+view, these are both viewed as the same.  Quite odd, you might think, but not
+too remarkable.  Similarly,
+
+<code>int main();</code>
+
+is viewed as a 'declaration' too --- yet no object is defined nor instantiated.
+Weirdness number 1 though is:
+
+<code>int a, main();</code>
+
+Firstly, I did a double-take when I realised this is legal.  Seems a function
+*declaration* can be mixed in with other declarations (a *definition* cannot,
+however, though it looks rather similar.  Secondly, this declaration statement
+doesn't treat each term of the declaration (the standard calls these
+'declarators') equally.  The declarator <code>a</code> is a definition and
+instantiation, whereas <code>main()</code> is a declaration.  To make matters
+more confusing, changing that line to be
+
+<code>extern int a, main();</code>
+
+makes both <code>a</code> and <code>main()</code> declarations.  The
+<code>extern</code> turns the whole statement into a declaration, regardless of
+the type of the declarators.  Ok --- odd, but again not really too bad, just
+decidedly non-orthogonal.
+
+The fun begins when one consults the C++ grammar again, and realises that from
+the point of view of the compiler the <code>int</code>, <code>extern</code>, and
+even <code>typedef</code> are treated as part and parcel of the same bit of the
+declaration, the type of objects being declared.  Thus, we can write code like:
+
+<code>int typedef i;</code>
+
+to typedef 'i' as being an integer type.  Add to this the fact that extened
+named types (<code>short int</code>, <code>long double</code> and the like) can
+be split up, and that class definitions are types too, and you can have all
+sorts of 'fun':
+
+<code>short typedef int ShortType;*// defines ShortType to be short int*</code>
+
+<code>struct { int a; } typedef T;*// defines T to be an unnamed structure
+containing an integer a*</code>
+
+In conclusion, C++ is a lot more awkward
+than I first gave it credit for.  Things like <code>typedef</code> and
+<code>extern</code> I took to be 'things you prefix types with', almost as if
+there was a whole special type of statement of *typedef-declaration* which
+always started with a <code>typedef</code> token.  It would seem a lot of people
+think that too --- while all the major vendors' compilers accept the code, most
+academic and open source parsers I tested refused to accept this type of code.
+Top marks to <a href="http://www.edg.com">EDG</a>'s compiler, that at least
+warns that it's a bit odd to put typedef halfway through your types.
+
+<table border="1" spacing="1">
+<tr>
+ <th>Compiler</th><th>Parses funny class</th><th>Parses funny typedef</th>
+</tr>
+<tr>
+ <td>EDG's compiler (tested via <a href="http://www.comeaucomputing.com/tryitout/">Comeau online</a>)</td>
+ <td>yes</td><td>yes</td>
+</tr>
+<tr>
+ <td>gcc 2.95</td><td>yes</td><td>yes</td>
+</tr>
+<tr>
+ <td>gcc 3.2</td><td>yes</td><td>yes</td>
+</tr>
+<tr><td>gcc 3.3</td><td>yes</td><td>yes</td></tr>
+<tr><td>gcc 3.4</td><td>yes</td><td>yes</td></tr>
+<tr><td>CL.EXE 13.00.9466</td><td>yes</td><td>yes</td></tr>
+<tr><td>CL.EXE 13.10.3077</td><td>yes</td><td>yes</td></tr>
+<tr><td><a href="http://www.programmar.com/">ProGrammar</a>'s example C++ parser</td><td>no</td><td>no</td></tr>
+<tr><td><a href="http://www.sdml.info/projects/srcml/">src2srcml</a></td><td>no</td><td>no</td></tr>
+<tr><td><a href="http://opencxx.sourceforge.net/">OpenC++</a></td><td>no</td><td>no</td></tr>
+</table>

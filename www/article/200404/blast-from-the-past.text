@@ -1,0 +1,18 @@
+Blast from the past
+Date: 2004-04-08 10:41:21
+Label: Blog
+
+I was amazed today to get an email from a German chap about some code I wrote
+around 7 years ago!
+
+While porting my good friend Phil Norman's IscaFS module to 32-bit, this chap
+needed to get a memory allocator I wrote working in 32-bit.  Now I just need to
+help the poor chap by digging out the source code from my aging, dusty and
+decrepit Risc PC.  Of course, that means finding it first -- the Risc PC that
+is!  Then I have to try and find the source code.
+
+Perhaps it's time I
+backed the whole thing up and kept it somewhere safe.  Maybe I could run it
+under emulation on <a
+href="http://www.redsquirrel.fsnet.co.uk/redsquirrel.html">Red Squirrel</a> or
+something too...hmm...I'll see how it goes

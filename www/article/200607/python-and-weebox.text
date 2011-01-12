@@ -1,0 +1,43 @@
+Python and Weebox
+Date: 2006-07-03 21:19:42
+Label: WeeBox Project
+
+In the last few evenings I've been looking at getting <a
+href="http://www.python.org">Python</a> ready for the Weebox.  I've been
+fascinated with using my favourite script language as the front-end for the
+music player; it's quick and easy to develop with, and there's an <a
+href="http://www.musicpd.org">MPD</a> client library for it already.
+
+Before I ran off all excited about using Python on this rather limited embedded
+system, I first thought I'd better see whether I could compile up Python for the
+ARM.
+
+Using the <a href="http://www.scratchbox.org">Scratchbox</a> setup (described in
+<a href="/200606/building-things">Building Things</a>), I unpacked the latest
+build of Python, configured it up and built.  Like so many decent Open Source
+products it compiled straight out of the box with no issues at all.  I still
+can't quite get over that, having last really played with Linux and its
+attendant OS packages in the mid 90s, I still expect a four hour head-scratching
+session every time I build anything.
+
+Fearful that the executable would be too bloated to use,  I checked its size: A
+<a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?strip">strip</a>ped python weighs
+in at 1.1MB, not half as bad as I feared.  Admittedly it requires a few other
+support dynamic libraries; but none that won't already be on the system.  Also,
+it'll need the python libraries themselves, which are rather more wieghty at
+15MB, but a lot of those can be cut out; indeed I'll only add the exact
+libraries needed (using <a href="http://www.python.org/dev/doc/maint24/lib/module-modulefinder.html">modulefinder</a>).
+
+So, looking good on that front; so until I find a problem, Python's going to be
+the way forward.  Excitedly, today in my spare time I knocked up a mini Tkinter-
+based mock up of a 24x2 character display, interfacing with MPD using the client
+library.  With a linux distribution running on my main PC in a <a
+href="http://www.vmware.com">VMWare</a> virtual PC, I was coding the Python
+script on the same PC under Windows.  Seems a bit overcomplex, I admit; but none
+of my real Linux PCs have working sound!
+
+The first thing that became clear with my mockup was that 24 characters isn't
+much at all!  A fair amount of scrolling will be needed, especially if I want to
+put some graphic equalizer-type display on the unit too!
+
+Fingers crossed some actual real hardware turns up soon!

@@ -1,0 +1,65 @@
+New Web Provider - UKShells
+Date: 2005-05-12 16:59:57
+Label: Blog
+
+<img width="138" height="36" align="right"
+src="http://xania.org/media/ukshells_1.png" alt="" />After my <a
+href="http://xania.org/article.php/webfusion_gits">bad experience with
+WebFusion</a>, we've finally found a new web provider for <a
+href="http://www.profactor.co.uk">ProFactor's web site</a> --- <a
+href="http://www.uksolutions.co.uk/ukshells/?area=shells&amp;id=4">UKShells</a>
+(who are part of UKSolutions).
+
+It took a lot of phoning around to find a rational, sensible hosting solution.
+You'd think it'd be easy to have a site where we can quickly and easily host our
+little web site and our executables, wouldn't you?
+
+### Freedom2Surf
+
+First up I tried my own personal ISP, <a>Freedom2Surf</a>.  They were very
+helpful on the phone, but their T&amp;Cs explicitly state that EXE and ZIP files
+can't be hosted.  When I pushed them on this, they said realistically we
+wouldn't be reprimanded as long as the bandwidth we used was sensible.  Their
+point was that usually ZIP and EXEs end up being bandwidth hogs, but of course
+it'd be much better if they just measured the bandwidth we actually used
+*regardless of the file extension of the file*!  I wasn't happy hosting with a
+provider which could, at any point, say we were in breach of T&amp;Cs and stop
+our service.  Shame, but there you go.
+
+### FastHosts
+
+Next recommended to us was <a>FastHosts</a>, where a friend has a reseller
+account.  They seemed ace, and most importantly we could get a top deal through
+our friend.  However, they wouldn't allow EXEs or similar either.  What's the
+world coming to?
+
+### Demon
+
+My first ever internet access account was at <a
+href="http://www.demon.net/">Demon Internet</a>; indeed I've had two accounts
+there over the years, and they've always been a good service provider.  I
+eventually dropped them, fairly reluctantly, when I got wind of the 0800 number
+BT were rolling out.  Anyway, I rang and spoke to them, and after a lot of to-
+ing and fro-ing their very non-technical sales staff finally put me through to a
+techie who could answer my question.  Yes, they would allow us to host EXEs!
+Right, at last, a rational sensible provider which allows us to host our own
+data!  Job's a good'un...until...we found:
+
+### UKShells
+
+<a
+href="http://www.uksolutions.co.uk/ukshells/?area=shells&amp;id=4">UKShells</a>
+were just that much 'cooler'!  We get a Unix command prompt (via ssh!), access
+to daemon processes, MySQL databases, PHP, cgi-bin scripts, email autoresponders
+and mailing lists.  Best of all, as it's a really techie service anyway, the
+tech support people are (a) clued up and (b) expect you to be too!  No more
+convincing Raj the call-centre-slave to transfer you to the techie people
+instead of following his monotonous pre-ordained scripted response path.  The
+UKShells guys are top, and the transfer was utterly painless (once I'd chased up
+WebFusion to change the IPS tag).
+
+Just being able to ssh in, and tail -f the log file to get a handle on traffic
+is great.  It's geeky I know, but I do like it.
+
+So, UKShells are recommended, as long as you know what you're doing.  Or don't
+mind finding out!
