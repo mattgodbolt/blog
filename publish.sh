@@ -1,19 +1,8 @@
 #!/bin/bash
 
-if [ "foo$1" == "foo" ]; then
- # no args, update and re-run ourselves.
- echo Updating script
- svn --config-dir . up scripts
- $0 updated
- exit;
-fi
+set -e
 
-echo Updating data
-
-svn --config-dir . up www conf
-
-cd pygen && ./main.py
-cd ..
+(cd pygen && ./main.py)
 
 # Publish the generated and static content from www/ into htdocs/.
 #
@@ -28,5 +17,4 @@ cd ..
 # an option, but this is easier.
 rsync -vc -rlp --exclude=.svn/ --exclude=/article www/ htdocs
 rsync -vc -rlp --exclude=.svn/ --include='*.html' --include='*.png' --include='*.jpeg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ htdocs
-rsync -vc -rlp --exclude=.svn/ --exclude=/article www/ mbs-user@ext.xania.org:htdocs
-rsync -vc -rlp --exclude=.svn/ --include='*.html' --include='*.png' --include='*.jpeg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ mbs-user@ext.xania.org:htdocs
+rsync -vc -rlp htdocs/ mbs-user@ext.xania.org:htdocs/
