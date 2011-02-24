@@ -1,0 +1,28 @@
+Introducing Miracle
+Date: 2011-02-23 05:00:00
+Status: Public
+Summary: A Sega Master System emulator in JavaScript
+Label: Coding
+
+This weekend was a long weekend in the US ([Presidents' Day][pd], apparently).  As well as spending some time with my family, I set myself the goal of doing something "cool", programming-wise.
+
+[pd]: http://en.wikipedia.org/wiki/Presidents_Day_(United_States)
+
+Inspired by [JSNES](http://benfirshman.com/projects/jsnes/) and [JSSpeccy](http://matt.west.co.tt/spectrum/jsspeccy/), I decided to port Richard Talbot-Watkins and my old [Sega Master System](http://en.wikipedia.org/wiki/Sega_Master_System) emulator, [!Miracle](http://web.archive.org/web/20030605151933/http://www.willothewisp.demon.co.uk/SMS/), to JavaScript.
+
+I borrowed the Z80 emulator from JSSpeccy and thankfully Richard's [Master System documentation](http://www.smspower.org/uploads/Development/richard.txt?sid=e1c1470128c9ce8491b3d0772f1790cd) is still on the web, so I had a great head-start.
+
+<p class="picture">
+<img src="/201102/Sonic.png" width="500" height="440" alt="Miracle, showing Sonic the Hedgehog"/>
+<br/>Sonic wags his fingers at me.
+</p>
+
+You can take it for a spin [here][miracle] (I'll hack it later to allow me to embed it here). Keys are W, S, A and D for movement, Enter and Space for the fire buttons. I've rather cheekily embedded two ROMs that work quite well, Sonic and Teddy Boy. 
+
+[miracle]: http://xania.org/miracle/miracle.html "Miracle, a JavaScript Sega Master System emulator."
+
+The source code is on [github](https://github.com/mattgodbolt/Miracle) if you want to take a peek.
+
+There's a ton of bugs and things to implement, but I'm pretty damn pleased with the results.
+
+Next up, fix some bugs and then perhaps think about a BBC Micro emulator...
