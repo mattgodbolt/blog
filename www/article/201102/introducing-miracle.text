@@ -23,6 +23,6 @@ You can take it for a spin [here][miracle] (I'll hack it later to allow me to em
 
 The source code is on [github](https://github.com/mattgodbolt/Miracle) if you want to take a peek.
 
-There's a ton of bugs and things to implement, but I'm pretty damn pleased with the results.
+There's a ton of bugs and things to implement (most notably sound), but I'm pretty damn pleased with the results.
 
 Next up, fix some bugs and then perhaps think about a BBC Micro emulator...
