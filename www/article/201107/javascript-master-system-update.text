@@ -1,0 +1,20 @@
+An update to Miracle
+Date: 2011-07-08 23:30:30
+Status: Draft
+Summary: An update on Miracle, the Javascript Sega Master System Emulator
+Label: Coding
+
+Again I find my blog has fallen into disrepair due to lack of updates...but I have my excuses!
+
+Firstly, I've been incredibly busy at [work](http://www.drw.com), continuing to enjoy learning lots about how trading systems work. I've ended up travelling quite a lot to our satellite office in Greenwich, Connecticut too, which eats into my time.
+
+I've also moved house since the last update, now living opposite Lake Michigan in the town of Winnetka.  Ness, the boys and I are all really enjoying our new suburban living.  Both boys have had birthdays too --- Isaac is now 1, and William is 3.
+
+So anyway, to the other time sink in my life: [Miracle][miracle].  Since the last update I've added a lot of bug fixes, optimized it a load, integrated a debugger (complete with persistent labelling of memory addresses), and most importantly of all, have added early sound support.
+
+It requires an up-to-date browser (bleeding edge Chrome, for example), and probably needs you to fiddle with enabling alpha settings (see [here](http://chromium.googlecode.com/svn/trunk/samples/audio/index.html)), but you can now enjoy Sonic with sound!
+
+Take it for a spin [here][miracle], or check the code out on [Github].
+
+[miracle]: http://xania.org/miracle/miracle.html "Miracle, a Javascript Sega Master System emulator."
+[github]: https://github.com/mattgodbolt/Miracle) "Source code to Miracle"
