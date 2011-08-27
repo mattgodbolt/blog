@@ -14,7 +14,7 @@ So anyway, to the other time sink in my life: [Miracle][miracle].  Since the las
 
 It requires an up-to-date browser (bleeding edge Chrome, for example), and probably needs you to fiddle with enabling alpha settings (see [here](http://chromium.googlecode.com/svn/trunk/samples/audio/index.html)), but you can now enjoy Sonic with sound!
 
-Take it for a spin [here][miracle], or check the code out on [Github].
+Take it for a spin [here][miracle], or check the code out on [Github][].
 
 [miracle]: http://xania.org/miracle/miracle.html "Miracle, a Javascript Sega Master System emulator."
 [github]: https://github.com/mattgodbolt/Miracle) "Source code to Miracle"
