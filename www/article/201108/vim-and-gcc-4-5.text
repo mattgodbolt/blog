@@ -1,0 +1,32 @@
+Vim's quickfix and GCC 4.5
+Date: 2011-08-27 20:30:30
+Status: Draft
+Summary: Getting GCC 4.5's error messages parsing in vim 7.3
+Label: Coding
+
+I've been using Vim more and more as my primary editor both at home and at work.
+Recently I've started using its quickfix support too to run make and then navigate
+to the errors.
+
+I hit a problem where in the version of Vim in Ubuntu doesn't have support for the
+newer format error messages in gcc 4.5, misinterpreting the "In file XX at line YY:ZZ" message.  The most recent Vim has a fix, but if, like
+me, you don't have much appetite for installing non-system versions of things like
+Vim, then you can fix up the error parsing by putting this in your `.vimrc`:
+
+    set errorformat=%*[^\"]\"%f\"%*\\D%l:\ %m,\"%f\"%*\\D%l:\ %m,%-G%f:%l:\ (Each\ undeclared\ identifier\ is\ reported\ only\ once,%-G%f:%l:\ for\ each\ function\ it\ appears\ in.),%-GIn\ file\ included\ from\ %f:%l:%c:,%-GIn\ file\ included\ from\ %f:%l:%c,%-GIn\ file\ included\ from\ %f:%l,%-Gfrom\ %f:%l:%c,%-Gfrom\ %f:%l,%f:%l:%c:%m,%f(%l):%m,%f:%l:%m,\"%f\"\\,\ line\ %l%*\\D%c%*[^\ ]\ %m,%D%*\\a[%*\\d]:\ Entering\ directory\ `%f',%X%*\\a[%*\\d]:\ Leaving\ directory\ `%f',%D%*\\a:\ Entering\ directory\ `%f',%X%*\\a:\ Leaving\ directory\ `%f',%DMaking\ %*\\a\ in\ %f,%f\|%l\|\ %m
+
+I'm also experimenting with some alternative bindings to replace me typing `:make`. So far I'm using control-F10 to build and show errors, and F3, F4 to navigate between errors with:
+
+    function Make() 
+        silent make
+        redraw!
+        cw 8
+        echo getqflist()[-1].text
+    endfunction
+
+    nnoremap <c-F10> :call Make()<CR>
+    nnoremap <F4> :cnext<CR>
+    nnoremap <F3> :cprev<CR>
+
+It's by no means perfect as you get no feedback during the make process itself (which is rubbish), but it's a start.
+
