@@ -1,0 +1,74 @@
+GCC Explorer - an interactive take on compilation
+Date: 2012-05-24 22:40:00
+Status: Draft
+Summary: Introducing a new way to stare at the disassembly of your compiled C and C++
+Label: Coding
+
+One of the things I spend a fair amount of time doing at [work][drw] is
+compiling my C/C++ code and looking at the disassembly output.  Call me
+old-fashioned, but I think sometimes the only way to _really_ grok your code
+is to see what the processor will actually execute. Particularly with some of
+the newer features of C++11 --- lambdas, move constructors, threading
+primitives etc --- it's nice to be able to see how your elegant code becomes
+beautiful (and maybe even fairly optimal) machine code.
+
+[drw]: http://www.drwtrading.com/ "DRW - always looking for smart C/C++ coders"
+
+I'd managed to get my pipeline for taking small snippets of C code, building
+them with [GCC][gcc], [de-mangling][dm] the output, musing on the assembly,
+tweaking the input and then repeating over and over again.  It occurred to me
+there might be a better way, and I set to hacking up a much more pleasant
+experience, partially in my own time and partially during downtime at work.
+
+[gcc]: http://gcc.gnu.org/ "GCC, the GNU Compiler Collection. Definitely not the Grace Community Church"
+[dm]: http://en.wikipedia.org/wiki/Name_mangling
+
+I got the OK to open source the fruits of my labour, and so I'm delighted to
+announce the release of [GCC Explorer][gcce], a web-based tool for exploring
+the output of the compiler under small tweaks of the code, compiler version
+and compiler flags.
+
+[gcce]: http://gcc.godbolt.org/ "GCC Explorer - an interactive web-based compiler"
+
+Taking a very small example, it's interesting to note the difference in code
+output between the following three hash bucket choosing functions:
+
+    :::cpp
+    // Hash with dynamic number of buckets.
+    extern int NumBuckets;
+    int hash1(int value) {
+        return value % NumBuckets;
+    }
+
+    // Hash with constant number of buckets.
+    const auto ConstNumBuckets = 257;
+    int hash2(int value) {
+        return value % ConstNumBuckets;
+    }
+
+    // Hash with constantunsigned number of buckets. One
+    // of the places where 'auto' might have led to a
+    // problem as it's easy to forget the trailing 'u'.
+    const auto uConstNumBuckets = 257u;
+    int hash3(int value) {
+        return value % uConstNumBuckets;
+    }
+
+(I'm working on ways to be able to send links to GCC Explorer for canned code
+snippets. For now you'll have to copy paste in, or pick from the examples.)
+
+In the first case, the compiler's forced to use the uber-slow integer divide
+instruction. In the second, thanks to some [cunning tricks][hd] for
+compile-time constants, the compiler can use multiply-by-reciprocal type operations to remove the divide and
+replace it with two multiplies. It's easy to forget that the signed-ness has a
+performance cost (and probably isn't what you wanted anyway), and with
+<code>auto</code> it's easy to miss. The third case shows how good it can be
+(although I believe there are some even more cunning ways to do modulus of
+power-2 plus 1 values. 257 is a prime that's power-2 plus one, so quite
+handy for small hash tables.)
+
+[hd]: http://www.hackersdelight.org/divcMore.pdf "Thanks to Hacker's Delight"
+
+The [code][gh] of GCC Explorer is available on github for your pleasure, too.
+
+[gh]: https://github.com/mattgodbolt/gcc-explorer "GCC Explorer source code"
