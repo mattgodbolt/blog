@@ -1,0 +1,26 @@
+GCC Explorer - progress update
+Date: 2012-06-07 07:20:00
+Status: Public
+Summary: What's changed since the launch
+Label: Coding
+
+A quick update on the progress of [GCC Explorer][gcce].
+
+New features:
+
+   * Lots of new compilers: GCC4.7, AVR, ARM, MSP.
+   * Filters to remove clutter from the generated assembler: filter out unused
+     labels, directives and extraneous comments.
+   * Permanent links are now supported --- generate a link to your example.
+   * Various security fixes to make it safer to run on a publically accessible
+     website.
+
+<p class="picture">
+<img src="/201206/screenshot.png" width="400" height="118" 
+ alt="Line art picture of collision"/>
+  <br/>Interactively explore how your code compiles to assembly
+</p>
+
+[Check it out][gcce] now!
+
+[gcce]: http://gcc.godbolt.org/
