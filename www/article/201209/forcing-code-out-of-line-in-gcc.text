@@ -1,6 +1,6 @@
-A cute trick for forcing code out of line in GCC with C++11
-Date: 2012-09-17 07:20:00
-Status: Draft
+Forcing code out of line in GCC and C++11
+Date: 2012-09-17 18:10:00
+Status: Public
 Summary: A way of ensuring non-hot code is taken out of line in GCC, using C++11 lambdas
 Label: Coding
 
