@@ -14,17 +14,19 @@ Boy is it your lucky day today!
 
 Before:
 
-    :::cpp
+    ::: cpp
     void test() {
        // do stuff here, update failure
        if (failed) {
-        cout << "Oh no!" << endl;  // <<--- really don't want all the stream code inlined here polluting up my cache
+         // Not only is this unlikely, but I don't
+         // want this code polluting the i-cache.
+        cout << "Oh no!" << endl;
       }
     }
 
 After:
 
-    :::cpp
+    ::: cpp
     void test() {
        // do stuff here, update failure
        if (failed) {
