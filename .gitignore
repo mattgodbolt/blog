@@ -1,4 +1,5 @@
 htdocs/
+*.swp
 *.pyc
 conf/pycache.db
 www/feed*

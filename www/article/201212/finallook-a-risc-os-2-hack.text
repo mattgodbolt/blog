@@ -1,0 +1,130 @@
+!FinalLook - a RISC OS 2 hack explained
+Date: 2012-12-15 22:40:00
+Status: Draft
+Summary: A trip down memory lane to a hack for RISC OS 2 I wrote at University
+Label: Coding
+
+One of the coolest things about the Acorn range of computers was their flexibility and hackability.  It was easy to extend the OS, and in some cases replace funtionality.  This is the story of how I totally abused the software interrupt (`SWI`) vector on my A3010 way back in 1995.
+
+I was jealous of the newer machines that had recently come out with RISC OS 3.1. They had a fancy new UI with texture window backgrounds and anti-aliased text.  I set about to get the same effects on RISC OS 2.
+
+The biggest issue was the Wimp (the window manager), was stored in ROM.  Unlike many other parts of the OS, there weren't predefined hooks to modify its behaviour.
+
+However, it _was_ possible to globally hook every `SWI`, and this is what I did:
+
+I looked for `SWI`s the Wimp used internally to talk to other parts of the OS. With a global `SWI` handler defined, I filtered all but a a few choice `SWI`s, checked the calling code to see if it looked like the right part of the ROM, and then substituted my code, calling back into the original ROM as needed.
+
+It wasn't always that easy: to hook certain parts of the Wimp I had to pick out a random-seeming `SWI` "before" the target site and hook that. Then I had to duplicate the work after the `SWI` up until the bit I wanted to patch; then do my alternative code; then continue back in ROM.
+
+Here's the SWI handler I install, along with a few comments:
+
+    :::asm
+    .myswihand
+    ; Preserve a minimal register set
+    STMFD R13!,{R10,R14}
+    ; Mask the return address: this is
+    ; the address of the calling function
+    BIC R14,R14,#&FC000003
+    ; Check to see if it's in ROM
+    AND R10,R14,#&03800000
+    CMP R10,#&03800000
+    ; If not, return (via "myjump" which
+    ; jumps on to the original SWI handler)
+    LDMNEFD R13!,{R10,R14}
+    BNE myjump
+    ; Otherwise, read the SWI instruction
+    ; itself (which has the interrupt number
+    ; in it), masking out the "X" bit.
+    LDR R14,[R14,#-4]
+    BIC R14,R14,#&FF000000
+    BIC R14,R14,#&20000
+    ; Now compare against a set of target
+    ; SWI numbers to hook, ultimately
+    ; returning to the original handler
+    ; if we don't a SWI of interest.
+    CMP R14,#0:BEQ WriteC
+    LDR R10,ospl:CMP R14,R10:BEQ Write
+    LDR R10,openwindow:CMP R14,R10:BEQ RedrawRoot
+    LDR R10,deletewindow:CMP R14,R10:BEQ Delwin
+    LDR R10,ploticon:CMP R14,R10:BEQ Plot
+    LDR R10,ClrBack:CMP R14,R10:BEQ Clear
+    LDMFD R13!,{R10,R14}:B myjump
+
+Let's take one of the simplest examples, the `Clear` `SWI`. This hooks `SWI` 256+16, which is `OS_WriteI+16` - a `SWI` to output ASCII 16, taking no parameters and modifying no registers.  ASCII character 16 is interpreted as "clear graphics area" -- something the Wimp does when it draws the background of a window.  For FinalLook, I wanted to clear to a textured background instead of a plain colour.
+
+It turns out this `SWI` is only used in a couple of places in the ROM, so I was able to make a whole bunch of assumptions about the values of the registers even though no paramaters are passed in.
+
+    :::asm
+    ; Re-stack registers, preserving the whole
+    ; lot this time
+    LDMFD R13!,{R10,R14}
+    STMFD R13!,{R0-R12,R14}
+    ; It would appear that in the places in ROM
+    ; I expected to be called from, having R0
+    ; of &ffffffff was to be expected. Bail out
+    ; if this isn't so.
+    CMP R0,#1:BNE Normal
+    ; If texturing's off, bail out
+    LDR R0,TexOnFlag:MOVS R0,R0:BEQ Normal
+    ; If it doesn't look like R10 points at a
+    ; valid window handle, bail out
+    ; (Wind) = "WIND" ASCII magic value
+    ; (in retrospect it's amazing this works as
+    ;  no checks are made for the validity of the
+    ;  pointer in R10)
+    LDR R0,[R10]:LDR R1,Wind:CMP R0,R1:BNE Normal
+    LDR R0,[R10,#4]:CMN R0,#1:BEQ Normal
+    ; Read the opcode following the SWI, and 
+    ; check it against that expected in the
+    ; part of ROM we're trying to hook.
+    ; 'Word' has the instruction:
+    ;     LDR R14,[R10,#92]
+    BIC R14,R14,#&FC000003:LDR R14,[R14]
+    LDR R0,Word:CMP R0,R14:BNE Normal
+    ; (Here for clarity I've removed the code
+    ;  to check the current display mode and load
+    ;  sprites et al. )
+    ; Read out the caller's R2, which appears to
+    ; be the screen co-ordinates of the left of
+    ; the window
+    LDR R2,[R13,#8]
+    ; Move R10 along from the window handle to
+    ; point at the information about the window
+    ; (the WindowInfo block)
+    ADD R10,R10,#&48
+    ; Calculate width and height (R6, R7) of the
+    ; window from the data in the WindowInfo block
+    LDR R0,[R10,#0]:LDR R6,[R10,#16]:SUB R6,R0,R6
+    LDR R0,[R10,#12]:LDR R7,[R10,#20]:SUB R7,R0,R7
+    ; Load the size of the background tile
+    LDR R10,XSprSize:LDR R11,YSprSize
+    ; Find the starting X and Y coordinates
+    .shpondle SUB R6,R6,R10:CMP R6,R2:BGE shpondle
+    .shpondle ADD R7,R7,R11:CMP R7,R5:BLT shpondle
+    SUB R7,R7,R11
+    ; Remember the right and bottom edge
+    ; positions (the value in R4 presumably is the
+    ; right-hand edge, and R3 the bottom)
+    MOV R8,R4:SUB R9,R3,R11
+    ; Point R1 at the sprite header, and R2 at
+    ; its data.
+    LDR R1,SpriteAt
+    ADD R2,R1,#16
+    ; R0 = &222
+    MOV R0,#&22:ORR R0,R0,#&200
+    ; Set up R3 and R4 (X and Y position)
+    MOV R3,R6:MOV R4,R7:MOV R5,#0
+    ; Now loop for all X and all Y
+    ; (NB Y coordinates are inverted here)
+    .Loop
+    STMFD R13!,{R0-R5}
+    SWI "XOS_SpriteOp"
+    LDMFD R13!,{R0-R5}
+    BVS Normal
+    ADD R3,R3,R10:CMP R3,R8:BLT Loop
+    MOV R3,R6:SUB R4,R4,R11:CMP R4,R9:BGE Loop
+    ; Restore all the registers and return to
+    ; the OS.
+    LDMFD R13!,{R0-R12,R14}
+    MOVS PC,R14
+

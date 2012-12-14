@@ -161,7 +161,7 @@ body {
 
 #title {
   height: 60px;
-  background-image: url('/logo');
+  background-image: url('/logo.png');
   background-color: #444499;
 }
 #title div {

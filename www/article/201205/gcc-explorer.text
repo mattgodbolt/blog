@@ -33,7 +33,7 @@ and compiler flags.
 Taking a very small example, it's interesting to note the difference in code
 output between the following three hash bucket choosing functions:
 
-    :::cpp
+    ::: cpp
     // Hash with dynamic number of buckets.
     extern int NumBuckets;
     int hash1(int value) {
