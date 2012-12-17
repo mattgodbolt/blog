@@ -1021,6 +1021,9 @@ class Markdown(object):
         return list_str
 
     def _get_pygments_lexer(self, lexer_name):
+        if lexer_name == 'asm':
+            import asm_lexer
+            return asm_lexer.AsmLexer()
         try:
             from pygments import lexers, util
         except ImportError:

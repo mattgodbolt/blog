@@ -4,6 +4,7 @@ import os, sys, re, time, datetime
 from warnings import warn
 from smartypants import smartyPants
 from markdown2 import Markdown
+import pygments # unused but catches case when not installed
 from cache import Cache, SqlBackend
 from pytz import timezone, utc
 import codecs
