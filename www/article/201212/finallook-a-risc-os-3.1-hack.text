@@ -1,14 +1,14 @@
-!FinalLook - a RISC OS 2 hack explained
+!FinalLook - a RISC OS 3.1 hack explained
 Date: 2012-12-17 04:10:00
 Status: Public
-Summary: A trip down memory lane to a hack for RISC OS 2 I wrote at University
+Summary: A trip down memory lane to a hack for RISC OS 3.1 I wrote at University
 Label: Coding
 
 One of the coolest things about the [Acorn][Acorn] range of computers was their flexibility and hackability.  It was easy to extend the OS, and in some cases replace funtionality.  This is the story of how I totally abused the software interrupt (`SWI`) vector on my A3010 way back in 1995.
 
 [Acorn]: http://en.wikipedia.org/wiki/Acorn_Computers
 
-I was jealous of the newer machines that had recently come out with RISC OS 3.1. They had a fancy new UI with texture window backgrounds and anti-aliased text.  I set about to get the same effects on RISC OS 2.
+I was jealous of the newer machines that had recently come out with RISC OS 3.5. They had a fancy new UI with texture window backgrounds and anti-aliased text.  I set about to get the same effects on RISC OS 3.1.
 
 The biggest issue was that the [Wimp][Wimp] (the window manager), was stored in ROM.  Unlike many other parts of the OS, there weren't predefined hooks to modify its behaviour.
 
