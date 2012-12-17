@@ -1,0 +1,596 @@
+REM >PatchAll
+ON ERROR PRINT REPORT$;" at line ";ERL:END
+
+SYS "OS_Module",18,"WindowManager" TO ,,,WimpMod
+SYS "OS_Module",18,"Filer" TO ,,,FilerMod
+DIM code% &4000
+FOR pass%=4 TO 6 STEP 2
+P%=0
+O%=code%
+[OPT pass%
+
+EQUD    0
+EQUD    init
+EQUD    final
+EQUD    0
+EQUD    title
+EQUD    help
+EQUD    0
+EQUD    0
+EQUD    0
+EQUD    0
+EQUD    0
+.title
+EQUS    "PatchAll"
+EQUB    0
+.help
+EQUS    "PatchAll"+CHR$9+"1.41 (03 Jun 1995) by Matthew Godbolt"
+EQUB    0
+ALIGN
+.Monga
+EQUS "This module is by Matthew Godbolt (M.R.Godbolt@exeter.ac.uk).  "
+EQUS "It is FREEWARE and should have come with a !Help file describing"
+EQUS " what this means. :-)":EQUB 0:ALIGN
+.init
+STMFD   R13!,{R0,R1,R14}
+BL DoOptions
+ADR R1,FontName
+LDR R2,FontXSize
+LDR R3,FontYSize
+MOV     R4,#0
+MOV     R5,#0
+SWI     "XFont_FindFont"
+ADDVS R13,R13,#4:LDMVSFD R13!,{R1,PC}
+STR     R0,myfonthandle
+ADR R1,SymbolName
+LDR R2,FontXSize
+LDR R3,FontYSize
+MOV     R4,#0
+MOV     R5,#0
+SWI     "XFont_FindFont"
+MVNVS R0,#0
+STR     R0,mysymbolhandle
+SWI "OS_IntOff"
+MOV     R1,#8
+LDR     R0,[R1]
+STR     R0,oldbranch
+ADR     R1,myjump-8
+BIC R0,R0,#&FF000000
+SUB     R0,R0,R1,ASR #2
+BIC R0,R0,#&FF000000
+ORR R0,R0,#&EA000000
+STR     R0,myjump
+ADR     R0,myswihand-&10
+MOV     R0,R0,LSR #2
+ORR     R0,R0,#&EA000000
+MOV     R1,#8
+STR     R0,[R1]:STR R0,mycopy
+SWI "OS_IntOn"
+LDMFD   R13!,{R0,R1,PC}
+.myfonthandle   EQUD0
+.mysymbolhandle EQUD 0
+.myjump       B &1F033C0
+.mycopy EQUD 0
+.FontName EQUS "Trinity.Corpus.Bogus.Font.Italic.I.Dunno.!"+CHR$0:ALIGN
+.SymbolName EQUS "Trinity.Corpus.Bogus.Font.Italic.I.Dunno.!"+CHR$0:ALIGN
+.FontXSize EQUD 0
+.FontYSize EQUD 0
+.final
+STMFD   R13!,{R0,R1,R14}
+LDR R0,oldbranch
+MOV R1,#8
+LDR R2,mycopy:LDR R3,[R1]:CMP R3,R2:BNE Cant
+STR R0,[R1]
+LDR R0,myfonthandle
+SWI "XFont_LoseFont"
+LDR R0,mysymbolhandle:MOVS R0,R0:SWIPL "XFont_LoseFont"
+MOV R0,#7:LDR R2,SpriteAt:MOVS R2,R2:SWINE "XOS_Module"
+LDMFD   R13!,{R0,R1,PC}^
+.oldbranch      EQUD &EA6051CD
+.Cant LDMFD R13!,{R0,R1,R14}:ADR R0,errswi:ORRS PC,R14,#1<<28
+.errswi EQUS "!@#$Can't detach SWI handler"+CHR$0:ALIGN
+
+.myswihand
+STMFD   R13!,{R10,R14}
+BIC     R14,R14,#&FC000003
+AND R10,R14,#&03800000:CMP R10,#&03800000:LDMNEFD R13!,{R10,R14}:BNE myjump
+LDR     R14,[R14,#-4]
+BIC     R14,R14,#&FF000000
+BIC     R14,R14,#&20000
+CMP R14,#0:BEQ WriteC
+LDR R10,ospl:CMP R14,R10:BEQ Write
+LDR R10,openwindow:CMP R14,R10:BEQ RedrawRoot
+LDR R10,deletewindow:CMP R14,R10:BEQ Delwin
+LDR R10,ploticon:CMP R14,R10:BEQ Plot
+LDR R10,ClrBack:CMP R14,R10:BEQ Clear
+LDMFD R13!,{R10,R14}:B myjump
+
+.openwindow EQUD &400C5
+.deletewindow EQUD &400C3
+.ploticon EQUD &400E2
+.ClrBack EQUD 256+16
+.ospl EQUD &45
+
+.Word EQUD &E59AE05C
+.Wind EQUS "Wind"
+
+; HACKS AT THE WRONG TIME !!!!!!!!!!!!!!!!!!!!
+
+.Bongo2 SWI "XWimp_GetPointerInfo"
+.Delwin
+LDMFD R13!,{R10,R14}
+STMFD R13!,{R0-R12,R14}
+BIC R14,R14,#&FC000003:LDR R14,[R14,#16]:LDR R11,BilgePump2:CMP R14,R11
+BNE Normal
+B BonjourMeLad
+.RedrawRoot
+LDMFD R13!,{R10,R14}
+STMFD R13!,{R0-R12,R14}
+CMP R10,#&40000:BGT Normal
+BIC R14,R14,#&FC000003:LDR R10,[R14,#12]:LDR R11,Bongo2:CMP R11,R10
+BNE Normal
+.BonjourMeLad
+LDR R0,[R1]:BIC R0,R0,#3:ADD R0,R0,#&90:LDR R0,[R0]:ADD R0,R0,#4
+FNadr(7,Moglin):MOV R8,R7
+.PleiLoop
+LDRB R1,[R0],#1:CMP R1,#ASC".":MOVEQ R8,R7:STRB R1,[R7],#1:CMP R1,#32
+BGE PleiLoop
+MOV R1,#0:STRB R1,[R8],#1
+LDR R0,[R12,#8]
+.SearchLoop
+TEQ R0,#&40000001:BEQ Normal:LDR R2,[R0,#4]:ADD R2,R2,#4
+FNadr(7,Moglin)
+.CheckLp
+LDRB R3,[R7],#1:LDRB R4,[R2],#1:CMP R3,#0:CMPEQ R4,#0:BEQ Match
+CMP R3,R4:BEQ CheckLp
+LDR R0,[R0]:B SearchLoop
+.Match
+MOV R4,R0:LDR R3,[R4,#32]
+LDR R2,[R4,#&18]
+.FudgeLoop
+MOV R9,R8
+.Lop LDRB R10,[R2],#1:MOVS R10,R10:BNE Lop
+.Speedleloop
+LDRB R10,[R2],#1:LDRB R11,[R9],#1:CMP R10,#0:CMPEQ R11,#0:BEQ Match2
+CMP R10,R11:BEQ Speedleloop
+CMP R10,#0:SUBEQ R2,R2,#1
+SUBS R3,R3,#1:BNE FudgeLoop:SWI 256+7:B Normal
+.Match2
+ADD R5,R0,#&2C:LDR R0,[R0,#8]
+FNFiler_bl(&1EB8)
+ADD R1,R12,#&44:LDMIA R1,{R1-R4}
+SWI "XWimp_ForceRedraw"
+LDMFD R13!,{R0-R12,R14}
+B myjump
+.BilgePump2 EQUD &E92D40BE
+
+.TexOnFlag EQUD 0
+.FontOnFlag EQUD 0
+.DirOnFlag EQUD 0
+
+.Clear
+LDMFD R13!,{R10,R14}
+STMFD R13!,{R0-R12,R14}
+CMP R0,#1:BNE Normal
+LDR R0,TexOnFlag:MOVS R0,R0:BEQ Normal
+LDR R0,[R10]:LDR R1,Wind:CMP R0,R1:BNE Normal
+LDR R0,[R10,#4]:CMN R0,#1:BEQ Normal
+BIC R14,R14,#&FC000003:LDR R14,[R14]
+LDR R0,Word:CMP R0,R14:BNE Normal
+MOV R0,#&87:SWI "XOS_Byte":BVS Normal:LDRB R0,ModeLast
+CMP R0,R2:BLNE CalcSize
+MVN R0,#0:MOV R1,#9:SWI "XOS_ReadModeVariable":BVS Normal
+MVN R1,#0
+CMP R2,#0:ADREQ R1,Mode0
+CMP R2,#2:ADREQ R1,Mode12
+CMP R2,#3:ADREQ R1,Mode15
+CMN R1,#1:BEQ Normal
+LDR R14,ModeLoad
+CMP R14,R2:BEQ DontLoad
+STR R2,ModeLoad:STMFD R13!,{R0-R7}
+MOV R0,#7:LDR R2,SpriteAt:MOVS R2,R2:SWINE "XOS_Module"
+MOV R2,#0:STR R2,SpriteAt
+MOV R0,#5:LDR R1,[R13,#4]
+MOV R2,#0:MOV R3,#0:SWI "XOS_File":ADDVS R13,R13,#32:BVS Normal
+ADD R3,R4,#4:MOV R0,#6:SWI "XOS_Module":ADDVS R13,R13,#32:BVS Normal
+STR R2,SpriteAt:STR R4,[R2],#4
+LDR R1,[R13,#4]:MOV R0,#&FF:MOV R3,#0:MOV R4,#0:MOV R5,#0
+SWI "XOS_File":LDMFD R13!,{R0-R7}
+BLVC CalcSize:BVC DontLoad
+MOV R0,#7:LDR R2,SpriteAt:SWI "XOS_Module"
+MOV R2,#0:STR R2,SpriteAt
+B Normal
+.DontLoad
+LDR R2,SpriteAt:MOVS R2,R2:BEQ Normal
+LDR R2,[R13,#8]
+ADD R10,R10,#&48 ; should now point to WindowInfo Block ...
+LDR R0,[R10,#0]:LDR R6,[R10,#16]:SUB R6,R0,R6
+LDR R0,[R10,#12]:LDR R7,[R10,#20]:SUB R7,R0,R7
+LDR R10,XSprSize:LDR R11,YSprSize
+.shpondle SUB R6,R6,R10:CMP R6,R2:BGE shpondle
+.shpondle ADD R7,R7,R11:CMP R7,R5:BLT shpondle
+SUB R7,R7,R11
+MOV R8,R4:SUB R9,R3,R11
+LDR R1,SpriteAt
+ADD R2,R1,#16
+MOV R0,#&22:ORR R0,R0,#&200
+MOV R3,R6:MOV R4,R7:MOV R5,#0
+.Loop
+STMFD R13!,{R0-R5}
+SWI "XOS_SpriteOp"
+LDMFD R13!,{R0-R5}
+BVS Normal
+ADD R3,R3,R10:CMP R3,R8:BLT Loop
+MOV R3,R6:SUB R4,R4,R11:CMP R4,R9:BGE Loop
+LDMFD R13!,{R0-R12,R14}
+MOVS PC,R14
+.Normal
+LDMFD R13!,{R0-R12,R14}
+MOV R0,R0
+B myjump
+.ModeLoad EQUD -1
+.SpriteAt EQUD 0
+.ModeLast EQUD MODE
+.Mode0 EQUS "WindowDrop:Sprites0"+CHR$0:ALIGN
+.Mode12 EQUS "WindowDrop:Sprites12"+CHR$0:ALIGN
+.Mode15 EQUS "WindowDrop:Sprites15"+CHR$0:ALIGN
+.XSprSize EQUD 0
+.YSprSize EQUD 0
+
+.CalcSize
+STMFD R13!,{R0-R7,R10,R11,R14}
+LDR R1,SpriteAt:MOVS R1,R1:BEQ Flimsey
+ADD R2,R1,#16
+MOV R0,#40:ORR R0,R0,#&200:SWI "XOS_SpriteOp"
+MVN R0,#0:MOV R1,#4:SWI "XOS_ReadModeVariable":MOV R10,R3,LSL R2
+MVN R0,#0:MOV R1,#5:SWI "XOS_ReadModeVariable":MOV R11,R4,LSL R2
+STR R10,XSprSize:STR R11,YSprSize
+.Flimsey
+LDMFD R13!,{R0-R7,R10,R11,PC}^
+
+.GreyFlag EQUD 0
+.MaybeClear
+LDR R1,GreyFlag:MOVS R1,R1:BEQ Normal
+LDR R1,[R13,#56] ; r1 from previous
+AND R2,R1,#3:CMP R2,#3:BNE Normal
+TST R1,#256:BEQ Normal:TST R1,#1<<3:BEQ Normal
+LDMFD R13!,{R0-R12,R14}
+MOVS PC,R14
+
+.Word2 LDR R14,[R12,#84]
+.Word3 EQUD &0A00000C
+.Counter EQUD 0
+.WriteMen EQUD &70D0121
+; hacks at WindowManager+&76E0 called from WM+&7568
+.Write
+LDMFD R13!,{R10,R14}
+STMFD R13!,{R0-R12,R14}
+LDR R4,FontOnFlag:MOVS R4,R4:BEQ Normal
+BIC R14,R14,#&FC000003:LDR R11,[R14,#16]
+LDR R4,Word2:CMP R4,R11:BNE Normal
+CMP R0,#103:BEQ MaybeClear
+LDR R14,[R13,#64]
+BIC R14,R14,#&FC000003:LDR R14,[R14,#16]
+LDR R4,Word3:CMP R4,R14:BNE Normal
+CMP R0,#4:BNE Normal
+LDR R2,[R13,#60]:LDR R14,[R13,#56]:AND R9,R14,#&F<<12
+CMP R9,#12<<12:BGE Normal
+LDR R9,WriteMen:CMP R14,R9:ORRNE R9,R9,#1<<21:CMPNE R14,R9:BEQ Normal
+STMFD R13!,{R0-R2,R14}
+LDR R0,[R12,#128]:BIC R0,R0,#3:ADD R1,R0,#64:SWI "OS_ValidateAddress"
+BCS Bob
+LDR R2,[R0]:LDR R1,Wind:CMP R2,R1:BNE Bob
+LDR R2,[R0,#4]:CMN R2,#1:BNE Bob
+; ok so we have a menu here!
+LDR R14,[R13,#60+24] \ The IconFlags
+TST R14,#&100:MOVEQ R14,#&C:MOVNE R14,#&1000000:STR R14,Counter
+LDR R2,[R13,#16+60] \ Aha! the key, the secret! The icon data!
+STMFD R13!,{R0-R1,R3-R9}
+LDR R8,[R0,#(&48+8)]:LDR R9,[R0,#(&48)]
+SUB R8,R8,R9:SUB R8,R8,#64
+STMFD R13!,{R1,R2}:MOV R1,R8:MOV R2,#0
+SWI "Font_Converttopoints"
+MOV R8,R1:LDMFD R13!,{R1,R2}
+LDR R0,myfonthandle:SWI "XFont_SetFont"
+MOV R0,R2:.Fleep
+LDR R14,Counter:SUBS R14,R14,#1:STR R14,Counter:BEQ NoHK
+LDRB R3,[R0],#1:MOVS R3,R3:CMPNE R3,#13:CMPNE R3,#10
+BEQ NoHK:CMP R3,#32:BNE Fleep
+LDRB R3,[R0]:CMP R3,#ASC"ELSE":CMPNE R3,#ASC"^":BEQ FoundHK
+CMP R3,#32:BNE NotSpace
+LDRB R14,[R0,#-1]:CMP R14,#32
+LDR R14,Counter:ADD R14,R14,#1:STR R14,Counter
+BNE NotSpace
+.Skandl
+LDRB R3,[R0],#1
+LDR R14,Counter:SUBS R14,R14,#1:STR R14,Counter:BEQ NoHK
+CMP R3,#32:BEQ Skandl:MOVS R3,R3:CMPNE R3,#13:CMPNE R3,#10
+BEQ NoHK:SUB R0,R0,#1:B FoundHK
+.NotSpace
+CMP R3,#ASC"F":BNE Fleep:LDRB R3,[R0,#1]:CMP R3,#ASC"0":BLT Fleep
+CMP R3,#ASC"9":BGT Fleep
+.FoundHK
+LDRB R3,[R0,#-1]!:CMP R3,#32
+BEQ FoundHK:ADD R0,R0,#1
+ADR R4,HotKey:.Floopy LDRB R3,[R2],#1:STRB R3,[R4],#1:CMP R2,R0:BLT Floopy
+MOV R3,#0:STRB R3,[R4]
+STMFD R13!,{R1-R4}:ADR R1,HotKey:MOV R2,#&8000000:MOV R3,R2
+MVN R4,#0:MOV R5,#&FF:SWI "XFont_StringWidth":MOV R6,R2
+LDMFD R13!,{R1-R4}
+.Floopy2 LDRB R3,[R2],#1
+CMP R3,#32:BEQ Floopy2
+SUB R2,R2,#1
+ADR R5,HotKey2
+.Penelope LDRB R3,[R2],#1:CMP R3,#0:CMPNE R3,#13:CMPNE R3,#10:STREQB R3,[R5],#1:BEQ Finis
+CMP R3,#ASC"ELSE":STRNEB R3,[R5],#1:BNE Penelope
+LDR R3,mysymbolhandle:MOVS R3,R3:BPL OkFont
+LDR R3,Counter:ADD R3,R3,#1:STR R3,Counter
+MOV R3,#ASC"/":STRB R3,[R5],#1
+MOV R3,#ASC"\":STRB R3,[R5],#1:B Penelope
+.OkFont
+LDR R3,Counter:ADD R3,R3,#4:STR R3,Counter
+MOV R3,#26:STRB R3,[R5],#1:LDRB R3,mysymbolhandle:STRB R3,[R5],#1
+MOV R3,#ASC"ELSE":STRB R3,[R5],#1:MOV R3,#26:STRB R3,[R5],#1:LDRB R3,myfonthandle:STRB R3,[R5],#1
+B Penelope
+.Finis
+STMFD R13!,{R1-R4}:ADR R1,HotKey2:MOV R2,#&800000:MOV R3,R2:MVN R4,#0
+LDR R5,Counter
+SWI "XFont_StringWidth":ADD R6,R6,R2:SUB R8,R8,R6
+LDMFD R13!,{R1-R4}
+MOV R3,#9:STRB R3,[R4],#1
+STRB R8,[R4],#1:MOV R8,R8,LSR #8
+STRB R8,[R4],#1:MOV R8,R8,LSR #8:STRB R8,[R4],#1
+LDR R14,Counter:ADR R2,HotKey2
+.Floopy3 LDRB R3,[R2],#1:SUBS R14,R14,#1:MOVMI R3,#0
+STRB R3,[R4],#1
+CMP R3,#26:BNE Fombel
+LDRB R3,[R2],#1:SUBS R14,R14,#1:MOVMI R3,#0
+STRB R3,[R4],#1:B Floopy3
+.Fombel
+CMP R3,#&20:BGE Floopy3
+MOV R3,#0:STRB R3,[R4],#1:ADR R2,HotKey:B NoHK
+.HotKey ]:P%+=128:O%+=128:[OPT pass%
+.HotKey2 ]:P%+=64:O%+=64:[OPT pass%
+.WriteC
+LDMFD R13!,{R10,R14}
+STMFD R13!,{R0,R1,R2,R14}
+ADR R1,HotKey:ADD R1,R1,#1
+CMP R2,R1:LDMNEFD R13!,{R0,R1,R2,R14}:BNE myjump
+ADR R1,HotKey:MOV R2,#0
+.Tlp LDRB R0,[R1],#1:MOVS R0,R0:BEQ ZapY:SWI "XOS_WriteC"
+CMP R0,#26:BEQ Tlp
+CMP R0,#9:BNE Tlp
+LDRB R0,[R1],#1:SWI "XOS_WriteC"
+LDRB R0,[R1],#1:SWI "XOS_WriteC"
+LDRB R0,[R1],#1:SWI "XOS_WriteC"
+B Tlp:.ZapY
+STR R0,HotKey:.Womlbe LDMFD R13!,{R0-R2,R14}:MOV R0,#0:B myjump
+.NoHK
+LDMFD R13!,{R0-R1,R3-R9}
+STR R2,[R13,#16+60]
+.Bob
+MOV R0,#&87:SWI "XOS_Byte":LDMVSFD R13!,{R0-R2,R14}:BVS Normal
+LDRB R0,ModeLast:CMP R0,R2:STRB R2,ModeLast
+BEQ Already
+STMFD R13!,{R0-R5}
+BL CalcSize
+LDRB R0,myfonthandle:SWI "XFont_LoseFont"
+FNadr(1,FontName)
+LDR R2,FontXSize:LDR R3,FontYSize
+MOV     R4,#0
+MOV     R5,#0
+SWI     "XFont_FindFont"
+MVNVS   R0,#0
+STR     R0,myfonthandle
+LDMFD R13!,{R0-R5}
+LDMVSFD R13!,{R0-R2,R14}:BVS Normal
+.Already
+LDMFD R13!,{R0-R2,R14}
+LDR R0,GreyFlag:MOVS R0,R0:BEQ NotSelI
+AND R0,R14,#3:CMP R0,#3:BNE NotSelI
+TST R14,#256:BEQ NotSelI:TST R14,#(1<<21):BEQ NotSelI:TST R14,#1<<3:BEQ NotSelI
+MOV R1,R14,LSR #24:AND R1,R1,#&F
+BIC R14,R14,#&FF000000:ORR R14,R14,R1,LSL #24:ORR R14,R14,R1,LSL #28
+STR R14,[R13,#56]
+.NotSelI
+SUB R13,R13,#16:LDMFD R13!,{R0-R2,R14}
+.Bonza
+LDR R0,[R12,#128]:BIC R0,R0,#3: \\\ MAY BE BUGS HERE
+LDR R2,[R0]:LDR R1,Wind:CMP R2,R1:BNE Icon_Filled
+TST R14,#&FF000000:BNE NoTBar
+ADD R0,R0,#&48+32
+LDRB R1,[R0]:CMP R1,#&FF:BEQ Icon_Filled
+LDRB R0,[R0,#1]:ORR R0,R1,R0,LSL #4:ORR R14,R14,R0,LSL #24:B Smeg
+.NoTBar
+TST R14,#1<<5:BNE Icon_Filled
+ADD R0,R0,#&48+35:LDRB R0,[R0]:CMP R0,#&F:BGT Icon_Filled
+BIC R14,R14,#&F<<28:ORR R14,R14,R0,LSL #28:.Smeg
+STR R14,[R13,#56]
+.Icon_Filled
+SUB R13,R13,#16:LDMFD R13!,{R0-R2,R14}
+AND R9,R14,#42:CMP R9,#42:BNE Pj:TST R14,#&200:MOV R9,#0:BNE h
+; allow radio and text
+.Pj
+MOV R9,#0:TST R14,#8:MOVNE R9,#8:BNE h
+TST R14,#&200:MOVNE R9,#16:.h
+.loop LDRB R0,[R2],#1:CMP R0,#32:ADDCS R1,R1,R9:BCS loop:STR R1,Bo
+LDR R1,[R13,#56]:LDR R2,[R13,#60]:LDRB R0,myfonthandle:BIC R1,R1,#&FF000000
+ORR R1,R1,R0,LSL #24
+ORR R1,R1,#&40:FNbl(&78E8):LDR R1,Bo
+CMP R9,#8:SUBEQ R1,R1,R4,LSR #1
+CMP R9,#16:SUBEQ R1,R1,R4
+STR R1,Bo
+LDR R1,[R13,#56]
+MOV R9,R1,LSR #28:STRB R9,[R12,#124]
+AND R14,R1,#&F000000
+MOVS R14,R14,LSR #24
+CMPEQ R9,#0:MOVEQ R14,#7
+STRB R14,[R12,#123]
+FNbl(&7348)
+BVS Normal
+LDMFD R13!,{R0-R12,R14}
+MOV R0,#&D4:LDR R1,Bo:SUB R2,R2,#22:B myjump
+.Bo &0
+
+.Wordx LDRB R14,[R4,#40]
+.Plot
+LDMFD R13!,{R10,R14}
+STMFD R13!,{R0-R12,R14}
+BIC R14,R14,#&FC000003:LDR R14,[R14,#16]
+LDR R7,Wordx:CMP R7,R14:BNE Normal
+LDR R14,DirOnFlag:MOVS R14,R14:BEQ Normal
+ADR R11,open_dir
+LDR R14,[R1,#&18]:LDRB R14,[R14,#1]:CMP R14,#ASC"s":ADREQ R11,sopen_dir
+CMPNE R14,#ASC"d":BNE Normal
+.lebon
+LDR R0,[R4,#4]:FNadr(7,Moglin):.CopLp LDRB R14,[R0],#1:STRB R14,[R7],#1
+CMP R14,#0:BNE CopLp:MOV R14,#ASC".":STRB R14,[R7,#-1]
+LDR R0,[R1,#&14]:.CopLp LDRB R14,[R0],#1:CMP R14,#0:CMPNE R14,#&0D
+MOVEQ R14,#0:STRB R14,[R7],#1
+BNE CopLp
+LDR R0,[R12,#8]
+.RepLp
+TEQ R0,#&40000001:BEQ Normal:FNadr(7,Moglin):LDR R6,[R0,#4]
+.SeeIfSame LDRB R5,[R7],#1:LDRB R14,[R6],#1
+CMP R5,#32:MOVEQ R5,#0
+CMP R14,#32:MOVEQ R14,#0
+TEQ R14,#0:TEQEQ R5,#0:BEQ Yes
+CMP R14,R5:BEQ SeeIfSame:BNE NextOne
+.Yes
+LDMIA R1,{R0-R7}:MOV R6,R11:FNadr(14,Brea):STMIA R14,{R0-R7}
+LDMFD R13!,{R0-R12,R14}
+FNadr(1,Brea):B myjump
+.NextOne LDR R0,[R0]:B RepLp
+.open_dir EQUS "sdirectoryo"+CHR$0:ALIGN
+.sopen_dir EQUS "ssmall_diro"+CHR$0:ALIGN
+
+.Trans EQUD 0:EQUD 0:EQUD 0:EQUD 0
+.FnameCHO EQUS "<FinalLook$OptionsFile>"+CHR$0:ALIGN
+
+.Gm EQUS "(Opening file)"+CHR$0:ALIGN
+.Lookup EQUS "(Lookup)"+CHR$0:ALIGN
+
+.DoOptions
+STMFD R13!,{R0-R7,R14}
+ADR R0,Trans:ADR R1,FnameCHO:MOV R2,#0:SWI "XMessageTrans_OpenFile"
+ADRVS R0,Gm:BVS OptTrouble
+ADR R4,OptList:ADR R8,OptList
+.OptLoop
+ADR R0,Trans
+LDR R1,[R4],#4 ; token
+MOVS R1,R1:BMI OptEnd
+ADD R1,R1,R8 ; put to absolute address
+ADR R2,Transbuf:MOV R3,#255
+STMFD R13!,{R4-R7}:MOV R4,#0:MOV R5,#0:MOV R6,#0:MOV R7,#0
+SWI "XMessageTrans_Lookup":LDMFD R13!,{R4-R7}:ADRVS R0,Lookup
+BVS OptTrouble
+LDR R1,[R4],#4 ; address
+ADD R1,R1,R8 ; absolute address
+LDR R0,[R4],#4 ; type
+CMP R0,#0:BNE NotBoolean
+; A boolean Yes or No ... test by first letter
+LDRB R2,[R2]:CMP R2,#ASC"a":BLT LetOk:CMP R2,#ASC"z"
+SUBLE R2,R2,#32:.LetOk CMP R2,#ASC"Y":MVNEQ R2,#0:STREQ R2,[R1]
+BEQ OptLoop:CMP R2,#ASC"N":MOVEQ R2,#0:STREQ R2,[R1]:BEQ OptLoop
+STRB R2,Err1+4
+B UnBool
+.NotBoolean
+CMP R0,#1:BNE NotNumeric
+; A numeric
+MOV R7,R1:MOV R1,R2:MOV R0,#0:SWI "OS_ReadUnsigned"
+STR R2,[R7]:B OptLoop
+.NotNumeric
+; must be text so copy
+.Flobbadob LDRB R0,[R2],#1:CMP R0,#10:CMPNE R0,#0:MOVEQ R0,#0
+STRB R0,[R1],#1:BNE Flobbadob:B OptLoop
+.OptEnd
+ADR R0,Trans:SWI "MessageTrans_CloseFile"
+ADR R0,Clios:SWI "OS_CLI"
+LDMFD R13!,{R0-R7,PC}^
+.UnBool
+ADR R0,Err1:SWI "OS_GenerateError"
+LDMFD R13!,{R0-R7,PC}^
+.Err1 EQUS "!@#$Expecting 'Yes' or 'No' for an option ... cannot start"+CHR$0:ALIGN
+.OptTrouble
+ADR R1,Job:.Lop LDRB R2,[R0],#1:STRB R2,[R1],#1:MOVS R2,R2:BNE Lop
+ADR R0,Err0:SWI "OS_GenerateError"
+LDMFD R13!,{R0-R7,PC}^
+.Err0 EQUS "!@#$Cannot start !FinalLook as there has been a problem with the options file. - ":.Job
+;NB a runtime error overwrites from here on
+ALIGN
+
+.Clios
+EQUS "Set WindowDrop$Path "
+.TexPathSet EQUS STRING$(255,"*"):ALIGN
+
+
+.OptList
+EQUD Ptr_FontName-OptList:EQUD FontName-OptList:EQUD 2
+EQUD Ptr_SymbolName-OptList:EQUD SymbolName-OptList:EQUD 2
+EQUD Ptr_FontXSize-OptList:EQUD FontXSize-OptList:EQUD 1
+EQUD Ptr_FontYSize-OptList:EQUD FontYSize-OptList:EQUD 1
+EQUD Ptr_TexPath-OptList:EQUD TexPathSet-OptList:EQUD 2
+EQUD Ptr_TexOn-OptList:EQUD TexOnFlag-OptList:EQUD 0
+EQUD Ptr_FontOn-OptList:EQUD FontOnFlag-OptList:EQUD 0
+EQUD Ptr_DirOpen-OptList:EQUD DirOnFlag-OptList:EQUD 0
+EQUD Ptr_Grey-OptList:EQUD GreyFlag-OptList:EQUD 0
+EQUD -1
+.Ptr_FontName  EQUS "FontName:Corpus.Medium"+CHR$0
+.Ptr_SymbolName EQUS "SymbolName:WIMPSymbol"+CHR$0
+.Ptr_FontXSize EQUS "FontXSize:170"+CHR$0
+.Ptr_FontYSize EQUS "FontYSize:248"+CHR$0
+.Ptr_TexPath EQUS "TexturePath:<FinalLook$Dir>.WindowDrop.Default."+CHR$0
+.Ptr_TexOn EQUS "TexturesOn:No"+CHR$0
+.Ptr_FontOn EQUS "FontsOn:No"+CHR$0
+.Ptr_DirOpen EQUS "DirectoryOpen:No"+CHR$0
+.Ptr_Grey EQUS "RemoveGreyBlobs:No"+CHR$0
+ALIGN
+.Transbuf ]:P%+=256:O%+=256:[OPT pass%
+.Brea ]:P%+=64:O%+=64:[OPT pass%
+.Moglin
+]P%+=1024:O%+=1024
+NEXT
+SYS "OS_File",10,"<FinalLook$Dir>.AllPatch",&FFA,,code%,O%
+FOR pass%=4 TO 6 STEP 2
+P%=&8000:O%=code%
+[OPT pass%
+.Alt_Key
+STMFD R13!,{R0-R7,R14}
+MOV R0,#129:MOV R1,#256-3:MOV R2,#255:SWI "XOS_Byte"
+BVS End
+CMP R2,#255:ADREQ R0,On:ADRNE R0,Off
+SWI "XOS_CLI"
+.End
+LDMFD R13!,{R0-R7,PC}^
+.On EQUS "Set FinalLook$AltKey On"+CHR$0
+.Off EQUS "Set FinalLook$AltKey Off"+CHR$0:ALIGN
+]
+NEXT
+SYS "OS_File",10,"<FinalLook$Dir>.AltCheck",&FFC,,code%,O%
+END
+
+DEF FNbl(addr)
+[OPT pass%
+ADR R14,P%+16
+ORR R14,R14,#3
+LDR PC,P%+4
+EQUD WimpMod+addr
+]
+=""
+DEF FNFiler_bl(addr)
+[OPT pass%
+ADR R14,P%+16
+ORR R14,R14,#3
+LDR PC,P%+4
+EQUD FilerMod+addr
+]
+=""
+
+DEF FNadr(reg,addr)
+[OPT pass%
+LDR     reg,P%+12
+ADD     reg,pc,reg
+B       P%+8
+EQUD    addr-P%
+]
+=""

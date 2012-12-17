@@ -1,14 +1,18 @@
 !FinalLook - a RISC OS 2 hack explained
-Date: 2012-12-15 22:40:00
-Status: Draft
+Date: 2012-12-17 04:10:00
+Status: Public
 Summary: A trip down memory lane to a hack for RISC OS 2 I wrote at University
 Label: Coding
 
-One of the coolest things about the Acorn range of computers was their flexibility and hackability.  It was easy to extend the OS, and in some cases replace funtionality.  This is the story of how I totally abused the software interrupt (`SWI`) vector on my A3010 way back in 1995.
+One of the coolest things about the [Acorn][Acorn] range of computers was their flexibility and hackability.  It was easy to extend the OS, and in some cases replace funtionality.  This is the story of how I totally abused the software interrupt (`SWI`) vector on my A3010 way back in 1995.
+
+[Acorn]: http://en.wikipedia.org/wiki/Acorn_Computers
 
 I was jealous of the newer machines that had recently come out with RISC OS 3.1. They had a fancy new UI with texture window backgrounds and anti-aliased text.  I set about to get the same effects on RISC OS 2.
 
-The biggest issue was the Wimp (the window manager), was stored in ROM.  Unlike many other parts of the OS, there weren't predefined hooks to modify its behaviour.
+The biggest issue was that the [Wimp][Wimp] (the window manager), was stored in ROM.  Unlike many other parts of the OS, there weren't predefined hooks to modify its behaviour.
+
+[Wimp]: http://en.wikipedia.org/wiki/WIMP_(computing) "Windows Icons Menus Pointer"
 
 However, it _was_ possible to globally hook every `SWI`, and this is what I did:
 
@@ -50,7 +54,9 @@ Here's the SWI handler I install, along with a few comments:
     LDR R10,ClrBack:CMP R14,R10:BEQ Clear
     LDMFD R13!,{R10,R14}:B myjump
 
-Let's take one of the simplest examples, the `Clear` `SWI`. This hooks `SWI` 256+16, which is `OS_WriteI+16` - a `SWI` to output ASCII 16, taking no parameters and modifying no registers.  ASCII character 16 is interpreted as "clear graphics area" -- something the Wimp does when it draws the background of a window.  For FinalLook, I wanted to clear to a textured background instead of a plain colour.
+Let's take one of the simplest examples, the `SWI` for clearing the background of the windows.
+
+This hooks `SWI` 256+16, which is `OS_WriteI+16` - a `SWI` to output ASCII 16, taking no parameters and modifying no registers.  ASCII character 16 is interpreted as "clear graphics area" -- something the Wimp does when it draws the background of a window.  For FinalLook, I wanted to clear to a textured background instead of a plain colour.
 
 It turns out this `SWI` is only used in a couple of places in the ROM, so I was able to make a whole bunch of assumptions about the values of the registers even though no paramaters are passed in.
 
@@ -128,3 +134,10 @@ It turns out this `SWI` is only used in a couple of places in the ROM, so I was 
     LDMFD R13!,{R0-R12,R14}
     MOVS PC,R14
 
+The other hooks were even more tangled, relying on a plethora of registers and
+code paths in ROM to hack in anti-aliased fonts.
+
+The entire BASIC source (converted to text by [my python convertor][python]) is
+available [here](/media/PatchAll.txt).
+
+[python]: /200711/BBCBasicToText.py
