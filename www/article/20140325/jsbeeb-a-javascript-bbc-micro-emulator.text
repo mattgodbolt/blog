@@ -8,6 +8,11 @@ Those not following me on [twitter](https://twitter.com/mattgodbolt) or
 [Google+](https://plus.google.com/+MattGodbolt) won't have noticed that over the last few weeks
 I've been working feverishly on my latest Javascript emulator.
 
+<p class="picture">
+<img src="exil.png" width="500" height="362" alt="jsbeeb demonstrating Exile"/>
+<br/>At last I can play my favourite game ever in my browser
+</p>
+
 So I'd like to announce [jsbeeb](http://bbc.godbolt.org) -- a Javascript BBC Micro emulator, currently targetting only
 the BBC Model B (with sideways RAM).  It runs well in Chrome, fairly well in Firefox, and almost certainly
 won't work on any other browser.
