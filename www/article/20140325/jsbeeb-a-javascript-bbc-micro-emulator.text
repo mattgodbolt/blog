@@ -10,7 +10,7 @@ I've been working feverishly on my latest Javascript emulator.
 
 <p class="picture">
 <a href="http://bbc.godbolt.org/?disc=%7CSuperior%2FExile.zip&autoboot">
-<img src="exile.png" width="500" height="362" alt="jsbeeb demonstrating Exile"/></a>
+<img src="/20140325/exile.png" width="500" height="362" alt="jsbeeb demonstrating Exile"/></a>
 <br/>At last I can play my favourite game ever in my browser
 </p>
 
