@@ -1,0 +1,28 @@
+jsbeeb - a Javascript BBC Micro emulator
+Date: 2014-03-25 18:10:00
+Status: Draft
+Summary: Announcing a Javascript BBC Model B Microcomputer emulator
+Label: Coding
+
+Those not following me on [twitter](https://twitter.com/mattgodbolt) or
+[Google+](https://plus.google.com/+MattGodbolt) won't have noticed that over the last few weeks
+I've been working feverishly on my latest Javascript emulator.
+
+So I'd like to announce [jsbeeb](http://bbc.godbolt.org) -- a Javascript BBC Micro emulator, currently targetting only
+the BBC Model B (with sideways RAM).  It runs well in Chrome, fairly well in Firefox, and almost certainly
+won't work on any other browser.
+
+Games and other discs are available from the [Stairway to Hell](http://www.stairwaytohell.com/) archive and there's
+support for loading games directly -- click the "Load from STH" button.
+
+My pal Rich Talbot-Watkins is helping me get the instruction timings perfect so we can load some of the more gnarly
+protection systems of old, but for now you can enjoy playing classics like:
+
+  * [Repton](http://bbc.godbolt.org/?disc=%7CSuperior%2FRepton.zip&autoboot)
+  * [Elite](http://bbc.godbolt.org/?disc=elite.ssd&autoboot)
+  * [Exile](http://bbc.godbolt.org/?disc=%7CSuperior%2FExile.zip&autoboot)
+  * [Thrust](http://bbc.godbolt.org/?disc=%7CSuperior%2FThrust.zip&autoboot)
+
+...and many many more!
+
+I now need to spend some time working on my [goto; conference](http://gotocon.com) [presentation](http://gotocon.com/chicago-2014/presentation/x86%20Internals%20for%20Fun%20and%20Profit) which is getting pretty scarily close now!
