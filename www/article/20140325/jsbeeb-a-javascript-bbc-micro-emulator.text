@@ -1,6 +1,6 @@
 jsbeeb - a Javascript BBC Micro emulator
 Date: 2014-03-25 18:10:00
-Status: Draft
+Status: Public
 Summary: Announcing a Javascript BBC Model B Microcomputer emulator
 Label: Coding
 
@@ -9,7 +9,8 @@ Those not following me on [twitter](https://twitter.com/mattgodbolt) or
 I've been working feverishly on my latest Javascript emulator.
 
 <p class="picture">
-<img src="exil.png" width="500" height="362" alt="jsbeeb demonstrating Exile"/>
+<a href="http://bbc.godbolt.org/?disc=%7CSuperior%2FExile.zip&autoboot">
+<img src="exile.png" width="500" height="362" alt="jsbeeb demonstrating Exile"/></a>
 <br/>At last I can play my favourite game ever in my browser
 </p>
 
