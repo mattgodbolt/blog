@@ -1,0 +1,181 @@
+Emulating a BBC Micro in Javascript
+Date: 2014-05-14 22:10:00
+Status: Public
+Summary: Some notes on what goes on when you emulate a BBC Micro computer in javascript
+Label: Coding
+
+One of my favourite things to do of recent times is resurrect computer systems
+from my youth in Javascript. It's pretty amazing how fast Javascript
+interpreters are nowadays: Google's v8 and Webkit's engine (and its
+freshly-announced FTL upgrade) are amazing at taking a fully dynamic language
+and making it run almost as fast as native code.
+
+Writing an emulator in Javascript makes it much more accessible to users. No
+installs, often games and discs to emulate are available directly on the web,
+no configuration. With a modern browser, It Just Works.
+
+That being said, Javascript is not an obvious choice.  Most of the work inside
+an emulator is bit manipulation, or byte access. Using the right code idioms
+and data types helps, inasmuch as Javascript has types that is.
+
+[jsbeeb][] is a BBC Micro computer emulator, and builds on my experiences writing
+a Sega Master System emulator. I'm going to talk through some of the more
+interesting parts of the code. Of course, the code itself is on [github][].
+
+[jsbeeb]: http://bbc.godbolt.org/ "BBC Micro emulator"
+[github]: https://github.com/mattgodbolt/jsbeeb
+
+CPU emulation
+-------------
+
+The CPU emulator reads the next instruction, decodes it and then executes it just like
+its real-life silicon version does. From my experimentation in Miracle (the
+Sega emulator), I discovered that the naive "big switch statement" covering
+the 256 possible opcodes is not the best way to optimize.  Chrome's v8 at
+least bails out its JIT process if a function is either too big, or if it has
+too many entries in the switch statement.
+
+Instead, I use a 256-entry array of function pointers, each to its own
+instruction handling routine.  The main despatch then becomes something like:
+
+    :::javascript
+    for (;;) {
+      var opcode = readmem(pc++);
+      instructions[opcode]();
+      if (irq_happened) pc = irq_handler;
+    }
+
+As many of the instructions are similar (with just indexing or addressing mode
+differences), I code-generate the Javascript for each instruction from a
+table. (The table also acts as the source for the disassembler). By `eval`ling
+each function from its generated text, I build up the entries covering all the
+instructions.
+
+Timings are incredibly important for accurate emulation. To get the most out
+of the machine, games programmers would take advantage of timing subtleties
+and (usually undocumented) unusual side effects of instructions.  Games
+anti-copy mechanisms were often the most sensitive to this. For example, many
+instructions take several CPU cycles to execute, and access memory multiple
+times during their execution. These accesses may touch memory-mapped hardware
+which may interpret the access as a command (for example, to schedule a timer
+interrupt). Sometimes accessing hardware would cause the processor to use a
+slower clock to handle differing bus speeds. 
+
+The 6502 CPU in the BBC Micro had a number of "bugs" too -- for example, for
+read-modify-write instructions of a certain type, under some circumstances,
+the instruction would actually write the unmodified value first before
+replacing it with the modified value. Again, some game protection systems
+would use this to their advantage to try and prevent reverse engineering of
+their code bases.  Kevin Edwards' protection was the undisputed king -- using
+all the effects described so far; using interupt timings,
+various hardware timers and even the self-modifying decryption code itself to generate the
+keys to decrypt the game.
+
+All of this needs to be accurately modelled in order to get games to run
+correctly.
+
+The way I achieve this in jsbeeb is to expose the pipeline of when reads and
+writes are actually performed in the instructions. As I generate the
+instructions I keep track of which cycle within the instruction memory
+accesses would occur. I then ensure the peripheral state is updated to take
+into account passing time before I read or write to memory.
+
+As an optimization, I keep track of whether memory instructions are "visible"
+to the hardware. Some instructions only affect the stack, or the zero page
+(the area of memory in the first 256-bytes of RAM). Neither of these ever map
+to somewhere that hardware can see. As such I don't need to spool time on for
+these reads and writes, and so instead I can accumulate up the whole
+instruction's time into one block, which is more efficient.
+
+That's not quite true -- due to a small amount of pipelining inside the 6502
+the interrupt request lines are checked on the penultimate cycle of an
+instruction. If the IRQ happens on the last cycle of an instruction, it won't
+have a chance to take effect until the entirety of the next instruction has
+completed. And if that next instruction clears the IRQ status (for example),
+then the IRQ won't happen at all. This is a trick used by the Kevin Edwards
+protection.
+
+So in all instructions I spool time forward to the penultimate cycle before
+latching the "is an IRQ taken" flag, then spool forward one cycle, finish any
+final instruction work, and then take the IRQ as necessary.
+
+The code for this is in
+[6502.opcodes.js](https://github.com/mattgodbolt/jsbeeb/blob/master/6502.opcodes.js).
+
+Some examples -- this is the instruction that transfers the `A` register to
+the `Y` register.
+
+    :::javascript
+    function (cpu) {   // TAY
+      "use strict";
+      var REG = 0|0;
+      cpu.polltime(1);
+      cpu.checkInt();
+      cpu.polltime(1);
+      cpu.y = cpu.a;
+      cpu.setzn(cpu.y);
+    }
+
+(If you want to play along at home, fire up the website, hit the Home key to
+pause the emulator, then bring up the javascript console and type
+`processor.instructions[0xa8]`.)
+
+The `var REG` part is just a hangover from most instructions needing a
+temporary register. My hope is the Javascript engines are smart enough to
+throw it away. Note how the time is advanced (`cpu.polltime(1)`) once, then
+the IRQs are checked, then time advanced again. This is a two-cycle
+instruction so the IRQs are checked on cycle 1. The actual work of the
+instruction is done on the last cycle: this isn't important in this case as
+the instruction has no memory accesses.  Note that the `checkInt` merely
+latches whether an interrupt happens: it does no actual interrupt processing.
+That is done in the main dispatch loop.
+
+Taking a more complex example, this instruction does a rotate
+(read/modify/write) on a memory location indexed by the `X` register. That
+is, the code is effectively:
+
+    :::cpp
+    byte *mem = (byte *)(0x12ff + X);
+    *mem = (*mem << 1) | carryBit;
+
+This comes out as (brace yourself...) :
+
+    :::javascript
+    function (cpu) {   // ROL abs,x
+      "use strict";
+      var REG = 0|0;
+      var addr = cpu.getw();
+      var addrWithCarry = (addr + cpu.x) & 0xffff;
+      var addrNonCarry = (addr & 0xff00) | 
+            (addrWithCarry & 0xff);
+      cpu.polltime(4+ cpu.is1MHzAccess(addrNonCarry) * 
+            ((cpu.cycles & 1) + 1));
+      cpu.readmem(addrNonCarry);
+      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) * 
+            (!(cpu.cycles & 1) + 1));
+      REG = cpu.readmem(addrWithCarry);
+      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) * 
+            (!(cpu.cycles & 1) + 1));
+      cpu.checkInt();
+      cpu.writemem(addrWithCarry, REG);
+      var newBotBit = cpu.p.c ? 0x01 : 0x00;
+      cpu.p.c = !!(REG & 0x80);
+      REG = ((REG << 1) & 0xff) | newBotBit;
+      cpu.setzn(REG);
+      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) * 
+            (!(cpu.cycles & 1) + 1));
+      cpu.writemem(addrWithCarry, REG);
+    }
+
+All the complex code about `is1MHzAccess` is to synchronize the CPU clock with
+the slower, 1MHz peripheral bus. Also note the `cpu.readmem(addrNonCarry)`
+which is where a single read of the address before any carry in the 
+`(addr + X)` calculation has been applied. This is what the real 6502 did!
+
+So far the emulation is _almost_ perfect. My own encryption system from days
+gone by (used in Frogman) decodes, but sadly the game itself doesn't run --
+ironically from a bug in the Frogman code. (It works OK on a BBC Master but I
+don't emulate that yet).  Kevin Edwards' Alien8 decodes, but unfortunately I'm
+still a few steps off of getting Lunar Jetman and Nightshade decoding.
+
+I'll go into the screen and peripheral emulation another time.
