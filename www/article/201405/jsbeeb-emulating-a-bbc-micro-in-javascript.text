@@ -67,7 +67,7 @@ the instruction would actually write the unmodified value first before
 replacing it with the modified value. Again, some game protection systems
 would use this to their advantage to try and prevent reverse engineering of
 their code bases.  Kevin Edwards' protection was the undisputed king -- using
-all the effects described so far; using interupt timings,
+all the effects described so far; using interrupt timings,
 various hardware timers and even the self-modifying decryption code itself to generate the
 keys to decrypt the game.
 
