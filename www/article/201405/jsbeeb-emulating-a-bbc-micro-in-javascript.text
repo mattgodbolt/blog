@@ -29,11 +29,13 @@ CPU emulation
 -------------
 
 The CPU emulator reads the next instruction, decodes it and then executes it just like
-its real-life silicon version does. From my experimentation in Miracle (the
+its real-life silicon version does. From my experimentation in [Miracle][] (the
 Sega emulator), I discovered that the naive "big switch statement" covering
 the 256 possible opcodes is not the best way to optimize.  Chrome's v8 at
 least bails out its JIT process if a function is either too big, or if it has
 too many entries in the switch statement.
+
+[Miracle]: http://xania.org/miracle/miracle.html "A Sega Master System emulator, also in Javascript"
 
 Instead, I use a 256-entry array of function pointers, each to its own
 instruction handling routine.  The main despatch then becomes something like:
