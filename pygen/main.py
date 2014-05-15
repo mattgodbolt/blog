@@ -289,11 +289,13 @@ def XHtmlToHtml(xhtml):
     return xhtmlToHtmlRe.sub(r'\1>', xhtml).replace('&nbsp;', '&#160;')
 
 def CleanUpXHtml(xhtml):
-    return xhtml.replace('&nbsp;', '&#160;')
+    xhtml = xhtml.replace('&nbsp;', '&#160;')
+    xhtml = re.sub('&(?!(#|amp|gt|lt|quot))', '&amp;', xhtml)
+    return xhtml
 
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (10, article.ArticleText)
+    cacheObj = (14, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
         print "Read cached article", article.RawTitle
