@@ -1,0 +1,103 @@
+Emulating a BBC Micro in Javascript - Part Two
+Date: 2014-05-14 22:10:00
+Status: Draft
+Summary: More notes on what goes on when you emulate a BBC Micro computer in javascript
+Label: Coding
+
+Following on from my [previous post][pp], I'm going to talk a bit about
+emulating the video hardware of a BBC Micro. Firstly, a big credit to Tom
+Walker for his [b-em][bem] emulator upon which much of the jsbeeb video code is
+based. Thanks Tom!
+
+[pp]: http://xania.org/201405/jsbeeb-emulating-a-bbc-micro-in-javascript "Last time on Godbolt witters in a blog post"
+[bem]: http://b-em.bbcmicro.com/ "Thanks Tom!"
+
+The video hardware
+------------------
+
+When most people think of a BBC Micro, they think of the iconic
+"[Teletext][tt]" display, referred to as MODE 7. It was the default screen
+mode and had some great benefits: it had high-resolution, clear text, many
+colours, and some cool effects. The fact it only took up 1KB of memory was
+nice too, especially when that may be 1/16th of your whole RAM.
+
+<p class="picture">
+<a href="/201405/matt-is-cool.png"><img src="/201405/matt-is-cool-thumb.png" width="400" height="303"
+     alt="Picture of a typical MODE 7 display"/></a>
+<br/>
+MODE 7 in all its glory
+</p>
+
+TODO: [tt]: TODO link to teletext
+
+MODE 7 was supplied by a separate chip from the rest of the screen modes, and
+although it's very interesting and complex, it's not what I'm going to talk
+about today. I'm going to talk about the rest of the video circuitry; the
+graphics modes provided by the [6845CRTC][crtc], in combination with a custom
+video ULA which provided timings and palette configuration.
+
+TODO [crtc]: TODO link to wiki
+
+The 6502 CPU communicated with the 6845 by writing to its memory mapped area
+at `0xfe00` to `0xfe07`. The 6845 has 18 internal registers and to access them
+one would write the address number to `0xfe00` and then the value required to
+`0xfe01`. (The other addresses in the range mapped to the same two functions).
+
+The registers control things like where the television sync pulse would be
+generated, when and where horizontal lines would start and end, and what
+memory address the bitmapped screen was stored at. By judicious programming 
+of the start of screen memory, games could perform
+hardware scrolling, albeit at a somewhat coarse level of 8 pixels in the X
+direction.
+
+[jsbeeb][] operates in a physical PAL TV space of 1280x768 pixels. This allows it
+to account for things like the vertical sync pulse being configurable. At the
+end of each frame, the area of the 1280x768 that actually contained pixels is
+then blitted to a 698x571 canvas element. The unusual size is to purposefully
+blur the pixels a little to simulate an authentic TV experience.
+
+<p class="picture">
+<img src="/201405/screen-params.png" width="400" height="308"
+     alt="Some of the screen timings and registers"/>
+<br/>
+Some of the relationships between register values, courtesy of the Advanced
+User Guide
+</p>
+
+[jsbeeb]: http://bbc.godbolt.org) "Lovely, isn't it?"
+
+Every clock cycle (of the 2MHz clock), then 6845 processes one byte of screen
+memory, generating anywhere from two to eight logical pixels, depending on the number
+of colours per pixel and other register settings. In jsbeeb's terms, each tick
+generates between eight and sixteen physical pixels in PAL space.
+
+On each clock cycle, jsbeeb looks at all the hardware registers again,
+determines which settings are in effect, and renders either 8 or 16 32-bpp
+pixels into its buffer. The video code runs every time the CPU emulator calls 
+its `polltime()`, making it a kind of co-routine with the CPU (along with the
+other peripheral emulators).
+
+The reason the state is re-checked each cycle is
+because it was very common for games to alter the settings mid-frame by clever
+use of well-timed interrupts to, for example, scroll part of the screen, or
+change the palette of colours available halfway down the screen.
+
+Checking each time is a little inefficient -- as is ticking the screen code every
+time the CPU counter ticks. In future updates I plan on accumulating screen
+clock cycles and running the screen for longer batches if and only if I know
+for certain none of the registers have changed. At this point I can also
+consider better code arrangements to take advantage of rendering multiple
+screen pixels with the same settings.
+
+The framebuffer object written to is a 32-bpp overlay on the 8-bpp underlying
+canvas's framebuffer.  This lets me write a single 32-bpp value to set a whole
+pixel. The mappings between the BBC's colour format and the 32-bpp values
+required are all done only when the palette registers are written to, instead
+of each time a colour is needed, which is a nice optimization.
+
+In spite of the complexity, the performance of the screen code is suprisingly
+good. It does appear near the top of the profiles but upon further
+investigation a lot of the time is spent at the end of each frame in the
+blitting code that takes the area of the PAL physical screen that was rendered
+to and stretch blits it into the actual canvas object displayed on the web
+page.

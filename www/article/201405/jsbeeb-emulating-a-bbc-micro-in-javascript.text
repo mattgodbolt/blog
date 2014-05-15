@@ -91,9 +91,8 @@ That's not quite true -- due to a small amount of pipelining inside the 6502
 the interrupt request lines are checked on the penultimate cycle of an
 instruction. If the IRQ happens on the last cycle of an instruction, it won't
 have a chance to take effect until the entirety of the next instruction has
-completed. And if that next instruction clears the IRQ status (for example),
-then the IRQ won't happen at all. This is a trick used by the Kevin Edwards
-protection.
+completed, by which time timers etc have all moved on. This is a trick used 
+by the Kevin Edwards protection.
 
 So in all instructions I spool time forward to the penultimate cycle before
 latching the "is an IRQ taken" flag, then spool forward one cycle, finish any
