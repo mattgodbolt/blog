@@ -51,7 +51,10 @@ As many of the instructions are similar (with just indexing or addressing mode
 differences), I code-generate the Javascript for each instruction from a
 table. (The table also acts as the source for the disassembler). By `eval`ling
 each function from its generated text, I build up the entries covering all the
-instructions.
+instructions. (It has been suggested on the [Hacker News forums][hn] that it might
+be better to use a switch statement, but break it into two 128-way switches).
+
+[hn]: https://news.ycombinator.com/item?id=7746534
 
 Timings are incredibly important for accurate emulation. To get the most out
 of the machine, games programmers would take advantage of timing subtleties
@@ -180,3 +183,5 @@ don't emulate that yet).  Kevin Edwards' Alien8 decodes, but unfortunately I'm
 still a few steps off of getting Lunar Jetman and Nightshade decoding.
 
 I'll go into the screen and peripheral emulation another time.
+
+Next: [Emulating the Video](/201405/jsbeeb-part-two)

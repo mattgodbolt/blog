@@ -1,6 +1,6 @@
 Emulating a BBC Micro in Javascript - Part Two
-Date: 2014-05-14 22:10:00
-Status: Draft
+Date: 2014-05-16 12:10:00
+Status: Public
 Summary: More notes on what goes on when you emulate a BBC Micro computer in javascript
 Label: Coding
 
@@ -28,15 +28,15 @@ nice too, especially when that may be 1/16th of your whole RAM.
 MODE 7 in all its glory
 </p>
 
-TODO: [tt]: TODO link to teletext
+[tt]: http://en.wikipedia.org/wiki/Teletext
 
 MODE 7 was supplied by a separate chip from the rest of the screen modes, and
 although it's very interesting and complex, it's not what I'm going to talk
 about today. I'm going to talk about the rest of the video circuitry; the
-graphics modes provided by the [6845CRTC][crtc], in combination with a custom
+graphics modes provided by a Motorola [6845CRTC][crtc], in combination with a custom
 video ULA which provided timings and palette configuration.
 
-TODO [crtc]: TODO link to wiki
+[crtc]: http://en.wikipedia.org/wiki/Motorola_6845
 
 The 6502 CPU communicated with the 6845 by writing to its memory mapped area
 at `0xfe00` to `0xfe07`. The 6845 has 18 internal registers and to access them
@@ -60,8 +60,9 @@ blur the pixels a little to simulate an authentic TV experience.
 <img src="/201405/screen-params.png" width="400" height="308"
      alt="Some of the screen timings and registers"/>
 <br/>
-Some of the relationships between register values, courtesy of the Advanced
-User Guide
+Some of the relationships between register values, courtesy of the 
+<a href="http://stardot.org.uk/mirrors/www.bbcdocs.com/filebase/essentials/BBC%20Microcomputer%20Advanced%20User%20Guide.pdf">
+Advanced User Guide</a>
 </p>
 
 [jsbeeb]: http://bbc.godbolt.org) "Lovely, isn't it?"
@@ -71,11 +72,13 @@ memory, generating anywhere from two to eight logical pixels, depending on the n
 of colours per pixel and other register settings. In jsbeeb's terms, each tick
 generates between eight and sixteen physical pixels in PAL space.
 
-On each clock cycle, jsbeeb looks at all the hardware registers again,
+On each clock cycle, jsbeeb looks at all the hardware registers,
 determines which settings are in effect, and renders either 8 or 16 32-bpp
 pixels into its buffer. The video code runs every time the CPU emulator calls 
 its `polltime()`, making it a kind of co-routine with the CPU (along with the
-other peripheral emulators).
+other peripheral emulators). (Code is in [video.js][vjs])
+
+[vjs]: https://github.com/mattgodbolt/jsbeeb/blob/master/video.js
 
 The reason the state is re-checked each cycle is
 because it was very common for games to alter the settings mid-frame by clever
@@ -92,12 +95,47 @@ screen pixels with the same settings.
 The framebuffer object written to is a 32-bpp overlay on the 8-bpp underlying
 canvas's framebuffer.  This lets me write a single 32-bpp value to set a whole
 pixel. The mappings between the BBC's colour format and the 32-bpp values
-required are all done only when the palette registers are written to, instead
-of each time a colour is needed, which is a nice optimization.
+required are all done when the palette registers are written to, instead
+of each time a colour is needed.
+
+The code for a single screen byte `dat` looks something like:
+
+    :::javascript
+    var tblOff = dat * 16;
+    for (i = 0; i < charWidth; ++i) { // is 8 or 16
+        fb32[cur + i] = ulapal[table4bpp[tblOff + i]];
+    }
+
+The `table4bpp` is a table mapping the contributions of each display
+byte's bits to the 8 or 16 physical pixels of a character (created [here][tbl]). 
+It maps to a 4-bit
+value which indexes into the palette, `ulapal`.
+
+[tbl]: https://github.com/mattgodbolt/jsbeeb/blob/6e5623eac1524784eb1a3f44f75e670c6004f5c1/video.js#L63 "About here-ish"
+
+Conceivably it might be worth
+regenerating the table each time the palette is modified rather than
+doubly-indexing into tables for every physical pixel: I haven't done the
+profile so I can't be sure. In reality the table is also indexed by some other
+of the video registers, but these also could be folded into the table
+regeneration. I'm intrigued now and will have to take a look!
 
 In spite of the complexity, the performance of the screen code is suprisingly
 good. It does appear near the top of the profiles but upon further
 investigation a lot of the time is spent at the end of each frame in the
 blitting code that takes the area of the PAL physical screen that was rendered
 to and stretch blits it into the actual canvas object displayed on the web
-page.
+page. Blitting code is currently in the big blob of [main.js][main].
+Suggestions on how to improve its speed welcomed!
+
+[main]: https://github.com/mattgodbolt/jsbeeb/blob/29df5770497cf15e5e6c7687ba840d81e1dc70a6/main.js#L37 "Around about here, anyway"
+
+Returning briefly to MODE 7 support; this rather complex mode is implemented
+only partially at the moment. Code is in [teletext.js][ttjs], and there's a
+lot of allusions to interlacing that I don't currently do. Tom Walker's b-em
+is much better at this part and it's one of the reasons his emulator's MODE 7
+display looks so much nicer: emulating the TV's higher-resolution interlacing
+makes everything smoother. I'm hoping to find time to return to this
+soon.
+
+[ttjs]: https://github.com/mattgodbolt/jsbeeb/blob/master/teletext.js

@@ -1,0 +1,243 @@
+Getting the timings right -- jsbeeb part three
+Date: 2014-05-27 12:10:00
+Status: Draft
+Summary: How to get the timing just right when emulating
+Label: Coding
+
+This is the third post in my series on emulating a BBC Micro in Javascript. You
+might find it instructive to read the [first part][fp] which covers general
+stuff, or the [second part][sp] which focuses on the video hardware.
+
+[fp]: http://xania.org/201405/jsbeeb-emulating-a-bbc-micro-in-javascript "General overview on BBCs and emulating them"
+[sp]: http://xania.org/201405/jsbeeb-part-two "On the video hardware"
+
+This time around the thanks really have to go to my good chum Rich
+Talbot-Watkins. He and I have been friends since we were twelve years old and
+have been programming together since then. His knowledge of the Beeb is
+legendary -- he still [writes][demo1] [demos][demo2] for it even now. His help in
+getting the timings spot on in [jsbeeb][jsbeeb] was invaluable.
+
+[jsbeeb]: http://bbc.godbolt.org/
+[demo1]: https://www.youtube.com/watch?v=ttpGeDIjfeU "Blurp"
+[demo2]: https://www.youtube.com/watch?v=DBvrDZlzEOE "Bones"
+
+Why is timing so important anyway?
+----------------------------------
+
+Getting the instruction timings right is paramount for good emulation. I
+covered some of this in the [first post][fp], but so many tricks on the BBC
+required intimate knowledge of the instruction and hardware timings that if an
+emulator didn't account for them properly, many things wouldn't work right.
+TODO: example here
+
+The most challenging example of timings, however, was the protection systems
+that games used to use to prevent decompilation, copying and cheats from being
+made for them. The game code would be encrypted and would be decrypted by code
+that used XORs with hardware timers (amongst other things) to make it
+difficult to decrypt manually. The relative timing of the instructions that do
+the decryption and the hardware timers has to be emulated absolutely perfectly
+in order to decrypt the game.
+
+Worse still, it's not just how many CPU cycles each instruction takes that
+needs to be correct, but the fact that the memory reads and writes happen on
+particular cycles within an instruction that need to be correct. 
+
+Let's delve a little into that:
+
+Life of an instruction
+----------------------
+
+The 6502 at the heart of the Beeb is simple but powerful. Like most other
+processors, instructions are fetched from RAM and executed in turn. The 6502
+has a very simple pipeline where the instruction fetch for the next
+instruction is performed at the same time the last part of the previous
+instruction is running. This has important consequences that we'll deal with
+later.
+
+Most CPUs have physical pins dedicated to say "I need to access memory", but 
+to save costs this was left off of the 6502 and instead the memory system is
+permanently engaged. As almost every clock cycle needs 
+access to memory (to read instructions or data) this is generally a win.
+Again, this is an important fact which leads to some unusual behaviour we must
+account for.
+
+The 6502 treats the 256 bytes at the bottom of RAM specially (the "zero
+page"). Instructions accessing the zero page are a little faster (as they
+don't need to encode another byte of address), and the zero page can also be
+treated as an array of 16-bit pointers. They're like a slower extension to the
+three hardware registers (`A`, `X` and `Y`).
+
+Let's go through a quick example, calculating a very simple checksum over ten
+bytes:
+
+    .checksum        ; Sum 10 bytes pointed by $70/$71
+        LDA #0       ; Set A (our checksum) to zero
+        TAY          ; Also put zero in Y (the loop counter)
+    .lp
+        CLC          ; Clear carry (all adds are with carry)
+        ADC ($70), Y ; Add check sum
+        INY          ; Y++
+        CPY #10      ; is Y 10?
+        BNE lp       ; if not, loop around
+        RTS          ; we're done, result in A
+
+This example assembles to the 12 bytes:
+
+    a9 00 a8 18 71 70 c8 c0 0a d0 f8 60
+
+Using [Visual 6502][v6502-1], we can see what happens on each clock tick:
+
+[v6502-1]: http://www.visual6502.org/JSSim/expert.html?a=0&d=a900a8187170c8c00ad0f860
+
+      #  addr  data rw Comment
+      0  0000  a9   1  LDA #
+      1  0001  00   1  #0
+      2  0002  a8   1  TAY
+      3  0003  18   1  (clc)
+      4  0003  18   1  CLC
+      5  0004  71   1  (adc)
+      6  0004  71   1  ADC (zp),Y
+      7  0005  70   1  $70
+      8  0070  00   1  addrLo
+      9  0071  00   1  addrHi
+     10  0000  a9   1  val at (addr)
+     11  0006  c8   1  INY
+     12  0007  c0   1  (cpy) 
+     13  0007  c0   1  CPY #
+     14  0008  0a   1  #10 
+     15  0009  d0   1  BNE
+     16  000a  f8   1  lp
+     17  000b  60   1  (rts)
+     18  0003  18   1  CLC
+
+As you can see the memory is accessed unconditionally on every cycle. Points
+to note:
+
+On cycles 3, 12 and 17 the opcode following the current instruction is
+fetched prematurely. In the case of cycles 3 and 12, the instruction is a
+single byte instruction. The minimum number of clock cycles any
+instruction can take is two, so the program counter stalls here and the
+following instruction is fetched twice. In the case of cycle 17, the
+next instruction is fetched even though the branch isn't taken.
+
+The sequence of fetches for the `ADC ($70), Y` is `opcode`, `zero page
+address`, `zero page low`, `zero page high` and finally  `address pointed
+to by zero page plus Y`.
+
+So far so good - it seems unusual to our modern "memory is slow" mindset that
+the processor touches RAM every cycle, but this is from an age where
+processors and RAM were clocked at the same speed.
+
+Now let's get a little more interesting. Let's set the address pointed to by
+`$70`/`$71` to be `$0eff` and take a look at what happens for `Y=0` and `Y=1`,
+where we'd expect `$0eff+0 = $0eff` and `$eff+1 = $d00` to be read from.
+
+First, here's `Y=0`:
+
+      #  addr  data rw Comment
+      6  0004   71  1  ADC (zp),Y
+      7  0005   70  1  $70
+      8  0070   ff  1  addrLo=$ff
+      9  0071   0e  1  addrHi=$0e
+     10  0eff   00  1  val at $0eff
+
+Nothing shocking there. Now take a look at the next iteration where `Y=1`:
+
+      #  addr  data rw Comment
+     20  0004   71  1  ADC (zp),Y
+     21  0005   70  1  $70 
+     22  0070   ff  1  addrLo=$ff
+     23  0071   0e  1  addrHi=$0e
+     24  0e00   00  1  val at $0e00 ?!
+     25  0f00   00  1  val at $0d00
+
+Whoah -- what's all that? On cycle 24, we fetch the byte at `$0e00` which is
+not the right address at all. Then there's an extra cycle where we read from
+the correct place.
+
+The 6502 is an 8-bit machine and so adding an 8-bit offset to a 16-bit address
+ought to take two cycles: one to add the low bits together, and then one to
+add any carry to the high bits. As the address bus is always active, the
+non-carried address is output on the first cycle. If there's no carry, the
+6502 stops there, else it does another read, this time with the correct
+address. Neat, eh?
+
+Things aren't always that simple, however. For instructions that both read
+_and_ write, the double-read always happens. For example, the instruction `INC
+$1234,X` will always do two reads and one write, even if there's no carry.
+This is because even if there's no carry to do, there's still work to be done
+waiting for the increment operation to finish before the final result can be
+stored. There's nothing to short-cut. What's more, the increment operation
+takes a while longer and the write happens twice; once with the unmodified
+value, and once with the correct value. This is what it looks like, when there's
+no carry (for `INC $3412,X`, `X=0`):
+
+      #  addr  data rw Comment
+      2  0002   fe  1  INC Abs,X
+      3  0003   12  1  addrLo=$12
+      4  0004   34  1  addrHi=$34
+      5  3412   00  1  read $3412 (and get 0)
+      6  3412   00  1  read $3412 again
+      7  3412   00  0  write back 0
+      8  3412   01  0  write back 1
+
+And when there's a carry (`INC $3412,X`, `X=$FF`):
+
+      #  addr  data rw Comment
+      2  0002   fe  1  INC Abs,X
+      3  0003   12  1  addrLo=$12
+      4  0004   34  1  addrHi=$34
+      5  3411   00  1  read $3411 (non-carry addr)
+      6  3511   00  1  read $3511 (correct addr)
+      7  3511   00  0  write back 0
+      8  3511   01  0  write back 1
+
+Wait around for ages and then two turn up at once
+-------------------------------------------------
+
+Just when you thought all this was making sense, there's another thing to
+consider. Inside the Beeb there are two buses. Fast peripherals and the RAM
+can run at the same speed as the CPU itself and is clocked at 2MHz. Some of
+the peripherals can't work at this blazing speed, and instead need to be
+communicated with at the slothly 1MHz. The 6502 supports this variable speed
+memory access with a bit of help of some external circuitry. The gory details
+are mostly covered in the [BBC Micro hardware guide][hwg], but the main thing
+we need to worry about is how our CPU clock gets synchronized up and
+cycle-stretched to talk to the 1MHz bus.
+
+[hwg]: http://bbc.nvg.org/doc/A%20Hardware%20Guide%20for%20the%20BBC%20Microcomputer/bbc_hw_03.htm#3.3
+
+There are two possible cases -- one where the bus access starts in the middle
+of a 2MHz pulse, and one where they coincide.
+
+<script src="http://wavedrom.github.io/skins/default.js" type="text/javascript"></script>
+<script src="http://wavedrom.github.io/WaveDrom.js" type="text/javascript"></script>
+<script type="text/javascript">
+window.onload = function(){ WaveDrom.ProcessAll(); };
+</script>
+
+<script type="WaveDrom">
+{ signal : [
+  { name: "2 MHz",  wave: "N......." },
+  { name: "1 MHz",  wave: "N...", period: 2 },
+  {                 node: "..A.B...", phase: 0.5 },
+  { name: "Case 1", wave: "N.h.N..." },
+  {                 node: "...CD...", phase: 0.5 },
+  { name: "Case 2", wave: "N..hN..." }
+],
+edge: ['A->B stretch', 'C->D stretch']}
+</script>
+
+Most of the interesting things happen on the falling edge of the clock
+(although the 6502 does some things on the rising edge too). That means that
+depending on whether we're on an odd or even cycle relative to the 1MHz timer
+we'll get cycle stretched to either 3 or 5 cycles. And of course, each time
+the processor accesses memory, it may get stretched. So, putting this together
+with the previous section on all the extra accesses that happen, you can see
+that an instruction modifying the memory on a 1MHz peripheral can take many
+more cycles than it would otherwise seem to need.
+
+Let's take a specific example, from KE's protection 
+TODO: or from timings
+
+TODO: IRQs
