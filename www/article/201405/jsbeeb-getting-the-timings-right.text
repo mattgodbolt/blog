@@ -321,13 +321,13 @@ from the read bus cycle and will be also be the value written out in the write
 cycle.
 
 Next `getInstruction` gets together the addressing mode part, by parsing the
-opcode arguments `abs,x` [^2]. Here the instruction starts being assembled. In
+opcode arguments `abs,x` [^2]. Now the instruction starts being put together. In
 the following code snippets I've removed some `if` checks (describing them
 instead), and also have shortened the lines to fit here. Check the [source on
 github][opcodes] for full details.
 
-First the 16-bit address is fetched from the current program counter and then
-the indexed address is calculated, along with a non-carried version. We
+First the 16-bit address is fetched from the two bytes at the current program
+counter. Then the indexed address is calculated, along with a non-carried version. We
 account for the three cycles this takes (to fetch the opcode byte, and then
 the two bytes of the address):
 
@@ -340,8 +340,8 @@ the two bytes of the address):
     ig.tick(3);
 
 Next we perform the operation's required bus accesses. In our case we need a
-read and a write so we add in the appropriate code, accounting for the spurious read and
-write. The `readOp` and `writeOp` methods of the `InstructionGen` are
+read and a write. Here we account for the spurious read and write. 
+The `readOp` and `writeOp` methods of the `InstructionGen` are
 responsible for ticking the CPU the appropriate amount of time depending on
 cycle stretching.
 
