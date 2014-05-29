@@ -13,7 +13,7 @@ stuff, or the [second part][sp] which focuses on the video hardware.
 
 This time around the thanks really have to go to my good chum Rich
 Talbot-Watkins. He and I have been friends since we were twelve years old and
-have been programming together since then. His knowledge of the Beeb is
+have been programming together since we met. His knowledge of the Beeb is
 legendary --- he still [writes][demo1] [games][demo2] for it even now. His help in
 getting the timings spot on in [jsbeeb][jsbeeb] was invaluable.
 
@@ -27,11 +27,10 @@ Why is timing so important anyway?
 Getting the instruction timings right is paramount for good emulation. I
 covered some of this in the [first post][fp], but so many tricks on the BBC
 required intimate knowledge of the instruction and hardware timings that if an
-emulator didn't account for them properly, many things wouldn't work right.
-TODO: example here
+emulator didn't account for them properly, some things wouldn't work right.
 
-The most challenging example of timings, however, were games protection
-systems. These would be used to prevent decompilation, copying and cheats.
+The most challenging example of timings were games protection systems. 
+These would be used to prevent decompilation, copying and cheats.
 The game code would be encrypted first and would be decrypted at runtime by
 code. The code would often use XORs with hardware timers (amongst other things) to make it
 difficult to decrypt manually. In order to decrypt correctly the relative timing 
@@ -68,6 +67,7 @@ The zero page can also be treated as an array of 16-bit index pointers.
 Let's go through a quick example, calculating a very simple checksum over ten
 bytes:
 
+    :::asm
     .checksum        ; Sum 10 bytes pointed by $70/$71
         LDA #0       ; Set A (our checksum) to zero
         TAY          ; Also put zero in Y (the loop counter)
@@ -87,26 +87,27 @@ Using [Visual 6502][v6502-1], we can see what memory accesses happen on each clo
 
 [v6502-1]: http://www.visual6502.org/JSSim/expert.html?a=0&d=a900a8187170c8c00ad0f860
 
+    :::asm
       #  addr  data rw Comment
-      0  0000  a9   1  LDA #
-      1  0001  00   1  #0
-      2  0002  a8   1  TAY
-      3  0003  18   1  (clc)
-      4  0003  18   1  CLC
-      5  0004  71   1  (adc)
-      6  0004  71   1  ADC (zp),Y
-      7  0005  70   1  $70
-      8  0070  00   1  addrLo
-      9  0071  00   1  addrHi
-     10  0000  a9   1  val at (addr)
-     11  0006  c8   1  INY
-     12  0007  c0   1  (cpy) 
-     13  0007  c0   1  CPY #
-     14  0008  0a   1  #10 
-     15  0009  d0   1  BNE
-     16  000a  f8   1  lp
-     17  000b  60   1  (rts)
-     18  0003  18   1  CLC
+      0 $0000  $a9   1  LDA #
+      1 $0001  $00   1  #0
+      2 $0002  $a8   1  TAY
+      3 $0003  $18   1  (CLC)
+      4 $0003  $18   1  CLC
+      5 $0004  $71   1  (ADC)
+      6 $0004  $71   1  ADC (zp),Y
+      7 $0005  $70   1  $70
+      8 $0070  $00   1  addrLo
+      9 $0071  $00   1  addrHi
+     10 $0000  $a9   1  val at (addr)
+     11 $0006  $c8   1  INY
+     12 $0007  $c0   1  (CPY) 
+     13 $0007  $c0   1  CPY #
+     14 $0008  $0a   1  #10 
+     15 $0009  $d0   1  BNE
+     16 $000a  $f8   1  lp
+     17 $000b  $60   1  (RTS)
+     18 $0003  $18   1  CLC
 
 Here the columns indicate the cycle number; the value output on the physical
 address bus (`addr`); the data on the data bus (`data`); the value on the
@@ -137,22 +138,24 @@ where we'd expect `$0eff+0 = $0eff` and `$0eff+1 = $0d00` to be read from.
 
 First, here's `Y=0`:
 
+    :::asm
       #  addr  data rw Comment
-      6  0004   71  1  ADC (zp),Y
-      7  0005   70  1  $70
-      8  0070   ff  1  addrLo=$ff
-      9  0071   0e  1  addrHi=$0e
-     10  0eff   00  1  val at $0eff
+      6 $0004  $71  1  ADC (zp),Y
+      7 $0005  $70  1  $70
+      8 $0070  $ff  1  addrLo=$ff
+      9 $0071  $0e  1  addrHi=$0e
+     10 $0eff  $00  1  val at $0eff
 
 Nothing shocking there. Now take a look at the next iteration where `Y=1`:
 
+    :::asm
       #  addr  data rw Comment
-     20  0004   71  1  ADC (zp),Y
-     21  0005   70  1  $70 
-     22  0070   ff  1  addrLo=$ff
-     23  0071   0e  1  addrHi=$0e
-     24  0e00   00  1  val at $0e00 ?!
-     25  0f00   00  1  val at $0d00
+     20 $0004  $71  1  ADC (zp),Y
+     21 $0005  $70  1  $70 
+     22 $0070  $ff  1  addrLo=$ff
+     23 $0071  $0e  1  addrHi=$0e
+     24 $0e00  $00  1  val at $0e00 ?!
+     25 $0f00  $00  1  val at $0d00
 
 Whoah --- what's all that? On cycle 24, we fetch the byte at `$0e00` which is
 not the right address at all. Then there's an extra cycle where we read from
@@ -173,27 +176,29 @@ waiting for the increment operation to finish before the final result can be
 stored. There's nothing to short-cut. What's more, the increment operation
 takes a while longer and the write happens twice; once with the unmodified
 value, and once with the correct value. This is what it looks like, when there's
-no carry (for `INC $3412,X`, `X=0`):
+no carry (for `INC $3412,X` with `X=0`):
 
+    :::asm
       #  addr  data rw Comment
-      2  0002   fe  1  INC Abs,X
-      3  0003   12  1  addrLo=$12
-      4  0004   34  1  addrHi=$34
-      5  3412   00  1  read $3412 (and get 0)
-      6  3412   00  1  read $3412 again
-      7  3412   00  0  write back 0
-      8  3412   01  0  write back 1
+      2 $0002  $fe  1  INC Abs,X
+      3 $0003  $12  1  addrLo=$12
+      4 $0004  $34  1  addrHi=$34
+      5 $3412  $00  1  read $3412 (and get 0)
+      6 $3412  $00  1  read $3412 again
+      7 $3412  $00  0  write back 0
+      8 $3412  $01  0  write back 1
 
-And when there's a carry (`INC $3412,X`, `X=$FF`):
+And when there's a carry (`INC $3412,X` with `X=$FF`):
 
+    :::asm
       #  addr  data rw Comment
-      2  0002   fe  1  INC Abs,X
-      3  0003   12  1  addrLo=$12
-      4  0004   34  1  addrHi=$34
-      5  3411   00  1  read $3411 (non-carry addr)
-      6  3511   00  1  read $3511 (correct addr)
-      7  3511   00  0  write back 0
-      8  3511   01  0  write back 1
+      2 $0002  $fe  1  INC Abs,X
+      3 $0003  $12  1  addrLo=$12
+      4 $0004  $34  1  addrHi=$34
+      5 $3411  $00  1  read $3411 (non-carry addr)
+      6 $3511  $00  1  read $3511 (correct addr)
+      7 $3511  $00  0  write back 0
+      8 $3511  $01  0  write back 1
 
 Wait around for ages and then two turn up at once
 -------------------------------------------------
@@ -221,6 +226,7 @@ of a 2MHz pulse, and one where they coincide.
 window.onload = function(){ WaveDrom.ProcessAll(); };
 </script>
 
+<div>
 <script type="WaveDrom">
 { signal : [
   { name: "2 MHz",  wave: "N......." },
@@ -232,6 +238,7 @@ window.onload = function(){ WaveDrom.ProcessAll(); };
 ],
 edge: ['A->B stretch', 'C->D stretch']}
 </script>
+</div>
 
 Most of the interesting things happen on the falling edge of the clock
 (although the 6502 does some things on the rising edge too). That means that
@@ -255,17 +262,18 @@ previous section.
 [ns]: http://en.wikipedia.org/wiki/Nightshade_(1985_video_game)
 [ke]: http://www.stairwaytohell.com/authors/kedwards/PRO-KEdwards.html
 
+    :::asm
       #  addr  data rw Comment
-      0  0d2d   2e  1  ROL abs
-      1  0d2e   48  1  addrLo=$48
-      2  0d2f   fe  1  addrHi=$fe
-      3  fe48   00  1  read...
-      4  fe48   00  1  ..stretch..
-      5  fe48   08  1  ..read complete
-      6  fe48   08  0  write unmodified..
-      7  fe48   08  0  ..stretch..complete
-      8  fe48   10  0  write modified..
-      9  fe48   10  0  ..stretch..complete
+      0 $0d2d  $2e  1  ROL abs
+      1 $0d2e  $48  1  addrLo=$48
+      2 $0d2f  $fe  1  addrHi=$fe
+      3 $fe48  $00  1  read...
+      4 $fe48  $00  1  ..stretch..
+      5 $fe48  $08  1  ..read complete
+      6 $fe48  $08  0  write unmodified..
+      7 $fe48  $08  0  ..stretch..complete
+      8 $fe48  $10  0  write modified..
+      9 $fe48  $10  0  ..stretch..complete
 
 [^1]: Unlike the previous examples, this one is not generated by Visual 6502 but is hand-calculated. Visual 6502 doesn't have a way to simulate cycle stretches.
 
@@ -277,10 +285,120 @@ are generated to make the code even more difficult to emulate. In some cases,
 writing to the timers will suppress or cancel pending interrupts, so subtle
 timing differences can cause wildly different interrupt behaviour too.
 
-Talking of interrupts
----------------------
+Implementation details
+----------------------
 
-Which takes us on to the subject of interrupts. Like most CPUs, the 6502 has a
+[jsbeeb][] implements all the complex behaviour by "compiling" instructions from a
+table of opcode side effects and knowledge of what addressing modes cause what
+kinds of memory accesses. A list of cycles where memory accesses is kept, and
+then an optimization pass is made: any memory accesses that are known not to
+refer to any hardware devices (and thus don't have any sensitive time
+dependencies or side effects) are coalesced where possible. Sequences of
+CPU cycles with no hardware visible effects are also coalesced so that the
+various state machines (like timers, video, sound etc) can be run for as long
+a stretch as possible. Running them all a single cycle at a time is somewhat
+inefficient.
+
+For memory accesses that can't be optimized in this way, code is generated to
+check for 1MHz bus accesses and appropriately sync the CPU clock.
+
+The code for this is in the `InstructionGen` class in [6502.opcodes.js][opcodes].
+
+Let's look at `INC Abs,X` from earlier. The compilation starts at
+`getInstruction` which is given the text of opcode and its arguments. It calls
+`getOp` with the opcode part (`INC`) and that returns a struct describing what
+the instruction does (its `op`) and what bus cycles are needed (`read` and/or
+`write`). In this case the operation needs both a read and write bus cycle, 
+ and the op is the javascript snippet:
+
+    :::javascript
+    REG = (REG + 1) & 0xff;
+    cpu.setzn(REG);
+
+The `cpu.setzn` part sets the zero and negative processor flags according to
+its argument. `REG` here is a variable that will contain the read-in value
+from the read bus cycle and will be also be the value written out in the write
+cycle.
+
+Next `getInstruction` gets together the addressing mode part, by parsing the
+opcode arguments `abs,x` [^2]. Here the instruction starts being assembled. In
+the following code snippets I've removed some `if` checks (describing them
+instead), and also have shortened the lines to fit here. Check the [source on
+github][opcodes] for full details.
+
+First the 16-bit address is fetched from the current program counter and then
+the indexed address is calculated, along with a non-carried version. We
+account for the three cycles this takes (to fetch the opcode byte, and then
+the two bytes of the address):
+
+    :::javascript
+    ig = new InstructionGen();
+    ig.append("addr = cpu.getw();");
+    ig.append("addrWithCarry = addr + cpu.x;");
+    ig.append("addrNonCarry = (addr&0xff00) 
+                | (addrWithCarry&0xff);");
+    ig.tick(3);
+
+Next we perform the operation's required bus accesses. In our case we need a
+read and a write so we add in the appropriate code, accounting for the spurious read and
+write. The `readOp` and `writeOp` methods of the `InstructionGen` are
+responsible for ticking the CPU the appropriate amount of time depending on
+cycle stretching.
+
+    :::javascript
+    if (op.read && op.write) { // read/modify/write
+      // First a spurious read of the non-carried address
+      ig.readOp("addrNonCarry");
+      // Now the actual read
+      ig.readOp("addrWithCarry", "REG");
+      // And a write of the unmodified value
+      ig.writeOp("addrWithCarry", "REG");
+    }
+
+Now we apply the operation and write back the final result.
+
+    :::javascript
+    ig.append(op.op);
+    if (op.write)
+      ig.writeOp("addrWithCarry", "REG");
+
+The final code is the result of calling `render` on the `InstructionGen`,
+which does all the timer magic.
+
+The final compiled code for `INC Abs,X` comes out as something like:[^3]
+
+    :::javascript
+    addr = cpu.getw();
+    addrWithCarry = (addr + cpu.x) & 0xffff;
+    addrNonCarry = (addr&0xff00) 
+        | (addrWithCarry&0xff);
+    cpu.polltime(4+cpu.is1MHzAccess(addrNonCarry) 
+        * ((cpu.cycles & 1) + 1));
+    cpu.readmem(addrNonCarry);
+    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry) 
+        * (!(cpu.cycles & 1) + 1));
+    REG = cpu.readmem(addrWithCarry);
+    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry) 
+        * (!(cpu.cycles & 1) + 1));
+    cpu.checkInt();
+    cpu.writemem(addrWithCarry, REG);
+    REG = (REG + 1) & 0xff;
+    cpu.setzn(REG);
+    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry) 
+        * (!(cpu.cycles & 1) + 1));
+    cpu.writemem(addrWithCarry, REG);
+ 
+To get the actual version, fire up [jsbeeb][] and type `instructions6502[0xfe]` into the 
+Javascript console.
+
+[opcodes]: https://github.com/mattgodbolt/jsbeeb/blob/master/6502.opcodes.js
+[^2]: The code uses lowercase throughout although I've used more usual capitalization in this write-up. Sorry for any confusion!
+[^3]: As I look at the generated code I realise I could make it a bit more efficient and readable. I'll look at updating that later so hopefully by the time you take the trouble to look it will be much nicer.
+
+May I interrupt you a moment?
+-----------------------------
+
+Now on to the subject of interrupts. Like most CPUs, the 6502 has a
 physical pin (the IRQ line) which causes an interrupt when brought low: the current
 instruction is completed and then instead of proceeding to the next
 instruction the CPU enters interrupt mode and jumps to an operating system
@@ -312,6 +430,28 @@ Running out of time(rs)
 This post has grown beyond what I'd originally imagined, but while we're
 talking cycle correctness it's worth going back to those hardware timers. I
 glossed over them a little saying they count down at 1MHz, but in reality
-there's more complex interactions than that.
+they're capable of much more. There are two timers in each of two 6522
+Versatile Interface Adapters (VIA). Each timer can generate an interrupt when
+it overruns, and automatically reloads from a programmable start value.
 
-TODO: explain the -3, "just hit" stuff.
+From our cycle correctness point of view the interesting things about the
+timers are they trigger an interrupt 3 CPU cycles later than you'd imagine. As
+the timer ticks down at 1MHz, this is 1.5 timer ticks. I'm not quite sure why,
+but that's what seems to happen.
+
+Reading the low 8 bits of a timer has an extra meaning: it clears any pending
+interrupts from that timer. This is what an interrupt handler would do:
+once it had ascertained that it was a timer that caused the IRQ 
+(by checking the VIA status register) it would read from the timer 
+to clear its interrupt flag.
+
+By now you'll realise there's going to be a catch: if the CPU reads from the 
+timer on the cycle that triggered an interrupt, then the clear doesn't happen.
+In this case the interrupt flag remains set and an interrupt will still be 
+generated on the next cycle. Again, Kevin Edwards' protection systems take 
+advantage of this unusual behaviour.
+
+All the relevant code for the interrupts in in the [via.js][via] source file.
+The interrupt generation is in the `polltime` function.
+
+[via]: https://github.com/mattgodbolt/jsbeeb/blob/master/via.js
