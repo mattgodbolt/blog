@@ -2,7 +2,7 @@ Emulating a BBC Micro in Javascript
 Date: 2014-05-14 22:10:00
 Status: Public
 Summary: Some notes on what goes on when you emulate a BBC Micro computer in javascript
-Label: Coding
+Label: Coding, Emulation
 
 One of my favourite things to do of recent times is resurrect computer systems
 from my youth in Javascript. It's pretty amazing how fast Javascript

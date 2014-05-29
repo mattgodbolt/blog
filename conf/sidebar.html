@@ -1,14 +1,14 @@
 <div id="side-links">
   <h3>Tags</h3>
     <ul>
-[%- for label in allLabels -%]
+[%- for label in sorted(allLabels) -%]
       <li><a href="/[%= label.filename %]">[%= label.name %]</a></li>
 [%- end -%]
     </ul>
   <h3>Archives</h3>
     <ul>
       <li><a href="/archive">Full archive</a></li>
-[%- for label in allLabels -%]
+[%- for label in sorted(allLabels) -%]
       <li><a href="/[%= label.filename %]-archive">[%= label.name %]</a></li>
 [%- end -%]
     </ul>

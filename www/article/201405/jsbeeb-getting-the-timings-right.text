@@ -1,8 +1,8 @@
 Getting the Timings Right - jsbeeb Part Three
-Date: 2014-05-27 12:10:00
+Date: 2014-05-25 00:10:00
 Status: Draft
 Summary: How to get the timing just right when emulating
-Label: Coding
+Label: Coding, Emulation
 
 This is the third post in my series on emulating a BBC Micro in Javascript. You
 might find it instructive to read the [first part][fp] which covers general

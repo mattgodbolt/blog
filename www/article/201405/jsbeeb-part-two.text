@@ -2,7 +2,7 @@ Emulating a BBC Micro in Javascript - Part Two
 Date: 2014-05-16 12:10:00
 Status: Public
 Summary: More notes on what goes on when you emulate a BBC Micro computer in javascript
-Label: Coding
+Label: Coding, Emulation
 
 Following on from my [previous post][pp], I'm going to talk a bit about
 emulating the video hardware of a BBC Micro. Firstly, a big credit to Tom
