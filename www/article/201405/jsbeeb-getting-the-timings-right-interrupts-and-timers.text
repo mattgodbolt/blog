@@ -1,0 +1,177 @@
+jsbeeb Part Four - IRQs and timers
+Date: 2014-05-30 00:10:00
+Status: Draft
+Summary: Emulating a 6502's interrupt behaviour
+Label: Coding, Emulation
+
+This is the foruth post in my series on emulating a BBC Micro in Javascript. 
+I'd recommend reading the [previous part][pp] on 6502 internal timings before
+reading this post. It's also handy to have read read the [first part][fp] which covers general
+stuff, and the [second part][sp] which focuses on the video hardware.
+
+[pp]: http://xania.org/201405/jsbeeb-getting-the-timings-right-cpu "6502 CPU timings""
+[fp]: http://xania.org/201405/jsbeeb-emulating-a-bbc-micro-in-javascript "General overview on BBCs and emulating them"
+[sp]: http://xania.org/201405/jsbeeb-part-two "On the video hardware"
+
+Again thanks to go to my good chum Rich Talbot-Watkins who helped demystify
+what goes on in the Beeb.
+
+May I interrupt you a moment?
+-----------------------------
+
+Like most CPUs, the 6502 has a physical pin (the IRQ line) which causes an 
+interrupt when brought low: the current instruction is completed and then 
+instead of proceeding to the next
+instruction the CPU enters interrupt mode (which disables further interrupts)
+and jumps to an operating system handler. This handler then deals with the 
+interrupt --- a timer firing, a keyboard event, disc activity and so on. 
+The handler is responsible for polling all the potential interrupt sources
+to determine why the interrupt occurred, dealing with it appropriately, 
+acknowledging the interrupt with the hardware (to bring the CPU's IRQ line
+high again), and finally leaving interrupt mode and returning to whatever 
+it was doing before.
+
+As you're beginning to realise by now, nothing is that simple. On the 6502
+the simple pipelining has an interesting side effect: the IRQ pin is only
+checked on the penultimate cycle of each instruction. This is the point at
+which the next instruction's address is determined, ready to be fetched on the next
+cycle.
+
+The penultimate cycle in question is the last "logical" cycle of the 6502's
+state machine, not necessarily the penultimate physical cycle --- in the case
+of cycle stretching on the final cycle of the instruction, those stretched
+cycles don't cause the 6502 to recheck the IRQ line.
+
+If the IRQ line is pulled high mid-instruction when the processor had already
+noticed it being low, the interrupt is still taken --- Even though there's no
+evidence left for the interrupt handler to determine why it was called.
+
+Not emulating these strange quirks leads to subtle differences in when
+interrupts are taken, which causes the legendary Kevin Edwards'
+protection systems to fail to decode. 
+
+Given all this complexity, it's interesting to think how experiment to try 
+and work out how Kevin sussed all this out. Rich had a guess
+and in [this fascinating thread][kevin] Kevin confirms how it was done.
+
+[kevin]: http://stardot.org.uk/forums/viewtopic.php?f=1&t=696&p=4807#p4807
+
+Running out of time(rs)
+-----------------------
+
+While we're talking cycle correctness we should mention the hardware timers.
+There are two timers in each of two 6522 Versatile Interface Adapters (VIA). 
+Each timer can generate an interrupt when it overruns, and automatically 
+reloads from a programmable start value.
+
+From our cycle correctness point of view the interesting thing about the
+timers is the exact time that the timer fires. They tick at 1MHz, and generate
+their interrupt when they overrun back to `$fffd`, not when they reach zero. 
+This means they fire two 1MHz cycles later than you might imagine. 
+
+Additionally when initially programmed, they latch the programmed value on the rising
+edge of the 1MHz clock, which is to say a half-timer cycle later than you'd
+think, or one 2MHz CPU cycle later. Thus when a value `N` is written to the
+timer's latched start value, the first interrupt will happen `N + 1.5` 1MHz
+cycles later (i.e. `2N + 3` CPU cycles); and subsequent interrupts happen at
+`N + 2` 1MHz cycles (`2N + 4` CPU cycles).
+
+TODO: explain the +2 for the second case, it doesn't make sense now. diagram
+may help. Link to datasheet.
+
+<script src="http://wavedrom.github.io/skins/default.js" type="text/javascript"></script>
+<script src="http://wavedrom.github.io/WaveDrom.js" type="text/javascript"></script>
+<script type="text/javascript">
+window.onload = function(){ WaveDrom.ProcessAll(); };
+</script>
+
+<div>
+<script type="WaveDrom">
+{ signal : [
+  { name: "2 MHz",  wave: "n......." },
+  { name: "1 MHz",  wave: "n...", period: 2 },
+]
+}
+</script>
+</div>
+
+TODO: the above.
+
+Some games rely on the exact timing of the timers to change video settings
+midst frame.  For example, the driving game [Revs][revs] sets the timer to
+fire every `312.5 * 64 - 2` cycles --- which is to say exactly the number of
+1MHz ticks there is in an interlaced [PAL][] TV frame minus two to account for the
+unusal time the timer fires. Most games use the vertical blanking interrupt
+generated by the video circuitry at the top of a frame, then set a one-shot
+timer to fire after the appropriate time, but Revs just leaves a free-running
+timer going. If the emulation wasn't spot on, then over time the place where
+the video settings change would slowly creep up the screen.
+
+[PAL]: TODO link to wikimonkeypedia
+[revs]: TODO link
+
+Acknowledging the timer
+-----------------------
+
+Reading the low 8 bits of a timer has an extra meaning: it acknowledges any
+interrupts from that timer. This is what an interrupt handler would do:
+once it had ascertained that it was a timer that caused the IRQ 
+(by checking the VIA status register) it would read from the timer 
+to stop it holding the CPU IRQ pin low.
+
+By now you'll realise there's going to be a catch: due to a hardware glitch
+if the CPU tries to acknowledge the timer firing on the same cycle that it
+fired, then the acknowledgement gets lost. An interrupt will still be
+generated on the next cycle. Again, Kevin Edwards' protection systems take 
+advantage of this unusual behaviour.
+
+On a real system all the components of course run in parallel. In an emulator
+they're of course emulated serially. Empirically we determined that to get
+things to work right, at each tick we do things in this order:
+
+  1. Check to see if any IRQs are pending (if this is a penultimate CPU cycle).
+  2. Generate any IRQs due to happen this cycle.
+  3. Let any CPU memory accesses happen (which may of course clear IRQs etc).
+
+Also there are a few extra `+ 1`s in the code when counters are being loaded
+from or written to account for the actual point within a cycle the CPU would
+actually read or write the timer.
+
+Most of the relevant code for the interrupts in in the [via.js][via] source file.
+The interrupt generation is in the `polltime` function and it looks a little
+like:
+
+    :::javascript
+    // "cycles" is the number of 2MHz cycles that
+    // have occurred since the last time we checked.
+    count -= cycles;
+    justHit = false;
+    // Have we fired? -3 here accounts for
+    // firing at $fffd.
+    if (count <= -3) {
+      assertIRQ();
+      // "justHit" is our note that we
+      // should ignore any acknowledgment on
+      // this cycle.
+      if (count === -3) justHit = true;
+    }
+    // Reload the timer, accounting for the
+    // extra 4 2MHz ticks here.
+    while (count < -3) 
+      count += reload + 4;
+
+[via]: https://github.com/mattgodbolt/jsbeeb/blob/master/via.js
+
+Getting the emulation cycle-perfect has been a very satisfying achievement.
+Again enormous thanks are due to Rich Talbot-Watkins for gathering real-world
+measurements, poring over technical documents and making spreadsheets of
+possible internal timing behaviour. It's all been worth it as we finally
+cracked Kevin's preotection system.
+
+TODO: Ed S?
+
+As an amusing side-note, when Rich and I first tried cracking the Alien 8
+protection system (one of Kevin's earlier accomplishments) some 20 years ago
+we started down this road. We tried building a 6502 emulator --- in BBC Basic
+--- to run the decryption code. We never got it working, and now I have a much fuller
+appreciation of why!
