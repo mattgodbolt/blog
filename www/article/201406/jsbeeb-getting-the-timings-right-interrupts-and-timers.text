@@ -25,11 +25,13 @@ instead of proceeding to the next
 instruction the CPU enters interrupt mode (which disables further interrupts)
 and jumps to an operating system handler. This handler then deals with the 
 interrupt --- a timer firing, a keyboard event, disc activity and so on. 
-The handler is responsible for polling all the potential interrupt sources
-to determine why the interrupt occurred, dealing with it appropriately, 
-acknowledging the interrupt with the hardware (to bring the CPU's IRQ line
-high again), and finally leaving interrupt mode and returning to whatever 
-it was doing before.
+The handler is responsible for:
+
+   * Polling all the potential interrupt sources to determine why the 
+   interrupt occurred, dealing with it appropriately, 
+   * Acknowledging the interrupt with the hardware to bring the CPU's IRQ line
+   back high.
+   * Leaving interrupt mode and returning to whatever it was doing before.
 
 As you're beginning to realise by now, nothing is that simple. On the 6502
 the simple pipelining has an interesting side effect: the IRQ pin is only
@@ -43,7 +45,7 @@ of cycle stretching on the final cycle of the instruction, those stretched
 cycles don't cause the 6502 to recheck the IRQ line.
 
 If the IRQ line is pulled high mid-instruction when the processor had already
-noticed it being low, the interrupt is still taken --- Even though there's no
+noticed it being low, the interrupt is still taken --- even though there's no
 evidence left for the interrupt handler to determine why it was called.
 
 Not emulating these strange quirks leads to subtle differences in when
@@ -78,8 +80,8 @@ first interrupt will happen `N + 1.5` 1MHz cycles later (i.e. `2N + 3`
 CPU cycles); and subsequent interrupts happen at `N + 2` 1MHz cycle
 (`2N + 4` CPU cycle) intervals.
 
-<script src="http://wavedrom.github.io/skins/default.js" type="text/javascript"></script>
-<script src="http://wavedrom.github.io/WaveDrom.js" type="text/javascript"></script>
+<script src="/media/wavedrom/narrow.js" type="text/javascript"></script>
+<script src="/media/wavedrom/WaveDrom.js" type="text/javascript"></script>
 <script type="text/javascript">
 window.onload = function(){ WaveDrom.ProcessAll(); };
 </script>
@@ -87,23 +89,15 @@ window.onload = function(){ WaveDrom.ProcessAll(); };
 <div>
 <script type="WaveDrom">
 { signal : [
-  { name: "1 MHz",       wave: "n..|...|......" },
-  { name: "Timer write", wave: "010|..........",
-                         node: "..Z..........." },
-  { name: "IRQ",         wave: "1.....|....0..1.|....0...", period: 0.5 },
-  {                      node: "..A...B.....C.", period: 0.5 }
+  { name: "1 MHz",       wave: "lhlhlhlh|lhlhlhlhlhlhlhlhlhlh" },
+  { name: "Timer write", wave: "l.h.l...|...................." },
+  { name: "IRQ",         wave: "h.......|...l................" },
+  { name: "Counter",     wave: "x...=.=.|=.=.=.=.=.=.=.=.=.=.",
+    data: ["N", "N-1", "0", "ffff", "N", "N-1", "0", "ffff" ] },
 ],
-edge: ['Z-|-A', 'A<-|->B N+1.5 cycles', 'B<->C N+2 cycles'],
-config: { skin: 'narrow' }
-}
-</script>,
-  {                      node: "..A...B.....C.", period: 0.5 }
-],
-edge: ['Z-|-A', 'A<-|->B N+1.5 cycles', 'B<->C N+2 cycles'],
 config: { skin: 'narrow' }
 }
 </script>
-
 </div>
 
 TODO: the above.
