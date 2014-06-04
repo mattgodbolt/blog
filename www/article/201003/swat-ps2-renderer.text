@@ -113,4 +113,6 @@ The Xbox had an equivalent system, except instead of being a very expensive piec
 
 [PIX]: http://msdn.microsoft.com/en-us/library/ee417193(VS.85).aspx
 
-Next time I'll cover some of the other parts of the engine, probably the collision and AI.
+[Next time][next] I'll cover some of the other parts of the engine: the collision and AI.
+
+[next]: /201003/swat-final-part

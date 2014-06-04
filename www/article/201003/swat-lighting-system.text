@@ -60,3 +60,5 @@ Another cool feature of the lighting system was its simulation of a real film ca
 </p>
 
 When the player went from a dark room to the bright outside, this would momentarily dazzle them until the aperture closed a little. Glancing back at the dark room, the player would then only see a pitch black area, just as in real life. A similar effect was also used to simulate the temporary dazzling caused by the bright light of a flashbang grenade.
+
+[Next time][next] I'll talk about how the renderer worked, at least on Xbox.

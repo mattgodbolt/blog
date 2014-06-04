@@ -243,4 +243,6 @@ Endnotes
 
 That explains the majority of how the Xbox renderer worked. I've been a bit vague on some details: if you can bear more in-depth explanations please contact me and I'll happily go into any amount of detail.
 
-Next time I'll go into how we managed to get this very texture heavy and pixel and vertex shader dependent system onto a Playstation 2 --- which has __very__ limited texturing and blending capabilities.
+[Next time][next] I'll go into how we managed to get this very texture heavy and pixel and vertex shader dependent system onto a Playstation 2 --- which has __very__ limited texturing and blending capabilities.
+
+[next]: /201003/swat-ps2-renderer
