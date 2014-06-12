@@ -1,0 +1,326 @@
+Elite's crazy tokenised string routine
+Date: 2014-06-12 20:00:00
+Status: Public
+Summary: In which I lift the lid on BBC classic Elite and its text handling
+Label: Coding
+
+The other day some discussions between friends led to someone posting a faked
+up Elite status screen with a silly rating instead of "Harmless". Given what
+I've been spending all my time on recently I thought it would be more amusing
+to post a playable version with the "Harmless" replaced by patching the Elite
+code.
+
+I naively thought this would be easy to achieve: I added a quick routine in
+[jsbeeb][] to search for a string in memory and looked for `Harmless`. No joy.
+I tried a case-insensitive version. Likewise, no luck. This wasn't going to be
+as simple as I thought.
+
+[jsbeeb]: http://bbc.godbolt.org/ "Yes, it's that emulator again"
+
+I next put a conditional breakpoint on the OS write character routine
+`OSWRCH`, conditional on the character being the `H` of the `Harmless` I was
+hoping to replace.
+
+In jsbeeb (at the time of writing) breakpoints are a little awkward to use:
+Assign a function to `processor.debugInstruction` which will be called at
+every instruction with the program counter and should return `true` to stop
+the program, or `false` to carry on. `OSWRCH` is at `$ffee` so bringing up the
+Javascript console and typing:
+
+    :::javascript
+    processor.debugInstruction = function(pc) { 
+        return pc === 0xffee && processor.a == 72; 
+    }
+
+A quick run and...no joy. Of course, Elite doesn't use the OS routines to
+print text --- it has its own.
+
+At this point I remembered that Ian Bell, co-creator of Elite, had posted up
+some old [disc images of the source code][source] of the tape version of Elite. It's not
+quite the same as this disc image I'm using, but it should be a good starting
+point. For ease of reading without firing up an emulator, he's also posted a
+[ZIP of the pertinent files as text][source_text].
+
+[source]: http://www.iancgbell.clara.net/elite/archive/a/a4080602.zip
+[source_text]: http://www.iancgbell.clara.net/elite/archive/a/a4080610.zip
+
+Opening up the source gives an amazing insight into how the game was made: The
+source is a terrific mess. It's split over several BASIC files which assemble
+the code by daisy-chaining each other. The code has very few comments and
+whitespace; crams many 6502 instructions per line; and uses many tricks like skipping over the
+next few instructions in branches via PC-relative mechanisms like `BNE P%+4`.
+It's pretty hard-going stuff.
+
+Luckily one of the few comments is `\PRINT` and so this is the first clue: the
+print routine is at the obfuscatedly-named label `TT26`. There's no easy way
+to tie labels in the tape source to addresses in the disc version. I opted to
+search for the opcodes either side of the label, and struck gold: `TT26` lives
+at address `$1d56`. I moved my Javascript breakpoint there and was able to
+catch the letter 'H' being drawn. Lucky Elite uses ASCII or otherwise I
+wouldn't have been able to catch it here.
+
+Here I stepped out (keypress 'o' in the latest jsbeeb debugger) and found the
+calling routine, and traced its origin to `$31ac`. Searching in the source I
+found this corresponds to label `TT27`, which sadly has no handy comments. This
+routine is the "print a string character" routine, but its input is definitely not ASCII.
+
+The short version
+-----------------
+
+The code `EOR`s its input with 35, then interprets the character as a token:
+some tokens are ASCII, some are colour and case-changing codes, some refer to
+parts of the player's state  and some refer
+to one of a list of two-letter expansions, making the strings in general
+shorter. The string "Harmless" is actually all caps (the title casing is done
+by the code) and is encoded as 6 bytes: `H [AR] M [LE] S S` where the `AR` and `LE` are
+two-letter expansions. The string itself is stored at `$0769`. Capital letters
+are left unchanged, so to replace the string with, say, "Monkey" we can patch the code to put
+`6e4c4d48465a` ("MONKEY" `EOR`ed with 35) in the relevant place. This can be 
+achieved with a URL parameter in jsbeeb, adding `&patch=@31a6,0769:6e4c4d48465a` 
+to the autoboot URL to yield a [handy bootable patched URL][patch].
+
+[patch]: http://bbc.godbolt.org/?disc=elite.ssd&autoboot&patch=@31a6,0769:6e4c4d48465a "Patching has never been so easy"
+
+The "@" sign in the patch URL sets a breakpoint at that location, and then applies
+the patch (in `addr:bytestopatch`) when the breakpoint is hit. 
+That way, Elite loads up first, then the first time the print routine is called
+the patch is made.
+
+The long version
+----------------
+
+Let's dig into that print routine a bit and see what it's doing. Here I'm
+going to use the label names from the source. To follow along at home, fire up
+Elite in jsbeeb, hit the Home key and then go to `$31ac` by typing into the
+disassembly address box, or open up `ELITEB.TXT` from the source ZIP. 
+
+The "print message" routine directly follows the
+print character routine, and I've annotated the whole lot. Some of the
+auxiliary routines are just above `.TT27`, but to keep things a little shorter
+I've left those out, and just explained them in the text (e.g. the `csh`
+routine).
+
+    :::asm
+    .TT27       ; print char routine
+    TAX         ; save A into X, and set flags
+    BEQ csh     ; if zero, print "Cash:" and then
+                ; the player's cash
+    BMI TT43    ; if negative (bit 7 set) go to TT43
+                ; which treats the bottom 7 bits as an index
+                ; into a token table
+    DEX         ; decrement and set flags...
+    BEQ tal     ; if zero, A was 1; go to tal
+                ; which prints "tally" (a number)
+    DEX     
+    BEQ ypl     ; if A was 2; go to to ypl
+                ; which prints the current planet name
+    DEX 
+    BNE P%+5
+    JMP cpl     ; if A was 3; go to cpl
+                ; which prints the selected planet name
+    DEX 
+    BEQ cmn     ; if A was 4; go to cmn
+                ; which prints the player name (commander?)
+    DEX 
+    BEQ fwl     ; if A was 5; go to fwl
+                ; which just prints the player's cash
+    DEX 
+    BNE P%+7
+    LDA #128    ; if A was 6, store 128 in QQ17
+    STA QQ17    ; which is a case-switch flag
+    RTS         ; and return
+    DEX         ; (this comes from P%+7 above)
+    DEX 
+    BNE P%+5
+    STX QQ17    ; if A was 8, store zero ...
+    RTS         ; in case-switch flag and return
+    DEX 
+    BEQ crlf    ; if A was 9, tab over and put a colon
+                ; (maybe)
+    CMP #&60    ; NB we are comparing with the original 'A' again
+    BCS ex      ; If it's lower-case (or above), head to ex
+                ; which treats it as a message index to print
+    CMP #14     ; if less than 14..
+    BCC P%+6    ; treat as a capitcal
+    CMP #32     ; if less than 32
+    BCC qw      ; ...go to 'qw' which treats it as message number
+                ; A + 114
+    ; So now we have a capital letter.
+    LDX QQ17    ; otherwise check the case-switch flag
+    BEQ TT74    ; zero? leave as-is and just print
+    BMI TT41    ; negative? head to TT41
+    BIT QQ17    ; bit 6 set?
+    BVS TT46    ; ...go to TT46 (which prints the character
+                ; as-is, then clears bit 6 of case-switch)
+    ; This prints the char in the A register in lowercase:
+    .TT42
+    CMP #65     ; less than 'A' ?
+    BCC TT44    ; ...then print as is
+    CMP #&5B    ; more than 'Z' ?
+    BCS TT44    ; ...just print
+    ADC #32     ; otherwise add 32 to make it lower-case
+    .TT44       ; TT44 just jumps to TT26 (the character
+    JMP TT26    ; print routine).
+    .TT41
+    BIT QQ17
+    BVS TT45    ; if bit 6 of case-switch set, go to TT45
+    CMP #65     ; if less than 65 ('A')
+    BCC TT74    ; just print, else..
+    PHA
+    TXA
+    ORA #64
+    STA QQ17    ; set bit '6' in case-switch
+    PLA
+    BNE TT44    ; and print as-is - i.e. this character
+                ; will be printed but the next will be
+                ; down-cased
+    .qw
+    ADC #114    ; add 114 to A
+    BNE ex      ; and print it as a canned message
+
+    .crlf
+    LDA #21
+    STA XC      ; store 21 in the x position
+    BNE TT73    ; and go to TT73 (which prints a colon)
+
+    .TT45
+    CPX #FF     ; if case-switch was $ff
+    BEQ TT48    ; ...skip entirely
+    CMP #65     ; if it's 'A' or above
+    BCS TT42    ; ...print in lowercase
+    .TT46
+    PHA         ; save character to print
+    TXA
+    AND #191    ; clear bit 6 of case-switch
+    STA QQ17    
+    PLA         ; restore character
+    .TT74
+    JMP TT26    ; and print as-is
+
+    .TT43
+    CMP #160    ; is it >160?
+    BCS TT47    ; print as message number (A-160)
+    ; Else we're going to print it as a one or
+    ; two-character token.
+    AND #127    ; clear top bit to leave token number
+    ASL A       ; double it to get offset into table
+    TAY         ; put in Y register
+    LDA QQ16,Y  ; read first char
+    JSR TT27    ; print it
+    LDA QQ16+1,Y; read second char
+    CMP #63     ; if it's 63
+    BEQ TT48    ; ...skip (not that I've noticed any tokens that
+                ; take advantage of this)
+    JMP TT27    ; else print second char and exit
+
+    ; We got here if A>160 which means print canned message A-160
+    .TT47
+    SBC #160        ; A-=160
+    ; This is the main entry routine that prints canned message A
+    .ex
+    TAX             ; save A in X
+    ; point zero-page location (V,V+1) to QQ18
+    ; which is the message table.
+    LDA #(QQ18 MOD 256)
+    STA V
+    LDA #(QQ18 DIV 256)
+    STA V+1
+    LDY #0          ; init loop counter
+    TXA
+    BEQ TT50        ; Skip if this is the zeroth message
+
+    ; TT51 to TT59 skip to the end of a zero-terminated string
+    .TT51
+    LDA (V),Y       ; get current byte
+    BEQ TT49        ; if we found the end, exit loop
+    INY             ; otherwise move to next char
+    BNE TT51        ; if we didn't overflow, reloop
+    INC V+1         ; handle overflow
+    BNE TT51        ; and reloop
+    .TT49
+    INY             ; skip the zero-terminator
+    BNE TT59        ; handle overflow
+    INC V+1         
+    .TT59
+    DEX             ; decrement the message index
+    BNE TT51        ; and reloop if we haven't skipped to target
+
+    ; Now we're at the main loop where (V),Y point at the message
+    ; to print.
+    .TT50
+    ; Printing a char can recursively call us, so stack (V+1) 
+    ; and Y (which is enough to preserve our state).
+    TYA
+    PHA             ; preserve "Y"
+    LDA V+1
+    PHA             ; preserve (V+1)
+    LDA (V),Y       ; Read a string byte
+    EOR #35         ; "Decrypt" it
+    JSR TT27        ; call the print char routine
+    PLA             ; restore V+1
+    STA V+1
+    PLA             ; restore Y
+    TAY
+    INY             ; move to next char
+    BNE P%+4        ; overflowed?
+    INC V+1         ; handle overflow
+    LDA (V),Y       ; hit the end of the string?
+    BNE TT50        ; if not, go around again
+    .TT48
+    RTS             ; we're finished
+
+The token table (at `QQ18`) maps the following indices to these two-byte
+strings:
+
+    00  AL
+    01  LE
+    02  XE
+    03  GE
+    04  ZA
+    05  CE
+    06  BI
+    07  SO
+    08  US
+    09  ES
+    0a  AR
+    0b  MA
+    0c  IN
+    0d  DI
+    0e  RE
+    0f  A?
+    10  ER
+    11  AT
+    12  EN
+    13  BE
+    14  RA
+    15  LA
+    16  VE
+    17  TI
+    18  ED
+    19  OR
+    1a  QU
+    1b  AN
+    1c  TE
+    1d  IS
+    1e  RI
+    1f  ON
+
+So the `HARMLESS` string was encoded as:
+
+    48  'H'
+    8a  reference to 'AR'
+    4d  'M'
+    81  reference to 'LE'
+    53  'S'
+    53  'S'
+
+Then `EOR`ed with 35 ($23) and zero-terminated to yield `6b a9 6e a2 70 70 00`
+
+To make your own simple strings you can use this snippet of python:
+
+    :::python
+    def encode(msg):
+        return "".join("{:02x}".format(ord(x)^35) for x in msg)
+
+    msg = raw_input("Text to encode: ")
+    print encode(msg)
