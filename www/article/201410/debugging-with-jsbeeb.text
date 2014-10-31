@@ -1,7 +1,7 @@
-Debugging Master demos with jsbeeb
-Date: 2015-10-31 03:50:00
-Status: Draft
-Summary: Digging into emulation issues can yield interesting results
+Debugging BBC Master demos with jsbeeb
+Date: 2014-10-31 03:50:00
+Status: Public
+Summary: Digging into apparent emulation issues can lead you down a rabbit-hole
 Label: Emulation
 
 Over the last few weeks I've really been concentrating on shoring up the
