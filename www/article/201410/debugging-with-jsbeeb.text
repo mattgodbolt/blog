@@ -1,0 +1,188 @@
+Debugging Master demos with jsbeeb
+Date: 2015-10-31 03:50:00
+Status: Draft
+Summary: Digging into emulation issues can yield interesting results
+Label: Emulation
+
+Over the last few weeks I've really been concentrating on shoring up the
+emulation quality of [jsbeeb](http://bbc.godbolt.org/), mainly by adding test
+cases for all the [undefined opcodes](http://www.pagetable.com/?p=39).
+Thankfully, there are some processor test suites out there and I've been able
+to get them running in jsbeeb as part of the [continuous
+build](https://travis-ci.org/mattgodbolt/jsbeeb). It now takes about 40
+minutes to run all the tests, but I'm pretty darned sure jsbeeb has an
+accurate NMOS 6502 emulation.
+
+Most recently I've been taking a glance over the [BBC
+Master](http://en.wikipedia.org/wiki/BBC_Master) emulation, both in
+terms of hardware and the slightly different CMOS 65SC12 chip it used.
+
+With a little help from my friends on the [stardot
+forums](http://stardot.org.uk/forums/) I was able to get some tests run on
+real Masters and compare the output of the few instructions I couldn't find
+info for. Most notably the unusual behaviour of the 6502 when in [Binary Coded
+Decimal](http://en.wikipedia.org/wiki/Binary-coded_decimal) mode has mostly
+been fixed in the 65SC12.
+
+To test the emulation quality, Rich Talbot-Watkins suggested I try out a
+Master-only demo that Tom Walker (of [b-em](http://b-em.bbcmicro.com/) fame)
+had written[^1]. I fired it up and was both very impressed at the quality of
+the demo, and pleased that it worked first time!
+
+<p class="picture">
+<img src="/201410/TheMasterDemo.png" width="400" height="338"
+     alt="The Master demo, by Tom Walker"/></a>
+ <br/>
+Tom's impressive Master demo
+</p>
+
+[^1]: Sadly I don't know the license state of the demo so I haven't been able to share it here.
+
+Then I restarted it and the second time it ran, the sound went all crazy.
+
+Uh-oh.
+
+A bit of experimentation and it seemed about 30% of the time the sound would
+go nuts about a minute into the demo, squeaking and missing half the notes.
+
+At first I suspected the sound chip emulation. The emulation was taken from my
+earlier [Sega Master System emulator](http://xania.org/miracle/miracle.html)
+which happened to use the same chip, and I had recently updated the emulation
+there to fix up some other problems that Rich had noticed. I'd taken the
+information from the [SMS Power](www.smspower.org/Development/SN76489)
+emulation site, and it was pretty accurate, but maybe it didn't match the chip
+in the Beeb.
+
+It's definitely the case that Tom's b-em emulator and jsbeeb differ on how
+they latch the register values --- maybe that was it?  I ended up writing a
+"b-em" style sound system and running it in parallel with the jsbeeb one and
+comparing their outputs. They agreed 100%, even when the squeaks were there.
+
+Scratch that as a source of error, then.  It was a bit suspect anyway as the
+problem is intermittent and (somewhat) non-deterministic[^2].
+
+[^2]: From an autoboot (with a deterministic start time) it would always fail.  Subsequent runs would fail about 30% of the time.
+
+While instrumenting the sound code I was able to notice a pattern: at the
+point the squeaks started, two of the sound channels would be set to `$020`
+values. This was a handy automatic diagnostic of the problem --- it seems
+there's no normal time when the music ought to be this squeaky.
+
+The sound code in the demo is based off of Rich's "Blurp" music player. As
+such he had a pretty good understanding of how it worked, and he was able to
+determine what inputs to the sound code would make it choose to play a sound
+of frequency `$020`, reading from a particular part of the frequency lookup
+table.
+
+Armed with this information I added a breakpoint on reading that frequency
+table location. That allowed me to see when it was being read, but there
+wasn't any obvious reason why: I needed to somehow track to the root cause.
+
+Writing an emulator gives you amazing flexibility in debugging --- 
+I [added a circular buffer](https://github.com/mattgodbolt/jsbeeb/commit/5a760c1b8df15c79b201bbc8d6c2a387f206130d)
+of the last 256 values of all the registers after executing
+each instruction.  That meant when the breakpoint tripped I had a history of
+how the code and the values in the `A`, `X`, `Y` and flags registers had
+evolved.
+
+Poring over the history I noticed something odd in the code compared to the
+version in Rich's original: there was one comparison with zero, which was
+followed by a branch-if-less-than --- a branch that would never be taken.
+
+    :::asm
+    PC   opcode      A  X  Y   ; my comment
+    8248 CPX #$00   20 02 00
+    824a BNE $8291  20 02 00
+    8291 LDX #$00   20 00 00
+    8293 CMP #$c0   20 00 00   ; >= c0?
+    8295 BCC $829b  20 00 00   ; no...
+    829b CMP #$00   20 00 00   ; >= 0 (er?)
+    829d BCC $82a3  20 00 00   ; no... carry is set
+
+This is deeply suspicious --- this wasn't in Rich's Blurp code and didn't make
+any sense. On a hunch I reloaded until I got a "working" version where the
+sound didn't squeak and lo and behold: The code at location `$829b` was
+comparing with `#$60`. Something was overwriting the code!
+
+Excitedly I breakpointed on memory writes to the `$60` byte at location
+`$829a` and was rewarded with the culprit: a pretty screen-clearing routine
+that shutter-style cleared the screen at the point in the demo where the sound
+went wrong!
+
+Hooray! Now I knew how the corruption was happening. Next I needed to work out
+why it was intermittent...
+
+The clear routine writes zero bytes in a shutter-style pattern to the screen
+memory. Nothing too unusual there. The screen memory ends at `$7fff` in the
+Master memory map, and then in the bank `$8000`-`#bfff` there's a selectable
+16KB bank which can be ROM or one of four banks of RAM.  The sound playing
+routines live in one of the RAM banks at location `$8000`.
+
+To apparently save some cycles somewhere, the screen routine doesn't
+explicitly check for overrunning the memory at `$8000`: it writes past the end
+in some cases.  100% reproducible disaster, you might think. But no: Tom's
+smarter than that and every time he's about to write to the screen, he swaps
+the RAM out of `$8000` and instead pages in some ROM --- which of course makes
+the writes harmless.  Here's a snippet of the code:
+
+    :::asm
+    loop:
+    LDA #$0f
+    STA $fe30     ; page in ROM
+    SEI           ; disable IRQs
+    LDA #$00
+    STA ($72),Y   ; store zero
+    CLI           ; re-enable IRQs
+    LDA $72
+    CLC
+    ADC #$08      ; move to the next char
+    STA $72
+    BNE loop      ; and keep clearing
+
+The interesting part is where interrupts are disabled: recall I said the sound
+playing routine is in one of the RAM banks that gets paged in at `$8000`?
+Well, the sound player is driven by interrupts. The main interrupt handler
+(which lives down in unpaged memory) pages in the relevant RAM bank when it
+realises it needs to handle sound (in response to a timer firing). Critically,
+when it returns *it doesn't restore the page that was previously there*.
+
+To prevent this being a problem, Tom sensibly disables interrupts while he
+does his write.  However he doesn't disable interrupts between paging the ROM
+in and writing so there's a tiny window of opportunity where, should an IRQ
+happen, the sound handling bank is left in just before the zero byte is
+written.
+
+The window is _tiny_ - there's only 6 cycles between the point of no return
+for the store, and the `SEI` taking effect. Additionally, it's only if the
+clearing routine is just past the end of the screen when the IRQ happens that
+it causes an issue.
+
+Now we understand how, where and why. One last nagging thing to take care of
+--- why is it intermittent? Further instrumentation gives the answer: the
+timer values that are used to set the interrupt frequency aren't being
+deterministically set. Instead their values are loaded in the interrupt
+routine itself. That means the "start" time of the interrupts depends on how
+many cycles have passed since the last hard reset. I was able to use this to
+find the 6-cycle window: by externally varying the timer values at the point
+at which the first instruction of the demo executes I could find the values
+that caused it to go wrong.
+
+b-em and other emulators don't seem to see this issue --- I believe as they
+don't model the interrupts as precisely in all cases.
+
+The only remaining mystery is why nobody has ever seen the issue on a real BBC
+Master. The marvellous [Ed
+Spittles](https://plus.google.com/107049823915731374389/posts) has run the
+demo a number of times on a real Master and never seen the issue. This leaves
+me feeling that perhaps I'm missing something, but it could just be an
+emulation artifact (maybe in how long the disc drive takes to load?) that
+makes the few timer values where it's a problem more likely.
+
+Any ideas on this gratefully accepted! For now, I'm happy enough with my
+explanation and can hopefully get on with some of the other things that need
+[attending to](https://github.com/mattgodbolt/jsbeeb/issues).
+
+Big thanks to Rich for putting up with my enormous nocturnal email rambles as
+I picked my way through all this in addition to giving fantastic advice on
+what the problem might be. Again, also thanks to Tom Walker for both the demo
+and for his excellent emulator which was the inspiration for jsbeeb.

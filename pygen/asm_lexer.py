@@ -15,7 +15,7 @@ class AsmLexer(RegexLexer):
             (r'(\[|\])', Punctuation),
             (r'[-,{}!:()#=?.+%]', Punctuation),
             (r'"[^"]+"', Literal.String),
-            (r'(LD[AXY]|ST[AXY]|CMP|CP[XY]|IN[CXY]|RT[SI]|ADC|SBC|SEC|CLC|T[AXY][AXY]|RO[LR]|JSR|JMP|DIV|MOD|ASL|P[HL][AXY]|BIT|DE[CXY]|ORA|EOR)', Token.Keyword),
+            (r'(LD[AXY]|ST[AXY]|CMP|CP[XY]|IN[CXY]|RT[SI]|ADC|SBC|SE[IC]|CL[IC]|T[AXY][AXY]|RO[LR]|JSR|JMP|DIV|MOD|ASL|P[HL][AXY]|BIT|DE[CXY]|ORA|EOR)', Token.Keyword),
             (r'(STR|LDR|ADD|SUB|SWI|AND|ORR|CMP|BIC|MOVS?|LDM|STM|B)'
                 r'(NE|EQ|GT|GE|LT|LE|VC|VS|PL|MI|CC|CS)?'
                 r'(FD)?'
