@@ -1,0 +1,36 @@
+GCC Explorer's top 10 compilers
+Date: 2014-12-16 20:00:00
+Status: Draft
+Summary: Wondering which compilers I can retire from GCC Explorer
+Label: Coding
+
+I've had a post-it note on my computer for the over six months to upgrade the
+[GCC Explorer](http://gcc.godbolt.org) cluster to Ubuntu 14.04 from its
+current 12.04 setup. One issue I have is that newer
+[Clang](http://clang.llvm.org) versions only
+have pre-canned binaries for 14.04, and rather than have to build my own, I'd
+prefer to use those binaries.
+
+That being said; the reverse is true for older compilers like [GCC
+4.4](http://gcc.gnu.org). 
+
+I wondered if I could drop support for GCC 4.4, and in short, I don't think I
+can!  I turned to the very minimal Google Analytics I have for GCC Explorer,
+and the top ten compilers (in nearly 2 million compiles) are:
+
+1. clang++ 3.0.6 (the default when you visit the site) -- 37%
+2. g++ 4.8 -- 15%
+3. g++ 4.9 -- 13%
+4. clang++ 3.4.1 -- 6%
+5. g++ 4.9 concepts branch -- 4%
+6. clang++ 3.3 -- 4%
+7. g++ 4.7 -- 4%
+8. Intel's compiler 13.0.1 -- 3%
+9. ARM g++ 4.6 -- 2%
+10. g++- 4.4 -- 2%
+
+So, venerable old g++ 4.4 is still getting 2% of the hits to the site (40,000
+compiles).
+
+I suppose I'll have to bite the bullet and get builds of gcc4.4 for Ubuntu
+14.04. I also really ought to update the Intel compiler too!
