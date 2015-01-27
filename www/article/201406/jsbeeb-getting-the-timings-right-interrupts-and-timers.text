@@ -103,7 +103,7 @@ window.onload = function(){ WaveDrom.ProcessAll(); };
   {                      node: "...A......B.......C." }
 ],
 config: { skin: 'narrow' },
-edge: [ "A<->B 3.5", "B<->C 4" ]
+edge: [ "A&lt;-&gt;B 3.5", "B&lt;-&gt;C 4" ]
 }
 </script>
 </div>

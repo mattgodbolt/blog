@@ -238,7 +238,7 @@ window.onload = function(){ WaveDrom.ProcessAll(); };
   {                 node: "...CD...", phase: 0.5 },
   { name: "Case 2", wave: "N..hN..." }
 ],
-edge: ['A->B stretch', 'C->D stretch']}
+edge: ['A-&gt;B stretch', 'C-&gt;D stretch']}
 </script>
 </div>
 
