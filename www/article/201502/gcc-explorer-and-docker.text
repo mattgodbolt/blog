@@ -13,7 +13,9 @@ I was using some extra PPA repositories to get them, and while some compilers ha
 updated to 14.04, many were now on new versions. As I wanted to support the old versions
 still, I had a bit of a problem.
 
-[^well]: More than one...my URL format was terrible and the pathname of the compiler was specified...of course then upgrading OS would inevitably put a different compiler at `/usr/bin/g++`. I've now fixed this...
+[^well]: More than one...my URL format was terrible and the pathname of the compiler was
+specified...of course then upgrading OS would inevitably put a different compiler
+at `/usr/bin/g++`. I've now fixed this...
 
 Enter [Docker](http://docker.io) - a container system for OS images and data, like a
 very lightweight VM. Yes, this means running a VM (Docker) on a VM (Amazon EC2 instance)

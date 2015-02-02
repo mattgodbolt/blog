@@ -2,8 +2,7 @@
 
 import os, sys, re, time, datetime
 from warnings import warn
-from smartypants import smartyPants
-from markdown2 import Markdown
+from markdown import markdown
 import pygments # unused but catches case when not installed
 from cache import Cache, SqlBackend
 from pytz import timezone, utc
@@ -295,17 +294,16 @@ def CleanUpXHtml(xhtml):
 
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (14, article.ArticleText)
+    cacheObj = (15, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
         print "Read cached article", article.RawTitle
         article.XHtmlText, article.HtmlText = resultObj
     else:
         print "Caching article", article.RawTitle
-        md = Markdown(extras=["code-color", "footnotes"])
-        xhtmlText = smartyPants(md.convert(article.ArticleText), attr="2")
-        article.XHtmlText = CleanUpXHtml(xhtmlText)
-        article.HtmlText = XHtmlToHtml(xhtmlText)
+        extensions = ["markdown.extensions.extra", "markdown.extensions.smarty", "markdown.extensions.codehilite"]
+        article.XHtmlText = markdown(article.ArticleText, extensions=extensions, output_format="xhtml1")
+        article.HtmlText = markdown(article.ArticleText, extensions=extensions, output_format="html")
         globalData.cache.Add(cacheObj, (article.XHtmlText, article.HtmlText))
 
 def FormatHtmlDate(date):
