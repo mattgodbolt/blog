@@ -1,0 +1,122 @@
+Experiences with Docker and GCC Explorer
+Date: 2015-02-02 23:00:00
+Status: Public
+Summary: Musings on Docker
+Label: Coding
+
+[GCC Explorer](http://gcc.godbolt.org) has long ran on
+[Amazon EC2 Instances](http://aws.amazon.com/ec2/) which have been marvellous.
+
+I've been looking to upgrade from the Ubuntu 12.04 images I was using to Ubuntu 14.04.
+But I had a problem[^well]: most of the compilers I was supporting were only built for 12.04.
+I was using some extra PPA repositories to get them, and while some compilers had been
+updated to 14.04, many were now on new versions. As I wanted to support the old versions
+still, I had a bit of a problem.
+
+[^well]: More than one...my URL format was terrible and the pathname of the compiler was specified...of course then upgrading OS would inevitably put a different compiler at `/usr/bin/g++`. I've now fixed this...
+
+Enter [Docker](http://docker.io) - a container system for OS images and data, like a
+very lightweight VM. Yes, this means running a VM (Docker) on a VM (Amazon EC2 instance)
+on a real machine...but it's [turtles all the way down](http://en.wikipedia.org/wiki/Turtles_all_the_way_down)
+anyway.
+
+Docker has made it possible to build a 12.04 image including all the compilers I currently
+use, and then run that image on a 14.04 box.  My next plan is to get a 14.04 image to run
+too and then use some RPCs between the containers to present both 12.04 and 14.04 compilers
+to the web front-end. But anyway, thoughts on Docker.
+
+Docker's great. But there are some things that took me a while to "get":
+
+Containers vs Images
+--------------------
+
+In Docker, a non-running "VM" is an _image_. When an image runs, it runs in a _container_. Both
+can be tagged and named, and both can be referred to by tag, name or UID (a big hash value a la git).
+
+I conflated these two ideas and it took me a while to understand them.  Partly this is because you can
+"run" a container from an image, and you can "commit" a container to make a new image. But, the image is
+the non-running, shippable "VM image", and the container is like a VM instance.
+
+You can list containers with `docker ps`. This will show any containers that have running processes. But
+even if this list is empty, there may be containers on your system. `docker ps -a` shows them all.
+
+Images are shown with `docker images`. There are also a `docker images -a` which shows even intermediate
+images -- docker layers diffs between images so there's a ton of in-between steps.
+
+I think what confused me is that one can run a command in docker and specify an _image_ to start from.
+
+    $ sudo docker run ubuntu:12.04 bash -c 'echo "hello" > /world'
+
+Woo! We created a little message in `/world` in our ubuntu:12.04 image. Let's try reading from it:
+
+    $ sudo docker run ubuntu:12.04 bash -c 'cat /world'
+    cat: /world: No such file or directory
+
+Oh! what happened here? I'm sure we created a file, but where has it gone?
+
+So...I've conflated images and containers again. If you run a command from an _image_, you implicitly
+create a new container instance, and run your command in that. Any changes are now reflected in the
+_container_, but not the original _image_.  When I can the `cat`, I created a new fresh container from
+the Ubuntu image, and of course the file isn't there. So where did it go?
+
+    $ sudo docker ps
+    CONTAINER ID   IMAGE          COMMAND
+
+...well, not there. Maybe it's not running?
+
+    CONTAINER ID   IMAGE          COMMAND
+    20f2d1dc8f23   ubuntu:12.04   bash -c 'cat /world'
+    8d87f95f0ae9   ubuntu:12.04   "bash -c 'echo "hell
+
+Aha! I can see now both new containers. If I now try running my `cat` command with the container ID instead:
+
+    $ sudo docker run 8d87f95f0ae9 bash -c 'cat /world'
+    Unable to find image '8d87f95f0ae9' locally
+    Pulling repository 8d87f95f0ae9
+    2015/02/02 08:41:07 HTTP code: 404
+
+Hmm, well that didn't work. It seems to have tried to find an image named `8d87f95f0ae9` in the docker repo. You can't
+run a command in an existing container.  Some Googling reveals the presence of a `docker exec` feature, but that's
+not made it to Ubuntu 14.04's version of docker yet.
+
+The only way to modify an existing container on is to `docker commit` it into a new image, and then run on that.
+
+    $ sudo docker commit 8d87f95f0ae9 test
+    d317cbff7cff1c554760424651edf141addf2a3b5c4a5555bfa83c202f8dc0da
+    $ sudo docker run test bash -c 'cat /world'
+    hello
+
+Yay!
+
+Dockerfiles
+-----------
+
+All that committing and running seems like a right pain, right?
+Luckily that's not too much of an issue as the whole process of setting up your own image is made
+fairly simple by the `docker build` stuff, which takes a Dockerfile script of commands and
+automates the whole process.
+
+A snippet from one of the GCC Explorer Dockerfiles:
+
+    FROM ubuntu:12.04
+    MAINTAINER Matt Godbolt <matt@godbolt.org>
+
+    RUN mkdir -p /opt
+    RUN useradd gcc-user && mkdir /home/gcc-user \
+        && chown gcc-user /home/gcc-user
+    RUN apt-get -y update \
+        && apt-get install -y python-software-properties
+    RUN add-apt-repository -y ppa:chris-lea/node.js \
+        && add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+    RUN apt-get -y update && apt-get install -y \
+        curl \
+        s3cmd \
+        make \
+        nodejs
+
+After each `RUN` stanza, an intermediate image is created. The docker build agent tries to cache build steps, so
+if you're careful you can get a pretty fast build if only the latter steps change.
+
+The rest of GCC Explorer's Dockerfiles are on [github](https://github.com/mattgodbolt/gcc-explorer-image) if you want
+to take a look.
