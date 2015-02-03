@@ -3,11 +3,13 @@
 import os, sys, re, time, datetime
 from warnings import warn
 from markdown import markdown
-import pygments # unused but catches case when not installed
+import pygments, pygments.lexers
 from cache import Cache, SqlBackend
 from pytz import timezone, utc
 import codecs
 import ETL
+
+pygments.lexers.LEXERS['AsmLexer'] = ('asm_lexer', 'AsmLexer', ('asm',), ('*.asm',), ('text/asm'))
 
 # TODO: make this a per-article and config thing
 defaultTimeZone = timezone('Europe/London')
@@ -294,7 +296,7 @@ def CleanUpXHtml(xhtml):
 
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (15, article.ArticleText)
+    cacheObj = (16, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
         print "Read cached article", article.RawTitle

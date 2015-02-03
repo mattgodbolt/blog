@@ -1,6 +1,8 @@
 from pygments.lexer import RegexLexer
 from pygments.token import *
 
+__all__ = ['AsmLexer']
+
 class AsmLexer(RegexLexer):
     name = 'AsmLexer'
     aliases = ['asm']
