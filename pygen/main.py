@@ -296,16 +296,17 @@ def CleanUpXHtml(xhtml):
 
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (16, article.ArticleText)
+    cacheObj = (17, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
         print "Read cached article", article.RawTitle
         article.XHtmlText, article.HtmlText = resultObj
     else:
         print "Caching article", article.RawTitle
-        extensions = ["markdown.extensions.extra", "markdown.extensions.smarty", "markdown.extensions.codehilite"]
-        article.XHtmlText = markdown(article.ArticleText, extensions=extensions, output_format="xhtml1")
-        article.HtmlText = markdown(article.ArticleText, extensions=extensions, output_format="html")
+        extensions = ["markdown.extensions.extra", "markdown.extensions.codehilite"]
+        ex_conf = {"markdown.extensions.codehilite": {'guess_lang': False}}
+        article.XHtmlText = markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml1")
+        article.HtmlText = markdown(article.ArticleText, extensions=extensions+["markdown.extensions.smarty"], extension_configs=ex_conf, output_format="html")
         globalData.cache.Add(cacheObj, (article.XHtmlText, article.HtmlText))
 
 def FormatHtmlDate(date):
