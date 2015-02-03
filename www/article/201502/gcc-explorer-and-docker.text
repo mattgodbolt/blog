@@ -47,7 +47,8 @@ images -- docker layers diffs between images so there's a ton of in-between step
 
 I think what confused me is that one can run a command in docker and specify an _image_ to start from.
 
-    $ sudo docker run ubuntu:12.04 bash -c 'echo "hello" > /world'
+    $ sudo docker run ubuntu:12.04 \
+        bash -c 'echo "hello" > /world'
 
 Woo! We created a little message in `/world` in our ubuntu:12.04 image. Let's try reading from it:
 
@@ -84,7 +85,7 @@ not made it to Ubuntu 14.04's version of docker yet.
 The only way to modify an existing container on is to `docker commit` it into a new image, and then run on that.
 
     $ sudo docker commit 8d87f95f0ae9 test
-    d317cbff7cff1c554760424651edf141addf2a3b5c4a5555bfa83c202f8dc0da
+    d317cbff7cff1c554760424651edf141addf2a3b5c4
     $ sudo docker run test bash -c 'cat /world'
     hello
 
