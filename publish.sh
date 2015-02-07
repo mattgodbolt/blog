@@ -2,6 +2,7 @@
 
 set -e
 
+mkdir -p www/feed
 (cd pygen && ./main.py)
 
 # Publish the generated and static content from www/ into htdocs/.
@@ -17,4 +18,3 @@ set -e
 # an option, but this is easier.
 rsync -vc -rlp --exclude=.svn/ --exclude=/article www/ htdocs
 rsync -vc -rlp --exclude=.svn/ --include='*.html' --include='*.png' --include='*.jpeg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ htdocs
-rsync -vc -rlp htdocs/ mbs-user@ext.xania.org:htdocs/
