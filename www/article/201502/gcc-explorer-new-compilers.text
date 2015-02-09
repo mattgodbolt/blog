@@ -1,0 +1,26 @@
+Announcing new compilers for GCC Explorer
+Date: 2015-02-09 05:00:00
+Status: Draft
+Summary: Yup, more compilers
+Label: Coding
+
+I'm very pleased to announce that [GCC Explorer](http://gcc.godbolt.org) now
+supports some new compilers, and new architectures:
+
+* [x86 GCC 4.8.2](http://goo.gl/nEgijt)
+* [x86 Clang 3.5](http://goo.gl/D4uhgp)
+* [Power PC GCC 4.8](http://goo.gl/ohLiRl)
+* [ARM gcc 4.8](http://goo.gl/0RjZVx)
+* [ARM64 gcc 4.8.2](http://goo.gl/zD2L6o)
+
+It's been a long process to get here: keeping all the old Ubuntu 12.04
+compilers but supporting these newer ones on Ubuntu 14.04 was tricky. I ended
+up using a 12.04 [Docker](http://docker.io) image (after [much pain][blog])
+and then [adding support][sup] to passing through to other GCC explorer
+instances.
+
+[blog]: /201502/gcc-explorer-and-docker
+[sup]: https://github.com/mattgodbolt/gcc-explorer/commit/2e88d332b448bf7a5a54f4e2d917bacba62ab4a3
+
+I hope to add more compilers soon. Next on my hitlist is GCC 4.9.2 and a
+GCC 5.0 snapshot.  I'll update here when I do.
