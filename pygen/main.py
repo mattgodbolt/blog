@@ -306,7 +306,7 @@ def CacheArticle(globalData, article):
         extensions = ["markdown.extensions.extra", "markdown.extensions.codehilite"]
         ex_conf = {"markdown.extensions.codehilite": {'guess_lang': False}}
         article.XHtmlText = CleanUpXHtml(markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml1"))
-        article.HtmlText = markdown(article.ArticleText, extensions=extensions+["markdown.extensions.smarty"], extension_configs=ex_conf, output_format="html")
+        article.HtmlText = markdown(article.ArticleText, extensions=extensions+["markdown.extensions.smarty"], extension_configs=ex_conf, output_format="html5")
         globalData.cache.Add(cacheObj, (article.XHtmlText, article.HtmlText))
 
 def FormatHtmlDate(date):

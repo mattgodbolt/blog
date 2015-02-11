@@ -43,6 +43,11 @@
         </div>
     </div>
 </div>
+
+[%- if article.title != articles[-1].title -%]
+<hr>
+[%- end -%]
+
 [%- end -%]
 
 [%- include "trailer.html" -%]
