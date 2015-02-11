@@ -12,11 +12,54 @@ pre {
 
 div.codehilite {
     padding: 0.25em;
-    margin-bottom: 1em;
 }
+
+.article div, .article table {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
+}
+
+.article p.picture {
+    text-indent: 0;
+    font-style: italic;
+    font-size: 85%;
+    text-align: center;
+    max-width: 40em;
+    margin-left: auto;
+    margin-right: auto;
+}
+.article p.picture i, .article p.picture em, .article p.picture var {
+    font-style: normal;
+}
+.article p.picture + p {
+    text-indent: 0;
+}
+
+.article p.side {
+    float: left;
+    margin: 5px 10px 0 0;
+    /* user should set max-width to the width of the image. */
+
+    text-indent: 0;
+
+    /* The content of the paragraph is the caption, if any. */
+    font-style: italic;
+    font-size: 85%;
+    text-align: center;
+}
+
 
 .postingtime:before {
     content: "\2015";
     color: rgb(80%,80%,80%);
     padding-right: 0.25em;
 }
+
+table.ps { border-collapse: collapse; }
+table.ps, table.ps th, table.ps td { border: 1px solid black; }
+table.ps td { width: 1.5em; text-align: center; }
+table.ps td.red { background-color: #ffaaaa; }
+table.ps td.green { background-color: #aaffaa; }
+table.ps td.blue { background-color: #aaaaff; }
+table.ps td.alpha { background-color: #aaaaaa; }
