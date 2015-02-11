@@ -41,7 +41,7 @@ The source artwork was created in [Photoshop][] and [3D Studio Max][max]. The va
 
 Textures were applied to models using a custom shader plugin, which allowed settings unique to Okre to be configured inside Max. Okre supported rich (for the time!) shaders, allowing all sorts of cool effects to be placed in a material. The shaders were little scripts written in a domain specific language, describing how textures would be blended together, how UV coordinates should be interpreted and how geometry should be modified. They compiled into bytecodes that were interpreted on the CPU, and then (on Xbox) into vertex and pixel shaders. The Xbox engine would combine up to four textures in this way to give the appearance of flickering computer screens, moving conveyor belts, etc[^tim]. On the PS2 we only supported a very simple shader system with a single texture.
 
-	::: cpp
+	:::cpp
 	// An example shader.
 	texture t0 = "badger";
 	texture t1 = "ammocrate03" {

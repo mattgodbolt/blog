@@ -15,7 +15,7 @@ discuss a handy trick I've discovered in reducing dependencies, particularly use
 
 Take for example, this header file, which declares a class for averaging integers:
 
-    ::: cpp
+    :::cpp
     // Averager.h
     #include <list>
 
@@ -72,7 +72,7 @@ refer to a declared (but not defined) class as long as you don't try and find
 its size, or call any functions within it.  This means you don't need the `#include <list>`
 after all:
 
-    ::: cpp
+    :::cpp
     // NaiveAverager.h
     // Forward declare std::list.
     namespace std { template<typename T> class list; }
@@ -97,7 +97,7 @@ have these issues with predeclaration.  But implementing our own list class isn'
 we don't get all the benefits of `std::list`'s implementation.  Well, so you might think --- but
 how about something like this, in `MyList.h`:
 
-    ::: cpp
+    :::cpp
     // MyList.h
     #include <list>
     template<typename T>
@@ -105,7 +105,7 @@ how about something like this, in `MyList.h`:
 
 And then:
 
-    ::: cpp
+    :::cpp
     // NewAverager.h
     // Forward declare a template list.
     template<class T> class MyList;

@@ -25,7 +25,7 @@ user settings are stashed only in `HKEY_CURRENT_USER`.
 We made the appropriate changes and then tested everything...but something still wasn't working
 right.  After a lot of debugging, we tracked it down to the some code similar to:
 
-    ::: cpp
+    :::cpp
     bool RegSetString(HKEY iKey, const char *iKeyName,
                       const std::string &iValue)
     {

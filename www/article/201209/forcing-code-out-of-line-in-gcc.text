@@ -14,7 +14,7 @@ Boy is it your lucky day today!
 
 Before:
 
-    ::: cpp
+    :::cpp
     void test() {
        // do stuff here, update failure
        if (failed) {
@@ -26,7 +26,7 @@ Before:
 
 After:
 
-    ::: cpp
+    :::cpp
     void test() {
        // do stuff here, update failure
        if (failed) {

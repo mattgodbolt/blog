@@ -13,7 +13,7 @@ As a result I've become rather blazé about aliasing types in my pointers.
 Pointer type aliasing is where you "lie" to the compiler and tell it a memory address contains a type of
 data that it in fact doesn't.  A quick example:
 
-    ::: cpp
+    :::cpp
     inline bool IsNegative(float f)
     {
         return *reinterpret_cast<int*>(&f) 
@@ -58,7 +58,7 @@ he has plenty of handy advice about how to avoid common pitfalls.
 
 In the example above, the code should be:
 
-    ::: cpp
+    :::cpp
     inline bool IsNegative(float f)
     {
         union
