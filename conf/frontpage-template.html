@@ -15,7 +15,6 @@
 [%- end -%]
   <link rel="alternate" type="application/atom+xml"
         title="Atom (full content)" href="/feed">
-  <link rel="made" title="Matt Godbolt" href="mailto:matt@godbolt.org">
     <script src="js/vendor/modernizr.js"></script>
   </head>
   <body>
@@ -39,7 +38,7 @@
                     <a href="/[%= label.filename %]">[%= label.name %]</a> 
                     [%- end -%]
                 </div>
-                <div class="medium-6 columns postingtime" id="[%= article.basenameNAME %]_postingtime" class="postingtime">Posted at [%= article.dateHTML %].</div>
+                <div class="medium-6 columns postingtime" id="[%= article.basenameNAME %]_postingtime">Posted at [%= article.dateHTML %].</div>
             </div>
         </div>
     </div>

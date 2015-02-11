@@ -15,7 +15,6 @@
 [%- end -%]
   <link rel="alternate" type="application/atom+xml"
         title="Atom (full content)" href="/feed">
-  <link rel="made" title="Matt Godbolt" href="mailto:matt@godbolt.org">
     <script src="js/vendor/modernizr.js"></script>
   </head>
   <body>
@@ -52,13 +51,7 @@
 
     <script src="js/vendor/jquery.js"></script>
     <script src="js/foundation.min.js"></script>
-    <script>
-[%- include "updatepostingtime.js" -%]
-[%- for article in articles -%]
-updatePostingTime("[%= article.basenameNAME %]_postingtime", "[%= article.dateISO %]");
-[%- end -%]
-      $(document).foundation();
-    </script>
+    <script> $(document).foundation(); </script>
 [%- include "common-headers.html" -%]
   </body>
 </html>
