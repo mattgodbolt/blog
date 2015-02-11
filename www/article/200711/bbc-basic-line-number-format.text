@@ -18,9 +18,7 @@ form, then the rather contrived line:
 
     10 IF A=1 GOTO 139 ELSE GOTO 204
 
-would tokenise as:
-
-<p class="sidenote">Here, underscores represent spaces, and <code>ll</code> means line length.</p>
+would tokenise as[^expl]:
 
     \n [ 10] ll IF  _  A  =  1  _ GOTO_ [Line139] _
     0D 00 0A 17 E7 20 41 3D 31 20 E5 20 8F 00 8B 20
@@ -28,6 +26,8 @@ would tokenise as:
     ELSE_ GOTO_ [line204]
     8B 20 E5 20 8D 00 CC
     ^^
+
+[^expl]: Here, underscores represent spaces, and <code>ll</code> means line length.
 
 If the interpreter chose to scan forward for the `ELSE` by just looking for its token `0x8b`
 then it would trip over on the `0x8b` in the `GOTO` (marked with `^^`) --- `0x8b` in decimal is 139.

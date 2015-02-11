@@ -30,13 +30,13 @@ Computer Science, and were learning languages like Java and Javascript --- which
 the design of IRBasic.  Conversations with Malcolm in particular shaped the language into a
 dynamically-typed, overloadable, garbage-collected, object-oriented version of BBC BASIC.
 
-<p class="sidenote">Incidentally, this error message apparently occurs if you tried to use the <code>.</code> operator
-on a non-numeric value.  Something like:<br/><code>PROC"hi".foo</code></p>
+[^worm]: Incidentally, this error message apparently occurs if you tried to use the <code>.</code> operator
+on a non-numeric value.  Something like:<br/><code>PROC"hi".foo</code>
 
 I've just been looking through some of the source code, and two things strike me.  One, that the
 interpreter is an absolute mess and it's impossible to imagine how I wrote it --- pure ARM assembler
 all the way through; stupendous label names (e.g. `OhShiteNoNoNoNono`, `WombleLoopJedi2`, `MMFOOMBO2`)
-and hard-to-fathom error messages ("[Worm tablets at line 6780][worm]") to name but a few.
+and hard-to-fathom error messages ("[Worm tablets at line 6780][worm]")[^worm] to name but a few.
 
 [worm]: http://gerph.org/misc/taglines.html "Gerph's taglines, a google of which set me on this crazy quest in the first place"
 
@@ -50,11 +50,10 @@ an example of [Zawinski's Law of Software Envelopment][zaw] --- _"Every program 
 [zaw]: http://static.userland.com/userLandDiscussArchive/msg018352.html "Cheers for the link Malc"
 
 [gerph]: http://www.gerph.org/ "Justin Fletcher, genius"
+[^gerph]: I hope Justin won't mind me using his BTree class as an example here.
 
-So, for a quick taster of IRBasic, let's define a class.  Classes are semi-dynamic inasmuch as they're
+So, for a quick taster of IRBasic, let's define a class[^gerph].  Classes are semi-dynamic inasmuch as they're
 defined dynamically, and can be modified so long as there's no active instance of a class.
-
-<p class="sidenote">I hope Justin won't mind me using his BTree class as an example here.</p>
 
     Class_BTree = FNRegisterClass("BTree")
     PROCAddField(Class_BTree,"data")

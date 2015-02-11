@@ -8,9 +8,9 @@ The other day I was chatting to Rich Talbot-Watkins about C++ stuff and
 he sent me some example code which shows how unusual the C++ function overloading rules
 can be.
 
-Take the example code snippet:
+Take the example code snippet[^1]:
 
-<p class="sidenote">This is a minimal form of the original code Rich had.</p>
+[^1]: This is a minimal form of the original code Rich had.
 
     :::cpp
     enum MyEnum { A, B, C };
@@ -55,9 +55,9 @@ tricky rules as to which is the "best" choice, or even if there exists an unambi
 ### More than one way to skin a cat
 
 In this case there's two ways to compare a `char` with a `MyEnum`.  The
-first is perhaps the most obvious one:
+first is perhaps the most obvious one[^2]:
 
-<p class="sidenote">The references cited here are to sections within the C++ standard.</p>
+[^2:]: The references cited here are to sections within the C++ standard.
 
 1. The first parameter gets converted:<br/>
 `char` gets converted  to `int`  ([4.5 paragraph 1][convprom].)

@@ -5,12 +5,7 @@ Label: Coding
 Status: Public
 
 Imagine you were making a simple asynchronous HTTP request API. If you were
-coding in C you might sketch out something a little like:
-
-<p class="sidenote">
-For brevity I've ignored the actual reading of HTTP data, and any form of error
-handling.
-</p>
+coding in C you might sketch out something a little like[^brevity]:
 
     :::cpp
     // Starts an asynchronous HTTP fetch of the given url.
@@ -53,6 +48,9 @@ If not, don't fret as you're in good company: Microsoft missed this in their
 
 [wininet]: http://msdn.microsoft.com/en-us/library/aa383630(VS.85).aspx
 
+[^brevity]: For brevity I've ignored the actual reading of HTTP data, and any form of error
+
+handling.
 To see where the problem lies, consider this situation:
 
     :::cpp
@@ -158,7 +156,7 @@ Unfortunately, on Windows Mobile devices, the handles are aggressively
 reused[^handle]. In the case described above, that could mean that between us
 taking a copy of the handle in `temp_handle` and us waiting on it; another
 thread could have cancelled our request, started a new one --- receiving the
-__same handle__ that the original thread thinks it owns. When the scheduler
+ __same handle__ that the original thread thinks it owns. When the scheduler
 allows the original thread to run, we will call `WaitForRequest` on the other
 thread's handle --- with disastrous results.
 

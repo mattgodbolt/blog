@@ -33,9 +33,9 @@ the same time, they seem to pick up the same IP address!
 [Vonage]: http://www.vonage.co.uk/ "Fairly good VOIP phone provider"
 [linksys]: http://www.linksys.com/servlet/Satellite?c=L_CASupport_C2&childpagename=US%2FLayout&cid=1166859882761&pagename=Linksys%2FCommon%2FVisitorWrapper&lid=8276182761N09 "Buggy firmware"
 
-Box 1's [DHCP][] log looks like:
+Box 1's [DHCP][] log looks like[^ahem]:
 
-<p class="sidenote">NB: the MAC and IP addresses used here are illustrative only.</p>
+[^ahem]: NB: the MAC and IP addresses used here are illustrative only.
 
 [DHCP]: http://en.wikipedia.org/wiki/Dhcp "Dynamic Host Configuration Protocol"
 

@@ -6,9 +6,7 @@ Summary: More of an anti-pattern than a how to - avoiding and/or diagnosing pure
 
 If you're staring at the run-time error "Pure virtual function call" you might be wondering what's happened.
 Usually, this is due to calling pure virtual functions from a constructor or destructor.  Consider the following
-code:
-
-<p class="sidenote">Yes, another totally contrived example.</p>
+code[^yeah]:
 
     :::cpp
     class AllocBase
@@ -90,3 +88,5 @@ in the destructor or constructor, for example.  However, GCC and Microsoft's com
 notice nested calls (and in general it would be [extremely hard][halt] to prove they actually get called).
 
 [halt]: http://en.wikipedia.org/wiki/Halting_problem "About this hard"
+
+[^yeah]: Yes, another totally contrived example.
