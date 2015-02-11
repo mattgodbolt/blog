@@ -11,16 +11,16 @@
             <li class="has-dropdown">
             <a href="#">Tags</a>
             <ul class="dropdown">
-                [%- for label in sorted(allLabels) -%]
-                <li><a href="/[%= label.filename %]">[%= label.name %]</a></li>
+                [%- for l in sorted(allLabels) -%]
+                <li><a href="/[%= l.filename %]">[%= l.name %]</a></li>
                 [%- end -%]
             </ul>
             </li>
             <li class="has-dropdown">
             <a href="#">Archive</a>
             <ul class="dropdown">
-                [%- for label in sorted(allLabels) -%]
-                <li><a href="/[%= label.filename %]-archive">[%= label.name %]</a></li>
+                [%- for l in sorted(allLabels) -%]
+                <li><a href="/[%= l.filename %]-archive">[%= l.name %]</a></li>
                 [%- end -%]
             </ul>
             </li>

@@ -22,7 +22,11 @@
 [%- include "topbar.html" -%]
 <div class="row">
     <div class="small-12 columns">
+[%- if label -%]
+        <h2>Archive &#8212; [%= label.name %]</h2>
+[%- else -%]
         <h2>Archive</h2>
+[%- end -%]
 [%- for article in articles -%]
 [%- if article.dateMonthPrev != article.dateMonth -%]
 [%- if article.dateMonthPrev != "" -%]
