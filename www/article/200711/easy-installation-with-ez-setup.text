@@ -5,8 +5,8 @@ Summary: ez_setup: the quick and easy way to install new python libraries.
 
 A follow on from my previous "[cool things about Python][prev]", there's another cool thing
 you might not have known about.  Almost all python packages are available at the
-[Cheeseshop][] in Python EGG files (geddit?), and the easiest way to install them is using
-[setuptools][]'s [ez_setup.py][ezsetup] bootstrap script.
+ [Cheeseshop][] in Python EGG files (geddit?), and the easiest way to install them is using
+ [setuptools][]'s [ez_setup.py][ezsetup] bootstrap script.
 
 [prev]: http://xania.org/200710/cool-python-things "previously on 'why Python is so great'"
 [cheeseshop]: http://pypi.python.org/pypi "the Python Cheeseshop.  It doesn't sell cheese"
@@ -14,7 +14,7 @@ you might not have known about.  Almost all python packages are available at the
 [ezsetup]: http://peak.telecommunity.com/dist/ez_setup.py "the ez_setup.py bootstrap file"
 
 This little 8K Python file is a little package manager a little like [Red Hat's][rh] [yum][] tool, or
-[Debian's][deb] [apt-get][apt] tool --- it will download, install and configure each python package you need.
+ [Debian's][deb] [apt-get][apt] tool --- it will download, install and configure each python package you need.
 
 [rh]: http://www.redhat.com/ "A big linux distro"
 [yum]: http://fedoraproject.org/wiki/Tools/yum "Yum package manager"

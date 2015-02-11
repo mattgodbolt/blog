@@ -37,9 +37,9 @@ was for my [MUD][] back at university.
 [MUD]: http://www.topmudsites.com/forums/mudinfo-TheMoog.html "Aah for the old days"
 
 This is all great, and they're pretty easy to use --- once you've worked out their many subtleties.  Firstly, the
-[documentation][doc] is *rubbish*.  There's no decent overview documentation, and some of the reference material
+ [documentation][doc] is *rubbish*.  There's no decent overview documentation, and some of the reference material
 is plain misleading.  After some email nagging from me, they've improved it a little, but they seem to have changed
-[the way they document return values][rv], making them almost as [confusing][conf] as they used to be.
+ [the way they document return values][rv], making them almost as [confusing][conf] as they used to be.
 
 [doc]: http://msdn.microsoft.com/en-us/library/aa365198(VS.85).aspx
 [rv]: http://blogs.msdn.com/oldnewthing/archive/2008/06/18/8612930.aspx "Honestly, it's so confusing"
@@ -93,7 +93,7 @@ completion key.
 [pqcs]: http://msdn.microsoft.com/en-us/library/aa365458(VS.85).aspx
 
 One final gotcha, and a bit of a "[wtf][]" moment:  When creating unassociated IO Completion Ports, watch out for the parameters to
-[CreateIoCompletionPort][cicp].  The first `HANDLE` you pass has to be `INVALID_HANDLE_VALUE`, whereas the second has to be `NULL`.
+ [CreateIoCompletionPort][cicp].  The first `HANDLE` you pass has to be `INVALID_HANDLE_VALUE`, whereas the second has to be `NULL`.
 You'd think if both `HANDLE`s were basically saying "no handle", convention would have it that they'd be the same, but no.  The
 only thing I can think of is that the second parameter is marked as "optional", so `NULL` is more appropriate, but it does make you
 wonder why `INVALID_HANDLE_VALUE` isn't `NULL`.  Seems it's [legacy reason][leg].

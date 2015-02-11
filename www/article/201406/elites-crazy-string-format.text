@@ -11,7 +11,7 @@ to post a playable version with the "Harmless" replaced by patching the Elite
 code.
 
 I naively thought this would be easy to achieve: I added a quick routine in
-[jsbeeb][] to search for a string in memory and looked for `Harmless`. No joy.
+ [jsbeeb][] to search for a string in memory and looked for `Harmless`. No joy.
 I tried a case-insensitive version. Likewise, no luck. This wasn't going to be
 as simple as I thought.
 
@@ -39,7 +39,7 @@ At this point I remembered that Ian Bell, co-creator of Elite, had posted up
 some old [disc images of the source code][source] of the tape version of Elite. It's not
 quite the same as this disc image I'm using, but it should be a good starting
 point. For ease of reading without firing up an emulator, he's also posted a
-[ZIP of the pertinent files as text][source_text].
+ [ZIP of the pertinent files as text][source_text].
 
 [source]: http://www.iancgbell.clara.net/elite/archive/a/a4080602.zip
 [source_text]: http://www.iancgbell.clara.net/elite/archive/a/a4080610.zip

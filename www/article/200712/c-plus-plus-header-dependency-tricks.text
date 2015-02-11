@@ -8,7 +8,7 @@ Keeping header file dependencies to a minimum in C++ is always a good idea.  The
 a great book on the subject --- John Lakos's [Large Scale C++ Design][lakos] --- but
 there's plenty of little tricks that aren't mentioned.  In this article I'm going to 
 discuss a handy trick I've discovered in reducing dependencies, particularly useful for
-[STL][] headers.
+ [STL][] headers.
 
 [lakos]: http://www.amazon.co.uk/Large-Scale-C-Software-Design-APC/dp/0201633620 "the best book I've found on real world C++ design"
 [stl]: http://www.sgi.com/tech/stl/ "the C++ Standard Template Library"

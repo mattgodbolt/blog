@@ -7,7 +7,7 @@ Summary: Discussing a couple of Python libraries designed for parsing real world
 Sometimes it's nice to be able to read the information of a website
 programmatically --- sometimes referred to as screen-scraping.  This is the
 kind of thing I knock up occasionally to do one-off things like "find all the
-[line painting][paul] companies in Torquay, outputting to a CSV" or "guess how many
+ [line painting][paul] companies in Torquay, outputting to a CSV" or "guess how many
 people have bought a particular title for [Xbox Live][xbox] by looking at the [high score tables][hsc]."
 
 [paul]: http://www.linemarkingservices.co.uk/ "LMS, Torquay.  Good at painting lines on roads"

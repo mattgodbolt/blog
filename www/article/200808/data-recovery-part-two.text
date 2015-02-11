@@ -23,8 +23,8 @@ The data recovery was achieved in the end by booting a '[backup][]'
 Windows 2000 
 ISO on [QEMU][], and then buying [R-Studio Data Recovery][rs] and 
 running that on the data.  A bit of a disappointment, but I ran out of 
-time either rolling my own or getting either [ScroungeNTFS][] or 
-[testdisk][] to work.
+time either rolling my own or getting either [ScroungeNTFS][] or
+ [testdisk][] to work.
 
 [backup]: http://thepiratebay.org "saved me a drive to the office to blag the MSDN version"
 [QEMU]: http://bellard.org/qemu/index.html "worked amazingly well - better than VMWare"

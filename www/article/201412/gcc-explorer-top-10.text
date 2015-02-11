@@ -5,9 +5,9 @@ Summary: Wondering which compilers I can retire from GCC Explorer
 Label: Coding
 
 I've had a post-it note on my computer for the over six months to upgrade the
-[GCC Explorer](http://gcc.godbolt.org) cluster to Ubuntu 14.04 from its
+ [GCC Explorer](http://gcc.godbolt.org) cluster to Ubuntu 14.04 from its
 current 12.04 setup. One issue I have is that newer
-[Clang](http://clang.llvm.org) versions only
+ [Clang](http://clang.llvm.org) versions only
 have pre-canned binaries for 14.04, and rather than have to build my own, I'd
 prefer to use those binaries.
 

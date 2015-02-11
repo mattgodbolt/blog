@@ -49,7 +49,7 @@ to bite us later on. Have a quick look and see if you can spot it.
 Got it? If so --- congratulations, go to the top of the class.
 
 If not, don't fret as you're in good company: Microsoft missed this in their
-[Windows Internet][wininet] (WinInet) API design too.
+ [Windows Internet][wininet] (WinInet) API design too.
 
 [wininet]: http://msdn.microsoft.com/en-us/library/aa383630(VS.85).aspx
 

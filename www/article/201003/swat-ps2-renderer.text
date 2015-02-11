@@ -11,6 +11,7 @@ The PS2 was a powerful but limited machine. Its speed at rendering to the screen
 As mentioned in the [introduction][intro], we were able to leverage Argonaut's existing PlayStation 2 technology, notably the code that ran Lego Bionicles and I-Ninja[^first]. This meant the most complicated parts had already been written --- notably the clipper which was a masterpiece of assembler by Carl Graham (co-designer of the [SuperFX chip][sfx]). The Xbox clipped geometry in hardware whereas the PS2 had to use software clipping, and would crash horribly if got it wrong and let it draw too far off the sides of the screen.
 
 [^first]: Argonaut had the first PlayStation 2 in the UK, and we developed a pretty complete demo of a game called "Cash on Delivery", which was a Crazy Taxi-like game. Sadly nothing came of it.
+
 [prev]: /201003/swat-xbox-renderer
 [intro]: /201002/developing-swat-gst-introduction
 [sfx]: http://en.wikipedia.org/wiki/Super_FX
@@ -113,6 +114,6 @@ The Xbox had an equivalent system, except instead of being a very expensive piec
 
 [PIX]: http://msdn.microsoft.com/en-us/library/ee417193(VS.85).aspx
 
-[Next time][next] I'll cover some of the other parts of the engine: the collision and AI.
+ [Next time][next] I'll cover some of the other parts of the engine: the collision and AI.
 
 [next]: /201004/swat-final-part

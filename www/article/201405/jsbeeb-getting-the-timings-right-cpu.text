@@ -252,7 +252,7 @@ that an instruction modifying the memory on a 1MHz peripheral can take many
 more cycles than it would otherwise seem to need.
 
 Let's take a specific example, from the legendary [Kevin Edwards'][ke]
-[Nightshade][ns]
+ [Nightshade][ns]
 protection. Here, Kevin uses a read-modify-write instruction on a 1MHz-bus
 attached timer register at `$fe48`. This register is the low 8 bits of a
 16-bit timer that counts down at 1MHz. Writing to the register replaces the
@@ -293,7 +293,7 @@ timing differences can cause wildly different interrupt behaviour too.
 Implementation details
 ----------------------
 
-[jsbeeb][] implements all the complex behaviour by "compiling" instructions from a
+ [jsbeeb][] implements all the complex behaviour by "compiling" instructions from a
 table of opcode side effects and knowledge of what addressing modes cause what
 kinds of memory accesses. A list of cycles where memory accesses is kept, and
 then an optimization pass is made: any memory accesses that are known not to

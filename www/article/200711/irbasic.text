@@ -7,7 +7,7 @@ Summary: An object-oriented BBC BASIC.
 You've probably noticed a trend in the [last][bbc1] [few][bbc2] [articles][bbc3].  I've actually stopped waxing
 lyrical about Python, and instead I've been going on about the innards of BBC BASIC V.
 I promised that I'd talk a bit about the old programs I had discovered and decoded using the
-[BBC BASIC detokeniser][detok].
+ [BBC BASIC detokeniser][detok].
 
 [bbc1]: http://xania.org/200711/bbc-basic-v-format "BBC BASIC part 1"
 [bbc2]: http://xania.org/200711/bbc-basic-line-number-format "BBC BASIC part 2"

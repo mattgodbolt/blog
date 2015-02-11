@@ -7,7 +7,7 @@ Status: Public
 In my [previous post][pp], I introduced a simple asynchronous HTTP request API
 which suffered from a quite major problem: it was impossible to cancel an
 in-progress request in a thread-safe manner. As it happens, the
-[Windows Internet][wininet] library suffers the same problem: though it's
+ [Windows Internet][wininet] library suffers the same problem: though it's
 hidden as desktop Windows doesn't re-use handle values. However, Windows CE and
 Windows Mobile do; and so this problem does affect these embedded OSes.
 
