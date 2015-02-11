@@ -1,11 +1,12 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-            "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en-GB">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="/style/site.css" type="text/css" media="all">
-  <link rel="stylesheet" href="/style/syntax.css" type="text/css" media="all">
-
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matt Godbolt's blog</title>
+    <link rel="stylesheet" href="/css/foundation.css" />
+    <link rel="stylesheet" href="/css/app.css" />
+    <link rel="stylesheet" href="/css/syntax.css" />
   <title>[%= title %] &#8212; Matt Godbolt&#8217;s blog</title>
 [%- if summary != "" -%]
   <meta name="description" content="[%= summary %]">
@@ -13,43 +14,44 @@
   <link rel="alternate" type="application/atom+xml"
         title="Atom (full content)" href="/feed">
   <link rev="made" title="Matt Godbolt" href="mailto:matt@godbolt.org">
-  <script type="text/javascript">
-    [%- include "updatepostingtime.js" -%]
-  </script>
-[%- include "common-headers.html" -%]
-</head>
-<body class="article">
-[%- include "title.html" -%]
+    <script src="/js/vendor/modernizr.js"></script>
+  </head>
+  <body>
+[%- include "topbar.html" -%]
 
-<div id="floatholder">
-<div id="content">
-<h2>[%= title %]</h2>
+<div class="row">
+    <div class="small-12 columns">
+        <h2>[%= title %]</h2>
 
-[%= contentHTML %]
-
-<p class="labels">
-Filed under:
-[%- for label in labels -%]
-<a href="/[%= label.filename %]">[%= label.name %]</a> 
-[%- end -%]
-</p>
-
-<p id="[%= basenameNAME %]_postingtime" class="postingtime">
-Posted at [%= dateHTML %].
-</p>
-
-<p><a href="[%= permalink %]" class="permalink">Permalink</a></p>
-
+        [%= contentHTML %]
+    </div>
 </div>
-<div id="sidebar">
-[%- include "sidebar.html" -%]
+<div class="row">
+    <div class="small-12 columns">
+        <div class="panel">
+            <div class="row">
+                <div class="medium-2 right columns"><a href="[%= permalink %]" class="permalink">Permalink</a></div>
+                <div class="medium-4 columns">
+                    Filed under:
+                    [%- for label in labels -%]
+                    <a href="/[%= label.filename %]">[%= label.name %]</a> 
+                    [%- end -%]
+                </div>
+                <div class="medium-6 columns postingtime" id="[%= basenameNAME %]_postingtime" class="postingtime">Posted at [%= dateHTML %].</div>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
-
-<script type="text/javascript">
-updatePostingTime("[%= basenameNAME %]_postingtime", "[%= dateISO %]");
-</script>
 
 [%- include "trailer.html" -%]
-</body>
+
+    <script src="/js/vendor/jquery.js"></script>
+    <script src="/js/foundation.min.js"></script>
+    <script>
+[%- include "updatepostingtime.js" -%]
+updatePostingTime("[%= basenameNAME %]_postingtime", "[%= dateISO %]");
+      $(document).foundation();
+    </script>
+[%- include "common-headers.html" -%]
+  </body>
 </html>

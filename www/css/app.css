@@ -1,0 +1,26 @@
+.top-bar {
+    background: #444499;
+}
+
+.footer p {
+    font-size: 85%;
+}
+
+pre {
+    overflow: auto;
+    overflow-y: hidden;
+    background-color: #f4f4f4;
+    margin: auto;
+    max-width: 40em;
+}
+
+div.codehilite {
+    padding: 0.25em;
+    margin-bottom: 1em;
+}
+
+.postingtime:before {
+    content: "\2015";
+    color: rgb(80%,80%,80%);
+    padding-right: 0.25em;
+}

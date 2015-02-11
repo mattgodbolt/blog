@@ -1,0 +1,48 @@
+<nav class="top-bar" data-topbar role="navigation">
+    <ul class="title-area">
+        <li class="name">
+        <h1><a href="/">Matt Godbolt's blog</a></h1>
+        </li>
+        <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+        <ul class="right">
+            <li class="has-dropdown">
+            <a href="#">Tags</a>
+            <ul class="dropdown">
+                [%- for label in sorted(allLabels) -%]
+                <li><a href="/[%= label.filename %]">[%= label.name %]</a></li>
+                [%- end -%]
+            </ul>
+            </li>
+            <li class="has-dropdown">
+            <a href="#">Archive</a>
+            <ul class="dropdown">
+                [%- for label in sorted(allLabels) -%]
+                <li><a href="/[%= label.filename %]-archive">[%= label.name %]</a></li>
+                [%- end -%]
+            </ul>
+            </li>
+            <li class="has-dropdown">
+            <a href="#">About</a>
+            <ul class="dropdown">
+                <li><a href="/MattGodbolt">About me</a></li>
+                <li><a href="mailto:matt@godbolt.org">Contact me</a></li>
+                <li><a href="http://www.linkedin.com/in/godbolt">
+                    <img src="http://www.linkedin.com/img/webpromo/btn_liprofile_blue_80x15.gif" width="80" height="15" alt="View Matt Godbolt's profile on LinkedIn" title="View Matt Godbolt's profile on LinkedIn"></a></li>
+            </ul>
+            </li>
+            <li class="has-form">
+            <div class="row collapse">
+                <div class="large-8 small-9 columns">
+                    <input type="text" placeholder="Find Stuff">
+                </div>
+                <div class="large-4 small-3 columns">
+                    <a href="#" class="alert button expand">Search</a>
+                </div>
+            </div>
+            </li>
+        </ul>
+    </section>
+</nav> 

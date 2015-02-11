@@ -1,10 +1,11 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-            "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en-GB">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="/style/site.css" type="text/css" media="all">
-
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/foundation.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/syntax.css" />
 [%- if label -%]
   <title>[%= label.name %] Archive &#8212; Matt Godbolt&#8217;s blog</title>
   <link rel="alternate" type="application/atom+xml"
@@ -15,14 +16,13 @@
   <link rel="alternate" type="application/atom+xml"
         title="Atom (full content)" href="/feed">
   <link rev="made" title="Matt Godbolt" href="mailto:matt@godbolt.org">
-[%- include "common-headers.html" -%]
-</head>
-<body class="archive">
-[%- include "title.html" -%]
-
-<div id="floatholder">
-<div id="content">
-<h2>Archive</h2>
+    <script src="js/vendor/modernizr.js"></script>
+  </head>
+  <body>
+[%- include "topbar.html" -%]
+<div class="row">
+    <div class="small-12 columns">
+        <h2>Archive</h2>
 [%- for article in articles -%]
 [%- if article.dateMonthPrev != article.dateMonth -%]
 [%- if article.dateMonthPrev != "" -%]
@@ -40,12 +40,21 @@
 [%- end -%]
 </dl>
 </div>
-</div>
-<div id="sidebar">
-[%- include "sidebar.html" -%]
-</div>
+
+    </div>
 </div>
 
 [%- include "trailer.html" -%]
-</body>
+
+    <script src="js/vendor/jquery.js"></script>
+    <script src="js/foundation.min.js"></script>
+    <script>
+[%- include "updatepostingtime.js" -%]
+[%- for article in articles -%]
+updatePostingTime("[%= article.basenameNAME %]_postingtime", "[%= article.dateISO %]");
+[%- end -%]
+      $(document).foundation();
+    </script>
+[%- include "common-headers.html" -%]
+  </body>
 </html>
