@@ -16,6 +16,7 @@ parsing.
 If the line numbers were stored naïvely in most significant byte/least significant byte (`HI/LO`)
 form, then the rather contrived line:
 
+    :::basic
     10 IF A=1 GOTO 139 ELSE GOTO 204
 
 would tokenise as[^expl]:

@@ -10,6 +10,7 @@ import codecs
 import ETL
 
 pygments.lexers.LEXERS['AsmLexer'] = ('asm_lexer', 'AsmLexer', ('asm',), ('*.asm',), ('text/asm'))
+pygments.lexers.LEXERS['BasicLexer'] = ('basic_lexer', 'BasicLexer', ('basic',), ('*.basic',), ('text/basic'))
 
 # TODO: make this a per-article and config thing
 defaultTimeZone = timezone('Europe/London')

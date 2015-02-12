@@ -55,6 +55,7 @@ an example of [Zawinski's Law of Software Envelopment][zaw] --- _"Every program 
 So, for a quick taster of IRBasic, let's define a class[^gerph].  Classes are semi-dynamic inasmuch as they're
 defined dynamically, and can be modified so long as there's no active instance of a class.
 
+    :::basic
     Class_BTree = FNRegisterClass("BTree")
     PROCAddField(Class_BTree,"data")
     PROCAddField(Class_BTree,"less")
@@ -64,6 +65,7 @@ defined dynamically, and can be modified so long as there's no active instance o
 As you can see, classes are defined using functions and procedure calls.  The Class_BTree is then
 a "handle" to the metadata of a class, and an instance can be created and used via code like:
 
+    :::basic
     tree = NEW Class_BTree
     PROCtree.Add("test")
 
@@ -71,6 +73,7 @@ Method calls are specially named procedures.  For a class `XX`, a method call of
 of `XX` is equivalent to calling `XX_YY` --- with the exception that within `XX_YY` there's a magic "this"
 pointer `@`.  There's also a constructor `XX_Construct` and destrutor `XX_Destroy`, for example:
 
+    :::basic
     DEF PROCBTree_Construct
     @.compare = FNnewString("BTree_CompareNumbers")
     ENDPROC
