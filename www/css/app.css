@@ -1,3 +1,20 @@
+.top-bar {
+    background: #444499;
+}
+
+.top-bar-section li:not(.has-form) a:not(.button) {
+    background: #444499;
+}
+
+.top-bar-section .has-form {
+    background: #444499;
+}
+
+.top-bar-section .button.alert {
+    background-color: #111133;
+    border-color: #ee9999;
+}
+
 .footer p {
     font-size: 85%;
 }
