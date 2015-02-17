@@ -10,6 +10,17 @@
     background: #444499;
 }
 
+.top-bar-section ul li {
+    background: #444499;
+}
+
+.top-bar-section .dropdown li:not(.has-form):not(.active) > a:not(.button) {
+    background: #444499;
+}
+.top-bar-section .dropdown li:not(.has-form):not(.active):hover > a:not(.button) {
+    background: #333333;
+}
+
 .top-bar-section .button.alert {
     background-color: #111133;
     border-color: #ee9999;
