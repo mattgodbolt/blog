@@ -30,6 +30,16 @@
     font-size: 85%;
 }
 
+img.pic-left {
+    float: left;
+    margin-right: 1rem;
+}
+
+img.pic-right {
+    float: right;
+    margin-left: 1rem;
+}
+
 pre {
     overflow: auto;
     overflow-y: hidden;

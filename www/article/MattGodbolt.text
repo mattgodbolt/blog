@@ -15,7 +15,7 @@ and then a fairly pitiful result like a Union Jack flag being drawn on the scree
 what I saw in it all --- but for me it was just the beginning!
 [speccie]: http://en.wikipedia.org/wiki/ZX_Spectrum "The Sinclair ZX Spectrum"
 
-<img width="162" height="130" align="left" alt="Onslaught!" src="http://www.stairwaytohell.com/lostandfound/Onslaught-scr.jpg" />
+<img width="162" height="130" class="pic-left" alt="Onslaught!" src="http://www.stairwaytohell.com/lostandfound/Onslaught-scr.jpg" />
 
 During my school years I met like-minded Richard Talbot-Watkins, and we started making little programs
 for our computers.  By now I'd upgraded to a BBC Master computer (via a [Spectrum +3][plus3]), and Rich
@@ -36,7 +36,7 @@ after school, I plumped for a Physics degree at [Exeter University][exeter].  Th
 
 [exeter]: http://www.ex.ac.uk/ "Exeter University Website"
 
-<img width="176" height="120" align="right" alt="Blurp!" src="http://xania.org/media/blurp-thumb.gif" />
+<img width="176" height="120" class="pic-right" alt="Blurp!" src="http://xania.org/media/blurp-thumb.gif" />
 
 The internet took up a lot of my time at Uni, but so did programming.  I continued developing software
 for my Acorn, creating or co-creating [IRC clients][IRClient], [Sega Master System emulators][miracle]
@@ -57,17 +57,18 @@ Out of Uni I started work at Argonaut Games.  There I worked on  several titles:
 
 * [Croc -- Legend of the Gobbos][Croc] --- where I worked on the PC port of this PSX classic.
 * [Red Dog -- Superior Firepower][RedDog] --- I was responsible for making the tool chain and programming the graphics engine.
-* <img height="128" align="right" alt="SWAT:GST" width="170" src="http://www.xbox.com/NR/rdonlyres/C9CFCBB1-AB6E-4501-A22D-50961765A6C8/0/ilmswatgst0010.jpg" />
+* <img height="128" class="pic-right" alt="SWAT:GST" width="170" src="/201002/swat-outdoor-scene.jpeg" />
   [SWAT Global Strike Team][SWAT] --- for which I co-developed a gaming framework which worked on
   Xbox, PS2 and was successfully ported to GameCube too.  The framework itself had a renderer with
   some pretty fancy lighting effects too, though as usual in the games industry they ended up not
   being used quite as well one might like!  The framework was also used on an unreleased comic-book game, Orchid.
-* Urban Chaos: Riot Response (previously known as Roll Call) --- which has now been taken on by [RockSteady Studios][rocksteady] for SCi.
+* [Urban Chaos: Riot Response][uc] (previously known as Roll Call) --- which has now been taken on by [RockSteady Studios][rocksteady] for SCi.
 
 [Croc]: http://www.kidsdomain.com/down/pc/croclegend.html "Croc: Legend of the Gobbos"
 [RedDog]: http://www.gamerankings.com/htmlpages2/198441.asp "Red Dog reviews"
 [SWAT]: http://www.gamerankings.com/htmlpages2/537529.asp "Review of SWAT:GST"
 [rocksteady]: http://www.rocksteadyltd.com/ "RockSteady Studios"
+[uc]: http://en.wikipedia.org/wiki/Urban_Chaos:_Riot_Response
 
 Sadly, all good things come to an end, and Argonaut folded at the end of 2004.
 Many things have been said about its sad demise, and I shan't add anything new to
@@ -105,7 +106,9 @@ that eventually became Google+.
 
 All good things come to an end, however. After two happy years at Google I moved on to try my hand at something quite different:
 I now work for a private trading company, DRW, and have been working there for
-over three years on fun and exciting (but somewhat secret) projects.
+over three years on fun and exciting (but somewhat secret) projects. DRW
+offered my family and me a fantastic opportunity to move to the United States,
+and we are now very happily based just outside of Chicago, Illinois.
 
 You can learn more about my working life at [my LinkedIn profile][linkedin]. 
 
@@ -129,7 +132,7 @@ it a go!
 [smse]: http://xania.org/miracle/miracle.html "A SMS emulator, but in your browser"
 [jsb]: http://bbc.godbolt.org/ "A Javascript BBC Micro emulator"
 
-<img width="200" height="187" align="right" alt="My lovely wife, Ness Godbolt" src="http://xania.org/media/NessGodbolt.jpg" />
+<img width="200" height="187" class="pic-right" alt="My lovely wife, Ness Godbolt" src="http://xania.org/media/NessGodbolt.jpg" />
 
 On the 21st of October 2005 I married my long-term girlfriend, Vanessa.  Through all the trials and tribulations
 of starting a business, she has been 100% behind me.  Ness and I met through a mutual friend a few years back,
