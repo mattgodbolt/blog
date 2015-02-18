@@ -1,0 +1,14 @@
+Even more compilers for GCC explorer
+Date: 2015-02-18 23:50:00
+Status: Public
+Summary: Yup, even more compilers
+Label: Coding
+
+As promised in the [last post](/201502/gcc-explorer-new-compilers) I've added
+GCC 4.9.2 to [GCC explorer][ge]. Also new is clang 3.5.1 and experimental builds of
+clang 3.6, and clang 3.7 -- all for x86.
+
+[ge]: http://gcc.godbolt.org/
+
+I meant to do a GCC 5.0 snapshot but I haven't gotten around to that yet;
+hopefully later in the week I'll have time.
