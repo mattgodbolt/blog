@@ -1,0 +1,57 @@
+Seasocks - a quick and easy websocket server in C++
+Date: 2015-03-14 04:30
+Status: Draft
+Summary: Drawing attention to another open source project of mine
+Label: Coding
+
+It just occurred to me that I've never blogged about [Seasocks][], which is
+one of the libraries I developed at [work][] and have open sourced.
+
+[Seasocks]: https://github.com/mattgodbolt/seasocks "A simple, embeddable, C++ HTTP and Websocket library"
+[work]: http://www.drw.com/
+
+Seasocks is a simple-to-use, lightweight, embeddable C++ library that
+implements HTTP and websockets. It has a simple way of serving static content
+and even some dynamic content, but its main raison d'être is for
+websocket-based command and control.
+
+It has no external library dependencies, and only requires C++11 features such
+as GCC 4.7 and above and Clang 3.4 already support.
+
+Serving static files is as simple as:
+
+    :::cpp
+    void serve() {
+        Server server(make_shared<PrintfLogger>();
+        server.serve("web", 9090);
+    }
+
+Websockets are a little more involved, but not a whole deal more. He's the
+skeleton of a chat client that simply broadcasts any input from a client to
+all other connected parties.
+
+    :::cpp
+    struct ChatHandler : WebSocket::Handler {
+        set<WebSocket *> connections;
+        void onConnect(WebSocket *socket) override 
+        { connections.insert(socket); }
+        void onData(WebSocket *, const char *data) override 
+        { for (auto c : connections) c->send(data); }
+        void onDisconnect(WebSocket *socket) override 
+        { connections.erase(socket); }
+    };
+
+    void chat() {
+        Server server(make_shared<PrintfLogger>());
+        server.addWebSocketHandler(
+            "/chat", make_shared<ChatHandler>());
+        server.serve("web", 9090);
+    }
+
+There are more [examples][] in the [source][Seasocks].
+
+[examples]: https://github.com/mattgodbolt/seasocks/blob/master/src/app/c/ws_test.cpp#L103
+
+There are other websocket libraries for C++ out there, but Seasocks has been
+the workhorse of our C++ command and control for over four years now and has
+proven to be a pretty reliable bit of software.
