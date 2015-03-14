@@ -1,11 +1,13 @@
 Seasocks - a quick and easy websocket server in C++
-Date: 2015-03-14 04:30
-Status: Draft
+Date: 2015-03-14 03:15
+Status: Public
 Summary: Drawing attention to an open source project of mine
 Label: Coding
 
-I'd like to draw attention to an open-source library that [we][work] open
-sourced a while ago: [Seasocks][] is a simple-to-use, lightweight, embeddable C++ library that
+I'd like to draw attention to an open-source library that I open
+sourced a while ago: [Seasocks][].
+
+[Seasocks][] is a simple-to-use, lightweight, embeddable C++ library that
 implements HTTP and websockets. It has a simple way of serving static content
 and even some dynamic content, but its main raison d'être is for
 websocket-based command and control.
