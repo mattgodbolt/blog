@@ -179,7 +179,7 @@ Getting the emulation cycle-perfect has been a very satisfying achievement.
 Thanks are due to [Ed Spittles][eds] for gathering real-world measurements,
 and Rich Talbot-Watkins for poring over technical documents and making spreadsheets of
 possible internal timing behaviour. It's all been worth it as we finally
-cracked Kevin's preotection system.
+cracked Kevin's protection system.
 
 [eds]: https://plus.google.com/107049823915731374389/posts
 
