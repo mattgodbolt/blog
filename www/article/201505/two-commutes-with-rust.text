@@ -164,7 +164,11 @@ This leads to nice code like:
   with those names. This is only needed if the compiler can't derive them
   itself.
 
-An example: (please excuse the bad highlighting)
+<style>
+.err { border: none !important }
+</style>
+
+An example:
 
     :::rust
     struct HitRecord<'a> {
