@@ -1,0 +1,207 @@
+Two commutes with Rust
+Date: 2015-05-21 18:40
+Status: Public
+Summary: Note and thoughts on Rust, having spent a couple of commutes playing with it
+Label: Coding
+
+Over the last couple of commutes to and from [work](http://drw.com) I've been
+playing with [Rust][], which went v1.0 over the weekend.
+
+[Rust]: http://www.rust-lang.org/ "A programming language, not an oxidised metal"
+
+Rust is touted as a systems language in the same vein as C, C++ and to a
+lesser extent, Google's [Go](http://golang.org/). It offers both high level
+abstractions like generic programming and object-orientism while also giving
+access to lower-level facilities like fine-grained memory allocation control
+and even inline assembly.
+
+Critically for me, it has a "only pay for what you use" mentality like C++, a
+well-sized standard library and runtime, and no garbage collection.  It's
+quite feasible to use Rust to make a "bare metal" system in (for example,
+ [Zinc](https://github.com/hackndev/zinc)).
+
+One of the novel things Rust brings to the table is its memory ownership
+semantics. Each allocation's lifetime is tracked by the compiler (with an
+occasional helping hand from the programmer). Passing references to objects
+invokes the "Borrow Checker" which makes sure nobody holds on to objects
+beyond their lifetime. This solves a lot of memory ownership issues (maybe all of them?)
+up front, in the compiler. I love this.
+
+Another nice feature is having proper, deterministic "destructors"
+that run when a variable binding goes out of scope. I miss this a lot in those
+times where I'm programming in a language other than C++.
+
+So I loved the sound of all this, but in order to see how it all fitted
+together in practice, I decided to port a C++ 
+[path tracer](http://en.wikipedia.org/wiki/Path_tracing) to Rust, and see how
+I'd get on. I'm fond of [smallpt](http://www.kevinbeason.com/smallpt/), a
+99-line C++ program that generates lovely images. While I was still at Google,
+I did the same experiment with the (then unreleased) Go language; and found
+the code generator lacking, and the development experience a little lacking.
+How would Rust fare?
+
+Pretty well!
+
+### First steps
+
+Firstly I hacked up a `Vec3d` class to do all the 3D maths needed. It was
+surprisingly easy to make a `struct`, and then add an `impl` to do all the
+operations I needed. As a bonus, by `impl`-ing the relevant `Add`, `Sub` etc
+`traits`, I was able to get things like `let a = b + c;` working for vectors.
+
+
+    :::rust
+    pub struct Vec3d {
+        pub x: f64,
+        pub y: f64,
+        pub z: f64
+    }
+    impl Vec3d {
+        pub fn dot(self, other: Vec3d) -> f64 {
+            self.x * other.x + 
+                self.y * other.y + 
+                self.z * other.z
+        }
+        ...
+    }
+    
+    impl Add for Vec3d {
+        type Output = Vec3d;
+    
+        fn add(self, other: Vec3d) -> Vec3d {
+            Vec3d { 
+                x: self.x + other.x,
+                y: self.y + other.y,
+                z: self.z + other.z 
+            }
+        }
+    }
+
+Source of the above
+[here](https://github.com/mattgodbolt/path-tracer/blob/7766105f785bc5e7b99ac2bb98a6a64d7d6ec5fc/src/path_tracer/vec3d.rs#L4),
+full source on [github](https://github.com/mattgodbolt/path-tracer).
+
+Immediate things I found:
+
+* Semicolons are important! The last thing after the semicolon is the return
+  value of a function. Accidentally putting a semicolon after the return value
+  will cause you a moment of confusion.
+* There's no ternary operators, but instead *everything* is an expression, so
+  you just put an `if` statement in the middle of your expression like : 
+  `a = if b > 1 { 1 } else { 2 }`.
+* Math functions are brought in by importing extra traits onto the
+  floating-point types. Thus you don't say `sqrt(x)` you say `x.sqrt()`. Which
+  is awesome. Traits are not only interface descriptions (and are used both
+  for generics and for virtual-method type dispatch), they also have the
+  ability to provide C#-like extension methods to existing types.
+* Traits need to be brought into scope to be active. It kinda makes sense, but
+  if you haven't `use foo::bar;` a trait into scope, it won't act, so any
+  extension methods it provides won't be there. This may lead to scratching of
+  the head and the saying of "but I called `foo.bar()` in this other Rust file
+  ok!"
+* `f64` is how you spell `double` in Rust.
+* Types must agree! `2.3 * 2` is an error, but `2.3 * 2.0` is not.
+* Casting is `foo as Type`, for example `x as f64`. Its operator precedence is
+  high, so you can safely write `3.141 * x as f64` (assuming `x` is an
+  integer or similar).
+* Rust is pretty intent on making you use `snake_case_names`; not a personal
+  preference of mine but I guess I'll get used to it.
+* Making an object type copyable means putting `#[derive(Clone,Copy)]` in
+  front of it. This took a while to work out...I didn't find much in the Rust
+  tutorial on this.
+* Don't put a hyphen in the name of your module (makes it impossible to `use`
+  as far as I can tell).
+* Packaging and modules are a little tricky, with `mod` introducing new
+  submodules and the build process keying off of this somehow to work out what
+  Rust files to compile. I'm still
+  getting my head around it but have found something that works well enough
+  for me for now.
+
+### Making pictures
+
+Once the Vec3d class was finished (and even had a simple test), I moved on to
+the body of the renderer. It was fairly simple to get up and running. Probably
+the trickiest part was remembering to type `cargo build` instead of `make`!
+
+Things I learned getting the first image rendered:
+
+* Rust is also opinionated on naming constants. You have to SHOUT them, lest
+  you get ticked off by the compiler.
+* Array syntax is odd: `let a = [Vec3d; 1024];` and they're always allocated on
+  the stack, which is fixed to be 2MB for the main thread. That made my 
+  1024x768x`Vec3d` array to store the results of the render dump core as the
+  stack overflowed. The solution is to use a `Vec` (the `std::vector` of Rust)
+  which puts its memory on the heap.
+* `match`, `if let` and their destructuring are *awesome* -- being able to return an
+  `Optional<T>` and then match and destructure it elsewhere.
+
+This leads to nice code like:
+
+    :::rust
+    let mut result : Option<HitRecord> = None;
+    for sphere in scene {
+        // if let will assign to 'dist' if the return of intersect
+        // matches "Some".
+        if let Some(dist) = sphere.intersect(&ray) {
+            // if we don't currently have a match, or if this hit
+            // is nearer the camera than an existing result, then
+            // update 'result' with this hit.
+            if match result { None => true,
+                              Some(ref x) => dist < x.dist) {
+                result = Some(HitRecord { 
+                    sphere: &sphere, dist: dist 
+                });
+            }
+        }
+    }
+
+* Explicit lifetimes are cool. In the example above I elided the lifetimes,
+  but it actually is part of a routine that accepts a reference to a slice
+  of spheres, and then returns an optional `HitRecord` that may refer to one
+  of those spheres. In C++ you'd just use a `Sphere *` and then be aware that
+  that pointer is only valid while the array of Sphere is. In Rust you have to
+  be explicit by tagging lifetimes with `'names`, then matching references up
+  with those names. This is only needed if the compiler can't derive them
+  itself.
+
+An example: (please excuse the bad highlighting)
+
+    :::rust
+    struct HitRecord<'a> {
+        sphere: &'a Sphere,
+        dist: f64
+    }
+
+    fn intersect<'a>(scene: &'a [Sphere], ray: &Ray) 
+        -> Option<HitRecord<'a>> {...}
+
+
+Here the lifetime indicator `'a` is used to show the sphere reference inside
+the `HitRecord` is only valid while the similarly-tagged `scene` slice is. The
+compiler will give an error if you try and let a `HitRecord` outlive the
+`scene` it came from.
+
+With all that in place I got my first image:
+
+<p class="picture">
+<img src="/201505/first-render.png" width="256" height="192"
+    alt="A beautiful picture"/>
+<br/>
+A little example of path tracing in action.
+</p>
+
+### Performance
+
+If you look at the assembly output of Rust (e.g. with [Rust explorer](https://rust.godbolt.org), you
+can see it's able to utilize the LLVM backend to do some impressive SSE2 code
+generation. Coupled with the "no allocations unless you ask for them", and no
+need to stop the world for garbage collection etc, it performs well.
+
+In my simplistic benchmark on my laptop during my commute, it performs the
+same (within a second or so)  as the `smallpt.c` compiled with `-O3 -fopenmp`, at least once I put in
+rudimentary threading to match the OpenMP implementation in `smallpt`. I'll
+run a longer test (and debug some IO slowdowns that are contributing to the
+difference) and post again with more information.
+
+All in all I'm extremely excited and I look forward to spending more time
+hacking on Rust!
