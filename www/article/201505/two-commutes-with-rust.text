@@ -147,7 +147,7 @@ This leads to nice code like:
             // is nearer the camera than an existing result, then
             // update 'result' with this hit.
             if match result { None => true,
-                              Some(ref x) => dist < x.dist) {
+                              Some(ref x) => dist < x.dist) } {
                 result = Some(HitRecord { 
                     sphere: &sphere, dist: dist 
                 });
