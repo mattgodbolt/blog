@@ -1,0 +1,75 @@
+The runtime performance of Rust for a simple path tracer
+Date: 2015-05-26 05:05
+Status: Public
+Summary: Some notes on Rust performance
+Label: Coding
+
+In my last [article](/201505/two-commutes-with-rust) I described my port of
+[smallpt](http://www.kevinbeason.com/smallpt/) to
+[Rust](http://www.rust-lang.org/).
+
+In this short post I'm updating with some performance figures. I'm really
+impressed; the Rust version really is as good as the C++ version! I tested on
+my home server, a [4-core 2.5GHz X3323](http://ark.intel.com/products/35336/Intel-Xeon-Processor-X3323-6M-Cache-2_50-GHz-1333-MHz-FSB),
+which was otherwise idle.
+
+Due to some stack limitations in Rust, the [Rust code](https://github.com/mattgodbolt/path-tracer/tree/b74e4c6d37ced6b865f85393dc2ff1d330f7c5c5) 
+bails out after 500 levels of recursion; so I modified smallpt to do the same.
+
+I ran smallpt like this:
+
+    $ g++ -O3 -ffast-math -march=native -fopenmp smallpt.c \
+      && time ./a.out 1024
+    Rendering (1024 spp) 100.00%
+    real    13m5.357s
+    user    51m56.112s
+    sys     0m0.303s
+
+And then I ran the rust code with:
+
+    $ cargo build --release \
+      && time cargo run --release -- -s 1024
+    Compiling path_tracer v0.1.0 (file:///home/matthew/path-tracer)
+    Running `target/release/path_tracer -s 1024`
+    Using 4 threads
+    Rendering (1024 spp) 99.8698%...
+    Writing output to 'image.ppm'
+    real    12m53.603s
+    user    51m17.749s
+    sys     0m0.323s
+
+The two output images are similar enough that I'm pretty sure I'm running them
+with equivalent settings:
+
+<p class="picture">
+<a href="/201505/rust.jpeg"><img src="/201505/rust-thumb.jpeg" width="256" height="192"
+    alt="A beautiful picture"/></a>
+<br/>
+The output of the Rust version.
+</p>
+
+<p class="picture">
+<a href="/201505/smallpt.jpeg"><img src="/201505/smallpt-thumb.jpeg" width="256" height="192"
+    alt="A beautiful picture"/></a>
+<br/>
+The output of the C++ version.
+</p>
+
+Pretty impressive: the Rust version is actually a tiny bit faster that the C++
+version. I double-checked that both the Rust and C++ version use all the CPUs
+on the machine too. If anything, the C++ compiler settings I used are more
+generous than those the LLVM backend is using for Rust!
+
+Now I just need to get my head around how the borrow checker works: I had some
+[great
+suggestions](http://www.reddit.com/r/rust/comments/36s136/two_commutes_with_rust/crhtfel?context=3)
+ on the [Rust subreddit](http://www.reddit.com/r/rust) but have been unable to
+ get the borrow checker to let me use them.
+
+ I plan on hacking more on the tracer, but I know myself too well to promise
+ anything. I've had a bunch of suggestions for
+ [zindex](https://github.com/mattgodbolt/zindex) (which I must blog about very
+ soon), [Seasocks](https://github.com/mattgodbolt/seasocks) and of course
+ [GCC Explorer](https://gcc.godbolt.org) and I will probably spend some time
+ on them. But you can't really beat the awesome feedback of working on a
+ renderer!

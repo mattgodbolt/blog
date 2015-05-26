@@ -209,3 +209,7 @@ difference) and post again with more information.
 
 All in all I'm extremely excited and I look forward to spending more time
 hacking on Rust!
+
+*UPDATE*: I've now written a [follow-up post](/201505/on-rust-performance)
+ on the performance numbers, having
+fixed a number of bugs in the Rust version.
