@@ -1,4 +1,4 @@
-zindex -- search your huge gzip files really quickly
+zindex - index and search large gzipped files quickly
 Date: 2015-05-27 13:15
 Status: Public
 Summary: Introducing a gzip searching tool, zindex
