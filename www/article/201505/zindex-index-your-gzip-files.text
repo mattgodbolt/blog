@@ -1,0 +1,84 @@
+zindex -- search your huge gzip files really quickly
+Date: 2015-05-27 13:15
+Status: Public
+Summary: Introducing a gzip searching tool, zindex
+Label: Coding
+
+We generate an awful lot of logs [at work][drw]. The application I work on
+outputs a large [JSON][] log line each time we make a decision, and we make a lot
+of decisions. We end up with many tens of gigabytes of JSON log file per
+machine per day.
+
+[drw]: http://www.drw.com/ "DRW - an awesome trading company. We're hiring!"
+[JSON]: http://json.org/
+
+All this is then gzipped, archived and placed into longer-term storage, accessible to
+me over NFS. If we need to do any diagnostics or answer historical questions about
+the decisions our software made, the main tools we used were `zgrep`
+and [`jq`][jq]. These are both irreplaceably awesome, but `zgrep` in particular
+understandably take a little while to run. The gzip file format does not in
+general[^1] support random access, and so `zgrep` is forced to decompress the
+entire file serially and then search each line.
+
+[jq]: https://github.com/stedolan/jq "jq - the best JSON tool there is"
+
+I thought there must be a better way, and when I discovered the
+[zran.c](https://github.com/madler/zlib/blob/v1.2.8/examples/zran.c)
+example in the zlib sources (a way to accelerate seeks inside gzipped
+files) I set to work on [zindex][].
+
+[zindex]: https://github.com/mattgodbolt/zindex "Index and search gzipped files"
+[^1]: It _is_ possible to create points in the gzip stream where one can later
+`seek()` to by resetting the state of the compressor and flushing it
+periodically. That wasn't an option in our case as the file archival
+process is not something I had the freedom to change.
+
+`zindex` creates an index on your gzipped files and then `zq` lets you quickly
+search that index. Not only does `zindex` create an index based on a
+configurable key per line, it also creates an acceleration structure to allow
+random access within an existing gzipped file. That makes it super fast to
+query and return the matching lines without the index itself being too large.
+
+Random access is afforded by a "checkpoint" of the decompressor's state being
+stored every few megabytes of data. Later on, this checkpoint can be used to
+re-initialise the decompressor to decompress from within the middle of the
+file. To read from a particular offset in the file, the nearest checkpoint
+before the required data is found, the decompressor initialized with its
+state, and then data decompressed and discarded until the required offset is
+found. This bounds the amount of time needed to read a file to be on average 
+the time taken to decompress half the checkpoint size's amount of data.
+Without checkpoints the average time is half the time needed to decompress the
+entire file.
+
+The index itself can be generated in a number of ways:
+
+* A field within the file. For example, the `n`th field of a CSV log line.
+* The output of a regular expression. For example `--regex 'id:([0-9]+)'` would search
+  for matches like `id:1234` and then the index would be built on the `1234`.
+* By piping each line to an external program and using its output as the
+  index. For example, piping each line through `jq` and generating matches for
+  each `orderId.id` in the `actions` array:
+  `"jq --raw-output --unbuffered '[.actions[].orderId.id] | join(\" \")'"`
+
+By default the index is created as `<FILENAME>.gz.zindex`, but this can be changed
+if (for example) your gzip file is on a read-only NFS share.
+
+Once the index is built, querying it is simple: run `zq` and pass it the path
+to the gzipped file and then whatever queries you want to make. `zq` will use
+the default index on a file unless told otherwise: it can also query by line
+number. I plan on adding support for multiple indices soon.
+
+Typical numeric indexes I have built are around 20% of the size of the
+compressed file size, which is to say around 4% of the uncompressed size.
+Indexing runs at around 50MB of compressed data per second (250MB/sec
+uncompressed). I suspect the limiting factor in my tests is NFS.
+
+Querying the index is pretty fast; taking on average 0.01s per query in my tests.
+
+Still to do are supporting multiple indices, and optimizing some cases where I
+can reuse the decompression state without rewinding and starting again.
+
+As you'd expect the source is available on [github][zindex] and I welcome
+patches. Ideas and bug reports are also welcomed. I hope to get a few things
+fixed up and then do a v1.0 release, complete with binaries: at the moment
+you'll need to build from source.
