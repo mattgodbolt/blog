@@ -1,0 +1,70 @@
+Further notes on Rust: a second look
+Date: 2015-06-01 14:00
+Status: Public
+Summary: After further experimentation with my path tracer, I hit some first issues
+Label: Coding
+
+Last time I looked at [Rust's performance vs C++ for a simple path tracer][last].
+Since then I've been further hacking on the source to get a little extra
+functionality, like partial rendering and merging (so I can try out some
+distributed rendering).
+
+[last]: /201505/two-commutes-with-rust
+
+I guess the honeymoon is over. I tried a bit of "simple" file
+manipulation, and I'm finding all sorts of trickinesses. In this post I
+am referring to [this version][tv] of path-tracer on GitHub. I'm sure by the time
+anyone reads this I'll have found workarounds, so check the 
+[most recent version](https://github.com/mattgodbolt/path-tracer) to
+see how I'm getting on.
+
+[tv]: https://github.com/mattgodbolt/path-tracer/tree/b6b51e64ea206fd3db3d659e123529af166a79ba
+[be]: https://github.com/mattgodbolt/path-tracer/blob/b6b51e64ea206fd3db3d659e123529af166a79ba/src/bin/merge.rs
+
+My path tracer can now spit out intermediate partial renders, each containing
+a set of samples, which are then merged together at the end. Although the
+image library I'm using for PNG support can probably do something similar, as an experiment I
+output my own simple text-based format of the form:
+
+    width height #samples
+    R G B R G B ... f64 triples each sample line 1
+    R G B R G B ... f64 triples each sample line 2
+    R G B R G B ... etc
+
+Generating the file is pretty simple, but loading it back again to merge it has
+been a major source of frustation. 
+
+My best effort is [here][be]. I welcome suggestions to improve it, notably:
+
+* I'm not quite sure when I'm borrowing, and when I'm copying. Although
+it's a toy example, I'd like to know!
+* `load_file` tries to be a good citizen and return an `io::Result<>`. That means it
+can use the `try!` macro. But there's a couple of `panic!`s in there I'd like to
+make into `Error`s, but I couldn't get the syntax right to make them...or else I
+need to make the whole routine return something else (then `try!` won't work?).
+I'm confused!
+* I've tried to use iterators as much as possible, but it seems by needing
+to split and then bunch up in 3s (for `R G B`) I've lost a bunch of flexibility.
+I couldn't see a way to take an `iterator<T>` and return `(T, T, T)` in threes
+in a tuple.
+* Lots of `unwrap`s() seems a bad smell. All that `unwrap().ok().unwrap()` nonsense to
+carve off the first line and treat it differently seems really ugly.
+Maybe I can use "match" here to make it more elegant.
+* Annoyingly I couldn't see how to make an `operator +=` for my `Vec3d` type.
+* Iterating over two same-sized `Vec<Vec<X>>` is awkward. Maybe I could do
+something smarter?
+
+More generally I found the cargo setup to make a package with two binaries
+very awkward, painting myself into a corner multiple times before realising if
+I just name things "correctly" and get rid of all my crap in Cargo.toml, it
+kinda "just works". Though now I need to run each binary by name in
+`cargo run --bin path_tracer --release -- my args here`.
+
+Anyway, I'm still liking Rust, but I think I need to get my head around how to
+use it more effectively. I've asked for help from [Phil Dawes][pd] (author of
+ [racer][] -- a Rust code completion tool), who works for the same company as me,
+so hopefully I'll be
+able to post a follow-up with improvements soon!
+
+[pd]: http://phildawes.net/blog/ "A thoroughly lovely bloke"
+[racer]: https://github.com/phildawes/racer "Awesome auto-complete for Rust"
