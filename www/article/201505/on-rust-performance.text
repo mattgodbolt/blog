@@ -2,7 +2,7 @@ The runtime performance of Rust for a simple path tracer
 Date: 2015-05-26 05:05
 Status: Public
 Summary: Some notes on Rust performance
-Label: Coding
+Label: Coding, Rust
 
 In my last [article](/201505/two-commutes-with-rust) I described my port of
 [smallpt](http://www.kevinbeason.com/smallpt/) to

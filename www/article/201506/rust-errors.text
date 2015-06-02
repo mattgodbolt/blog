@@ -2,7 +2,7 @@ Error handling in Rust
 Date: 2015-06-02 18:30
 Status: Public
 Summary: A pattern for handling errors in Rust
-Label: Coding
+Label: Coding, Rust
 
 [Previously](/201506/rust-second-look), I appealed for help with my little
 Rust path tracer.  Thankfully I had some help from [Phil Dawes][pd] and now at

@@ -2,7 +2,7 @@ Two commutes with Rust
 Date: 2015-05-21 18:40
 Status: Public
 Summary: Note and thoughts on Rust, having spent a couple of commutes playing with it
-Label: Coding
+Label: Coding, Rust
 
 Over the last couple of commutes to and from [work](http://drw.com) I've been
 playing with [Rust][], which went v1.0 over the weekend.

@@ -2,7 +2,7 @@ Further notes on Rust: a second look
 Date: 2015-06-01 14:00
 Status: Public
 Summary: After further experimentation with my path tracer, I hit some first issues
-Label: Coding
+Label: Coding, Rust
 
 Last time I looked at [Rust's performance vs C++ for a simple path tracer][last].
 Since then I've been further hacking on the source to get a little extra
