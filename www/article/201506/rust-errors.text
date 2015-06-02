@@ -1,0 +1,90 @@
+Error handling in Rust
+Date: 2015-06-02 18:30
+Status: Public
+Summary: A pattern for handling errors in Rust
+Label: Coding
+
+[Previously](/201506/rust-second-look), I appealed for help with my little
+Rust path tracer.  Thankfully I had some help from [Phil Dawes][pd] and now at
+least I "get" error handling, or at least I think I do!
+
+[pd]: http://phildawes.net/blog/ "A thoroughly lovely bloke"
+
+Rust made the brave decision to not support exceptions. Instead, a rich set of
+features are used to build more explicit error handling:
+
+* discriminated unions (somewhat confusingly called "enums")
+* return value annotation to say "must use"
+* macros to smooth their usage
+
+The only thing remotely
+exception-like is the last-resort "panic" that prints a diagnostic message and
+exits the current thread.
+
+Functions that can fail should return a 
+[`Result<T, E>`](https://doc.rust-lang.org/std/result/index.html) which itself is an enum
+holding either a return value of type `T` (wrapped in `Ok`), or an error of
+type `E` (which is wrapped in `Err`). Callers
+can then either `match` on the success (or otherwise), call `unwrap()` on
+the `Result` to turn it into its `T` (or panic if it was an error), or call
+one of the other convenience methods on `Result` (like `is_ok()`).
+
+The standard input/output routines all return `Result<T, io::Error>` so to
+open a file one might do one of the following:
+
+    :::rust
+    // this will panic if the file can't be opened
+    let file = File::open(&name).unwrap();
+
+    // this lets us check if the file opened ok
+    let file = match File::open(&name) {
+        // Error? Return from this function with the
+        // error.
+        Err(x) => return x,
+        // All ok? Get the file 
+        Ok(f) => f
+    };
+
+The pattern of returning the error to the caller if it's an error, or else
+unwrapping the return value and using it, is so common it is enshrined in a
+Rust macro, `try!`. The macro machinery expands
+[`try!(X)`](https://doc.rust-lang.org/std/macro.try!.html) into basically the
+same code as the `match` case above.
+
+One caveat: using `try!` only works if you're in a function whose return value
+is a `Result`. This first caught me out when copy/pasting examples from Stack
+Overflow into my `fn main()` function...the compiler errors were rather
+confusing.
+
+In my little path tracer's case I was interested in returning an error from
+the image merger's loader. In my [first attempt](https://github.com/mattgodbolt/path-tracer/commit/b6b51e64ea206fd3db3d659e123529af166a79ba)
+ I had rather punted on error handling, choosing instead to `panic!` on parse
+errors. I didn't like this, and now I return an error of my own.
+
+I was returning an `io::Result<PartialImage>` to propagate
+the `io::Result`s that the `try!` on the file routines would return on error. When it came
+to returning my own errors I was stuck: I couldn't
+work out how make my own `io::Result`s.
+
+[solution]: https://github.com/mattgodbolt/path-tracer/commit/2c56084c35520c7d46fa1944d4745e9be6bc8fef
+
+The [solution][] is to use my own error type, and then make it convertible from
+`io::Result`:
+
+    :::rust
+    enum ImageError {
+        IoError(io::Error),
+        BadFileError(String)
+    }
+
+    impl From<io::Error> for ImageError {
+        fn from(e: io::Error) -> ImageError {
+            ImageError::IoError(e)
+        }
+    }
+
+Once you know the trick of wrapping other librarys' error types in your own,
+it mostly makes sense.
+
+In a future post I hope to work out a nicer way of parsing the RGB triples
+using ranges.
