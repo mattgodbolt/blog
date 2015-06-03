@@ -1,0 +1,31 @@
+What abuse of compute resources looks like
+Date: 2015-06-03 01:50
+Status: Public
+Summary: What happens if you use work's computer resources
+Label: Coding, Rust
+
+With the partial image and seeding support in my [Rust path tracer][rpt], I
+was finally able to do what I had hoped...use some idle time on my work
+computers to render a "proper" number of samples.
+
+[rpt]: https://github.com/mattgodbolt/path-tracer
+
+<p class="picture">
+<a href="/201506/127k-samples.png"><img src="/201506/127k-samples-thumb.png" width="600" height="450"
+    alt="A pretty render"/></a>
+<br/>
+What 127,000 samples per pixel looks like.
+</p>
+
+Well, there you go then!
+
+Took just over an hour broken up into 1,000 jobs running at idle priority on
+work's compute cluster.
+
+Once I've finished stylistic tweaks to the Rust code, I'll put in explicit light
+tracing, which will speed it up considerably. Then I can start doing samples
+in the spectral space as well as the time and focus space, and get some really
+cool results, such as [Michael Fogleman][mf]'s [awesome Go path tracer][gpt].
+
+[mf]: http://www.michaelfogleman.com/
+[gpt]: https://github.com/fogleman/pt
