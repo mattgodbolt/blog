@@ -1,0 +1,145 @@
+Traits and trait objects
+Date: 2015-06-08 14:30
+Status: Public
+Summary: Learning more about the guts of Rust
+Label: Coding, Rust
+
+As I spend more time working with [Rust](http://www.rust-lang.org), I find
+myself hitting more edge cases, and ultimately into learning more about how
+Rust is implemented.
+
+This weekend I was working on
+[path-tracer](https://github.com/mattgodbolt/path-tracer), refactoring it to
+make shapes generic instead of always spheres, and adding explicit light
+sampling. While doing so I hit some unusual error messages, of the form:
+
+    the trait `renderable::Renderable` is not implemented 
+        for the type `renderable::Renderable`
+
+A somewhat confusing error message, I'm sure you'll agree. To understand what
+it means, one needs to understand the difference between traits, and trait
+objects.
+
+A trait is the specification of an interface. That interface can contain
+functions (both member, and non-member), types and constants. A simple
+example:
+
+    :::rust
+    pub trait Renderable {
+        fn intersect(&self, ray: &Ray) -> Option<f64>;
+    }
+
+Here we say something can be `Renderable` if it supports a member function
+called `intersect` taking a `Ray` and returning an optional double-precision
+floating point number.
+
+Later we may implement this trait for a concrete object, for example a sphere:
+
+    :::rust
+    struct Sphere { pos: Vec3d, radius: f64 }
+    impl Renderable for Sphere {
+        fn intersect(&self, ray: &Ray) -> Option<f64> {
+            ...
+        }
+    }
+
+There are two ways the trait can be used. The first is to accept it as a
+generic parameter:
+
+    :::rust
+    fn render<R: Renderable>(obj: &R) {
+        ...
+    }
+
+Here the `render` function works rather like a templated C++-function, and
+will be instantiated for each `R` type used. That is, it's roughly equivalent
+to:
+
+    :::cpp
+    // R must implement functions in "Renderable"
+    template<typename R> void render(const R &obj) {
+        ...
+    }
+
+(ith concepts lite, C++ will be able to restrict the `R` to being renderable
+soon.)
+
+Using traits generically is great -- the performance is excellent -- but of
+course there comes a time when you need to deal with a heterogenous collection
+of `Renderable`s at runtime. For example, if one has a scene made up of
+different types of object, each `render` call needs to be dispatched based on
+its runtime type. Enter the second way of using traits -- via trait objects:
+
+    :::rust
+    fn render(obj: &Renderable) {
+        ...
+    }
+
+Looks pretty much the same as the generic usage, right? Behind the scenes
+though, a lot has changed.  For a start, the compiler needs to have some kind
+of `vtable` around in order to dispatch calls to `Renderable::intersect` to
+the right implementation based on the concrete type of `obj`. So far this is
+similar to C++'s virtual method tables. However, where C++ embeds a pointer to
+the (one and only) `vtable` inside the object itself, Rust keeps it
+separately. This is to both to allow traits to be added to existing object and
+also to allow multiple independant implementations of a trait on an object.
+
+So, when it comes to calling a function that needs one of these `vtables`,
+under the hood Rust makes a `trait object` comprised of two pointers: one to
+the `obj`, and the other to the `vtable`. That trait object is what is passed
+to the function.
+
+So far so good: we get to choose between compile-time and runtime polymorphism
+with very similar syntax. Much nicer than C++ templates. But...there's a
+catch! In order for Rust to make a trait object, the trait must be ["Object
+Safe"][os]. In its simplest form, it means that the interface itself must have
+no generic arguments to any functions. Thus:
+
+[os]: http://huonw.github.io/blog/2015/01/object-safety/
+
+    :::rust
+    pub trait Foo {
+        fn bar<A>(o: &a);
+    }
+
+...is a valid trait, but cannot be made into a trait object and thus cannot be
+used for runtime polymorphism.
+
+But why?
+
+The `vtable` for `Foo` must somehow capture a function for every type of `A`
+you could supply. As the list of objects types that could be passed to `bar()`
+is not known, the compiler would have to do something like instantiate `bar()`
+for *every object type* and then make a `vtable` entry for each type! This is
+probably not even possible (I don't know how much stuff is baked into Rust
+crates during compilation).
+
+To put it into C++ terms, this would be like trying to write:
+
+    :::cpp
+    struct Foo {
+        virtual ~Foo() {}
+        template<typename A> virtual void bar(const A&) = 0;
+    };
+
+...which is [ill-formed](https://goo.gl/O7ZEpi) for basically the same reason!
+
+So...back to my original issue about the trait `Renderable` not being
+implemented by the type `Renderable`. Well, as you may have guessed by now,
+this is the error you might see if you've tried to use an object passed in as
+a trait as a trait object when the trait itself is not object safe. In my case
+I wanted to be able to find a random point on a renderable object, using a
+user-supplied random number generator:
+
+    :::rust
+    pub trait Renderable {
+        fn random_pos<R: Rng>(&self, r: &mut R) -> Vec3d;
+    }
+
+So far so good. My render method was generic on the `Renderable`, but somewhere
+in the body of the code I called another method that
+took a `&Renderable`. The compiler tries to construct a trait object to
+give to that method, and fails with the error described above. You
+can see the error in the [Rust Playground](http://is.gd/Ea2Kif).
+
+So, if you see this somewhat paradoxical error, now you know what it means!
