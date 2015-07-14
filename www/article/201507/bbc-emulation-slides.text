@@ -1,0 +1,20 @@
+BBC Emulation Slides
+Date: 2015-07-14 13:30
+Status: Public
+Summary: Slides on how to emulate a BBC Microcomputer in Javascript
+Label: Emulation
+
+Last year I gave a presentation at work on my favourite open source project,
+[jsbeeb](https://bbc.godbolt.org/) -- "Emulating a BBC Micro in Javascript".
+
+The slides are [now available online][slides]. Hopefully they
+make enough sense by themselves to be interesting. Please note that you can go
+both left/right and up/down: Some slides have more information if you go down.
+
+slides: https://mattgodbolt.github.io/bbc-micro-emulation/#/ "Emulating a BBC Micro in Javascript"
+
+The slides were made using [reveal](http://lab.hakim.se/reveal-js/) with a
+bit of custom work to get the 6502 assembly syntax highlighted.
+
+I'm hoping to get permission to release the video of my presentation too,
+which should make it a little easier to follow.
