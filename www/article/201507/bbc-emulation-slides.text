@@ -11,7 +11,7 @@ The slides are [now available online][slides]. Hopefully they
 make enough sense by themselves to be interesting. Please note that you can go
 both left/right and up/down: Some slides have more information if you go down.
 
-slides: https://mattgodbolt.github.io/bbc-micro-emulation/#/ "Emulating a BBC Micro in Javascript"
+[slides]: https://mattgodbolt.github.io/bbc-micro-emulation/#/ "Emulating a BBC Micro in Javascript"
 
 The slides were made using [reveal](http://lab.hakim.se/reveal-js/) with a
 bit of custom work to get the 6502 assembly syntax highlighted.
