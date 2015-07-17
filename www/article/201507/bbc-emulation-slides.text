@@ -16,5 +16,5 @@ both left/right and up/down: Some slides have more information if you go down.
 The slides were made using [reveal](http://lab.hakim.se/reveal-js/) with a
 bit of custom work to get the 6502 assembly syntax highlighted.
 
-I'm hoping to get permission to release the video of my presentation too,
-which should make it a little easier to follow.
+Update: I've just been given permission to release [the
+video](/201507/bbc-emulation-video).
