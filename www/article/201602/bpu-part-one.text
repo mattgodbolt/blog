@@ -20,7 +20,7 @@ in; so forgive the length of this post and the fact that it's the first in a ser
 
 So what's branch prediction? And what's static prediction?
 
-As you may know, modern processors have long pipelines comprised of
+As you may know, modern processors have long pipelines composed of
 Fetch / Decode / Execute / Retire[^simple] stages. An instruction is
 fetched, then decoded, then executed, and finally retired. This process is
 overlapped between adjacent instructions; so while one is retiring, the next
