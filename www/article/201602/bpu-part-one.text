@@ -1,0 +1,106 @@
+Static branch prediction on Intel processor since Westmere - part one
+Date: 2016-02-08 04:15
+Status: Draft
+Summary: Embarking on a branch prediction odyssey
+Label: Coding
+
+Over the last week or so I've been investigating the static branch prediction
+on modern Intel processors. A [thread][mst] on the excellent [Mechnical Sympathy][ms]
+mailing list got me thinking about it: a claim was made that static prediction
+is still used on Intel processors; and my understanding from 
+[Agner Fog's excellent resources][agner] is that newer Intel processors no
+longer do so.
+
+[ms]: https://groups.google.com/forum/#!forum/mechanical-sympathy
+[mst]: https://groups.google.com/forum/#!topic/mechanical-sympathy/UFscifOU8AQ
+[agner]: http://agner.org/optimize/
+
+This has led to quite an odyssey of understanding, which I'm still embroiled
+in; so forgive the length of this post and the fact that it's almost certainly
+the first in a series...
+
+So; first up - what's branch prediction? And what's static prediction?
+
+As you may know, modern processors have long pipelines comprised of
+(extremely simply), Fetch / Decode / Execute / Retire stages. An instruction is
+fetched, then decoded, then executed, and finally retired. This process is
+overlapped between adjacent instructions; so while one is retiring, the next
+is executing, the next is decoding and another is being fetched.
+
+On older CPUs these stages would be sequential, and so most instructions would
+take several cycles before the next even started, so pipelining is a big win.
+However, branches throw a spanner into the works: when a branch gets to the
+execution stage it changes what instruction will be executed next. This means
+anything in the Fetch and Decode stage needs to be thrown away -- wasted work!
+
+This is where branch prediction comes in: something ahead of even the Fetch
+stage makes a guess as to where the branches might be -- and in the case of
+conditional branches, whether they're going to be taken or not. This stage is
+the branch predictor (or branch prediction unit, BPU).
+
+The BPU has two jobs then: before the instruction stream has even been decoded
+it must make a guess whether there are any branches coming up. For
+unconditional branches, it makes a guess where the branch is going, and steers
+the fetcher accordingly. For conditional branches, it makes a guess whether
+the branch is going to be taken too.
+
+On Intel CPUs whose pipelines are far more complex and often have 10+ stages
+between the fetcher and the execution unit, the BPU's job is critical for
+performance. Intel have understandably put a lot of effort into making the BPU
+very good at its job. Older CPUs (Pentium M era) have been
+[reversed engineered][pm] to some extent, but Westmere and beyond haven't
+really been looked at.
+
+[pm]: http://www.ece.uah.edu/~milenka/docs/VladimirUzelac.thesis.pdf
+
+Intel processors fetch 16 bytes every cycle and can contain several branches.
+As best is understood, a cache-like structure called the Branch Target Buffer
+(BTB) is used to look up previous branch behaviour. Some number of bits of the
+current program counter are used to pick a set within the BTB, and then
+another subset of the bits is compared with the tags in each of the ways of
+the set. Any hits contain information about potential branches. Because there
+can be multiple matching branches in a set, some logic may have to pick the
+"first" encountered branch.  For conditional branches, a second system is used
+to predict the outcome. I won't go into too many details in this post.
+
+The guesses of the branch destination are sent on, and then in the decode
+stage, those guesses are checked against the actual decoded instruction
+stream. If a branch destination is wrong -- or if a non-branch was
+mis-guessed as a branch -- it's noted there, the BTB is corrected, and the
+fetchers are re-steered to the right destination.
+
+It's at this point the "static prediction" comes in: If the decoder spots a
+conditional branch that the BPU hadn't predicted, it has to re-steer
+the fetcher. As it's conditional, the decoder gets a chance to pick whether
+it's taken or not. This guess is a static prediction -- it was made based on
+static rules instead of any kind of knowledge about that particular branch.
+
+What might such a static prediction algorithm be? The most obvious is "predict
+not taken" -- just assume the fetcher should carry on to the instruction
+beyond the branch.
+
+Another sensible static prediction algorithm is to assume conditional branches
+to previous addresses are the branch at the end of a loop and so are more
+likely to be taken than not. Conditional branches forward are considered not
+taken. This latter algorithm is what the Pentium Ms and some earlier
+processors used, according to the documentation.
+
+A final choice is kind of not really a choice: instead use whatever prediction
+the dynamic "is it taken or not" predictor gives for this branch, even though
+it may know nothing about this branch.
+
+So, returning to the point in hand: I was reading the Mechanical Sympathy
+thread and -- having spent rather a long time reading about and thinking about
+this kind of thing -- I had an xkcd moment:
+
+<p class="picture">
+<a href="https://xkcd.com/386/">
+<img src="http://imgs.xkcd.com/comics/duty_calls.png" width="300" height="330"
+ alt="Someone is wrong on the internet"/>
+</a>
+<br/>Thanks to xkcd and its awesome CC license (by-nc 2.5)
+</p>
+
+And so began a long process of me trying to work out what type of static
+prediction modern processors use. Over the next few days I'll blog about how I
+went about this, and what I found.
