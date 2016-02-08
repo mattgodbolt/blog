@@ -1,5 +1,5 @@
-Static branch prediction on Intel processor since Westmere - part one
-Date: 2016-02-08 04:15
+Static branch prediction on newer Intel processors
+Date: 2016-02-08 04:45
 Status: Draft
 Summary: Embarking on a branch prediction odyssey
 Label: Coding
@@ -16,22 +16,25 @@ longer do so.
 [agner]: http://agner.org/optimize/
 
 This has led to quite an odyssey of understanding, which I'm still embroiled
-in; so forgive the length of this post and the fact that it's almost certainly
-the first in a series...
+in; so forgive the length of this post and the fact that it's the first in a series...
 
-So; first up - what's branch prediction? And what's static prediction?
+So what's branch prediction? And what's static prediction?
 
 As you may know, modern processors have long pipelines comprised of
-(extremely simply), Fetch / Decode / Execute / Retire stages. An instruction is
+Fetch / Decode / Execute / Retire[^simple] stages. An instruction is
 fetched, then decoded, then executed, and finally retired. This process is
 overlapped between adjacent instructions; so while one is retiring, the next
 is executing, the next is decoding and another is being fetched.
 
-On older CPUs these stages would be sequential, and so most instructions would
+[^simple]: This of course is a huge simplification as this post is already getting gargantuan. Modern Intels have probably 10-15 cycles' worth of cycles in its front end before it even reaches the even-more-complex Out-Of-Order system. If your interest is piqued in this, check out my <a href="https://www.youtube.com/watch?v=hgcNM-6wr34">YouTube video</a> on the subject.
+
+On older CPUs these stages would be sequential[^six]: most instructions would
 take several cycles before the next even started, so pipelining is a big win.
 However, branches throw a spanner into the works: when a branch gets to the
 execution stage it changes what instruction will be executed next. This means
 anything in the Fetch and Decode stage needs to be thrown away -- wasted work!
+
+[^six]: Though even the simple (but awesome) 6502 had a very simple pipeline where the fetch of the next instruction was overlapped with the execution of the previous.
 
 This is where branch prediction comes in: something ahead of even the Fetch
 stage makes a guess as to where the branches might be -- and in the case of
