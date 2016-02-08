@@ -52,7 +52,7 @@ between the fetcher and the execution unit, the BPU's job is critical for
 performance. Intel have understandably put a lot of effort into making the BPU
 very good at its job. Older CPUs (Pentium M era) have been
 [reversed engineered][pm] to some extent, but Westmere and beyond haven't
-really been looked at.
+really been looked at[^hmm].
 
 [pm]: http://www.ece.uah.edu/~milenka/docs/VladimirUzelac.thesis.pdf
 
@@ -68,6 +68,8 @@ can be multiple matching branches in a set, some logic may have to pick the
 "first" encountered branch.  For conditional branches, a second system is used
 to predict the outcome. I won't go into too many details about this part in this post.
 
+[^hmm]: Though a friend has told me there's some research in a paper I haven't yet been able to get hold of: "Shah Mohammad Faizur Rahman, Zhe Wang, and Daniel A. Jiménez, "Studying Microarchitectural Structures with Object Code Reordering", Proceedings of the 2009 Workshop on Binary Instrumentation and Applications (WBIA), December, 2009."
+
 The guesses of the branch destination are sent on, and then in the decode
 stage, those guesses are checked against the actual decoded instruction
 stream. If a branch destination is wrong -- or if a non-branch was
@@ -75,9 +77,9 @@ mis-guessed as a branch -- it's noted there, the BTB is corrected, and the
 fetchers are re-steered to the right destination.
 
 It's at this point the "static prediction" comes in: If the decoder spots a
-conditional branch that the BPU hadn't predicted, it has to re-steer
-the fetcher. As it's conditional, the decoder gets a chance to pick whether
-it's taken or not. This guess is a static prediction -- it was made based on
+branch that the BPU hadn't predicted, it has to re-steer
+the fetcher. If it's a conditional, the decoder gets a chance to pick whether
+it's predicted taken or not. This guess is made based on
 static rules instead of any kind of knowledge about that particular branch.
 
 What might such a static prediction algorithm be? The most obvious is "predict
