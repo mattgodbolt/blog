@@ -1,6 +1,6 @@
 Static branch prediction on newer Intel processors
 Date: 2016-02-08 04:45
-Status: Draft
+Status: Public
 Summary: Embarking on a branch prediction odyssey
 Label: Coding
 
@@ -56,7 +56,7 @@ really been looked at[^hmm].
 
 [pm]: http://www.ece.uah.edu/~milenka/docs/VladimirUzelac.thesis.pdf
 
-Intel processors fetch blocks of 16 bytes every cycle and each block 
+Intel processors fetch instructions in blocks of 16 bytes every cycle and each block 
 can contain several branches.
 As best is understood, a cache-like structure called the Branch Target Buffer
 (BTB) is used to look up previously-seen  branches. Just like a memory cache, 
@@ -110,4 +110,4 @@ this kind of thing -- I had an xkcd moment:
 
 And so began a long process of me trying to work out what type of static
 prediction modern processors use. Over the next few days I'll blog about how I
-went about this, and what I found.
+went about this, and what I've found so far.
