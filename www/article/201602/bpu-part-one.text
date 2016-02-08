@@ -56,15 +56,17 @@ really been looked at.
 
 [pm]: http://www.ece.uah.edu/~milenka/docs/VladimirUzelac.thesis.pdf
 
-Intel processors fetch 16 bytes every cycle and can contain several branches.
+Intel processors fetch blocks of 16 bytes every cycle and each block 
+can contain several branches.
 As best is understood, a cache-like structure called the Branch Target Buffer
-(BTB) is used to look up previous branch behaviour. Some number of bits of the
+(BTB) is used to look up previously-seen  branches. Just like a memory cache, 
+the BTB has a number of sets, and each set has a number of ways. Some number of bits of the
 current program counter are used to pick a set within the BTB, and then
 another subset of the bits is compared with the tags in each of the ways of
-the set. Any hits contain information about potential branches. Because there
+the set. Any hits found contain information about potential branches. Because there
 can be multiple matching branches in a set, some logic may have to pick the
 "first" encountered branch.  For conditional branches, a second system is used
-to predict the outcome. I won't go into too many details in this post.
+to predict the outcome. I won't go into too many details about this part in this post.
 
 The guesses of the branch destination are sent on, and then in the decode
 stage, those guesses are checked against the actual decoded instruction
