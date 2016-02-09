@@ -1,0 +1,138 @@
+Branch prediction - part two
+Date: 2016-02-09 14:45
+Status: Draft
+Summary: First results of BPU behaviour
+Label: Coding, Microarchitecture
+
+I'm in the middle of an investigation of the branch predictor on newer Intel
+chips. Read [the previous article][prev] to get some background.
+
+[prev]: /201602/bpu-part-one "Last time on Matt investigates BPUs"
+
+Where I left off I'd just decided to look into static prediction myself. I've
+previously used [Agner Fog's tools][aft] to do these kinds of investigations,
+and so that was my first stop.
+
+[aft]: http://agner.org/optimize/
+
+Agner's tools install a kernel module to give user-mode access to the hardware
+performance monitoring counters inside the Intel chips. Each CPU has four
+counters that can be used to count one of a number of internal CPU events.
+Agner's tools then run micro-benchmarks while counting the various internal
+things going on inside the processor. This seems perfect for us!
+
+Each CPU microarchitecture has a different set of counters available, so the
+first stop was to pick a CPU and choose the counters. As a starting point for
+my investigations I picked my laptop's CPU -- an Arrendale CPU (Core(TM) i5
+CPU M 520 @ 2.40GHz). This is a mobile version of the Westmere chip. Later I'd
+run similar investigations on other CPUs.
+
+Digging out the docs ([Intel Architectures Software Developer Manual Volume
+3B, part 2][3b], pages 362-393), there's a bewildering array of
+useful-sounding counters.
+
+[3b]: http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3b-part-2-manual.pdf
+
+Back to Agner's tools and my plan for the test started to form: I would write
+a series of microbenchmarks with:
+
+  * Forward branches that were not taken
+  * Backward branches that were not taken
+  * Forward branches that were taken
+  * Backward branches that were taken
+
+Within each microbenchmark I'd count the number of instructions and branch
+mispredictions (and some other useful-sounding counters). The expectation is
+that on the first run of the benchmark we would see a number of
+mispredictions, as the Branch Target Buffer (BTB) would miss for every branch.
+Then the decoder would be the first to spot the branch, and it has a choice as
+to whether it re-steers the fetcher to the branch destination or not. Either
+way, once the instruction retires we get to see if the decoder made the right
+guess or not.
+
+The expectation is if the decoder assumes the branch is not taken, then we
+should see no mispredictions for forward-not-taken and backward-not-taken, but
+we should see pretty much a 100% misprediction rate for the taken cases.
+
+If the decoder assumes backwards branches are loops and are likely to be
+taken, then we'd expect forward-not-taken and backwards-taken to have no
+mispredicts, and the other two cases would be close to 100% misprediction
+rate.
+
+After a number of false starts with Agner's set-up (and noting that some of
+his counter definitions seem to be incorrect for Westmere/Arrendale), I had
+some initial results. The test was 1000 back-to-back branches:
+
+### Arrendale
+| Test |   Instructions |   Mispredictions |
+|------|:--------------:|:----------------:|
+| Ahead NT |   1501707 | 3 |
+| Behind NT |  1501707 | 1011 |
+| Ahead Taken | 1301707 | 1003 |
+| Behind Taken |   900507 | 2 |
+
+Pretty compelling evidence for loop-style static prediction here![^yo]
+
+[^yo]: The misprediction number being above 1000 in some cases is an artifact of some branches around the outside of the test setup.
+
+I ran the same test on an Ivy Bridge (E5-2667 v2) and a Haswell (E5-1650 v3):
+
+### Ivy Bridge
+| Test |   Instructions |   Mispredictions |
+|------|:--------------:|:----------------:|
+| Ahead NT |   1501707 | 374 |
+| Behind NT |  1501707 | 114 |
+| Ahead Taken |1301707 | 818 |
+| Behind Taken |   900507 | 297 |
+
+### Haswell
+| Test |   Instructions |   Mispredictions |
+|------|:--------------:|:----------------:|
+| Ahead NT  |  1501707 | 133 |
+| Behind NT |  1501707 | 119 | 
+| Ahead Taken | 1301707 | 1123 |
+| Behind Taken  |  900507 | 1086 |
+
+Here the evidence is a little more puzzling. The Ivy seems to weakly predict
+ahead as not taken, but there's enough variability to make me wonder if
+something else is going on. For Haswell it seems no branch is ever predicted
+as taken. Interesting, and worth more investigation.
+
+The full results -- including some notes I made and the other counters -- are
+available in a [Google Sheet][gs].
+
+[gs]: https://docs.google.com/spreadsheets/d/1GuyiHF3NCxjzI3Ag53U-Z6Ucau4hjrEb6Bp0hZb_kBU/edit#gid=0 "The fruits of my labour. Mmmm labour-fruits"
+
+By this point I had resolved to improve upon Agner's tools which are a little
+finicky and easy to misuse. To that end I branched his code and started on a
+little refactoring.  That refactored code is available on GitHub as the
+ [agner](https://github.com/mattgodbolt/agner) project. The Google Sheet link
+above links to the git hash of the exact point at which the data was
+collected, should you wish to try reproducing.
+
+So: job done? Seems the Arrendale does static prediction of loop-like
+branches, but newer Intels don't, so case closed?
+
+Not quite.
+
+Agner's tests run each microbenchmark multiple times, back-to-back. By default
+10 iterations are performed. Obviously, once the BPU has learned about
+the whereabouts of each branch, the misprediction rate drops to essentially
+zero. This was useful initially in ensuring I was using the right counters:
+after the first iteration the misprediction rate ought to drop to zero.
+
+But then I thought I should be able to "scramble" the BPU in-between
+iterations to get a consistent misprediction rate on each iteration. I wrote
+some code (`ScrambleBTB`) to flood the CPU with loads of branches in an effort
+to evict the whole BTB. This I placed between iterations (but outside of the
+counter regions).
+
+To my surprise it took a lot more effort than I thought to make the routine
+effective: and I'm still not quite sure what is actually required to trick the
+BTB properly.
+
+In order to find out what's going on, I decided to further lift the lid and
+try and work out the size, arrangment and eviction policies of the BTB in my
+Arrendale.
+
+More on that next time though!

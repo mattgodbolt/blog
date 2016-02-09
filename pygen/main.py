@@ -468,7 +468,7 @@ def GenerateArticleIndices(globalData, label):
 
 def Generate(forceGenerate):
     globalData = GlobalData()
-    ReadGeneratorConfig("../conf/generator.conf", globalData)
+    ReadGeneratorConfig("generator.conf", globalData)
     
     CheckConfig(globalData)
     if forceGenerate:
@@ -510,6 +510,6 @@ def Generate(forceGenerate):
     print "Done"
         
 if __name__ == "__main__":
-    os.chdir(r'../conf')
+    os.chdir(os.path.join(os.path.realpath(os.path.dirname(__file__)), r'../conf'))
     Generate(False)
     
