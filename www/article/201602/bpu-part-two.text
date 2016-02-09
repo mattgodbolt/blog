@@ -1,6 +1,6 @@
 Branch prediction - part two
 Date: 2016-02-09 14:45
-Status: Draft
+Status: Public
 Summary: First results of BPU behaviour
 Label: Coding, Microarchitecture
 
@@ -33,7 +33,7 @@ useful-sounding counters.
 
 [3b]: http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3b-part-2-manual.pdf
 
-Back to Agner's tools and my plan for the test started to form: I would write
+Back to Agner's tools and my plan for the test started to form -- I would write
 a series of microbenchmarks with:
 
   * Forward branches that were not taken
@@ -132,7 +132,7 @@ effective: and I'm still not quite sure what is actually required to trick the
 BTB properly.
 
 In order to find out what's going on, I decided to further lift the lid and
-try and work out the size, arrangment and eviction policies of the BTB in my
+try and work out the size, arrangement and eviction policies of the BTB in my
 Arrendale.
 
 More on that next time though!

@@ -111,3 +111,5 @@ this kind of thing -- I had an xkcd moment:
 And so began a long process of me trying to work out what type of static
 prediction modern processors use. Over the next few days I'll blog about how I
 went about this, and what I've found so far.
+
+Next: [some results](/201602/bpu-part-two).
