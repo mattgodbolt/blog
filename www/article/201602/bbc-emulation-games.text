@@ -1,0 +1,44 @@
+BBC Micro games
+Date: 2016-02-17 14:45
+Status: Draft
+Summary: Some stats on emulated games
+Label: Emulation
+
+A quick one this. Last night while I ought to be doing more
+ [micro-architecture research][ma] I was instead reading the Wikipedia
+article on [Beebdroid][bd].
+
+[ma]: /Microarchitecture-archive
+[bd]: https://en.wikipedia.org/wiki/Beebdroid "A fab emulator by my pal Reuben"
+
+I noticed it had the top 20 played games...and I thought I'd do the same for
+[jsbeeb](https://bbc.godbolt.org/).
+
+So for the period 1st January 2015 to 16th February 2016, the top 20 disc images
+loaded from the "Stairway to Hell" archive are:
+
+| Image | Number of loads | Percentage |
+|-------|:---------------:|:----------:|
+| 10OfTheBestGames | 374 | 4.00% |
+| Elite | 318 | 3.40% |
+| 2002 | 192 | 2.06% |
+| Airwolf | 128 | 1.37% |
+| 3DPool | 123 | 1.32% |
+| Exile | 117 | 1.25% |
+| Elite-v1.0_B | 111 | 1.19% |
+| 3DBombAlley | 101 | 1.08% |
+| Elite-MasterAndTubeEnhanced | 99 | 1.06% |
+| Arcadians | 84 | 0.90% |
+| ChuckieEgg | 84 | 0.90% |
+| 180Darts | 82 | 0.88% |
+| Repton | 81 | 0.87% |
+| 3DGrandPrix | 78 | 0.83% |
+| Frak | 72 | 0.77% |
+| 10OfTheBestEducation_B | 72 | 0.77% |
+| 3DConvoy | 68 | 0.73% |
+| Pacman | 67 | 0.72% |
+| CastleQuest | 65 | 0.70% |
+| 1984 | 61 | 0.65% |
+
+Interesting, eh? I can only guess "100OfTheBestGames" is because it appears at the
+top of the list if you don't filter it. Likewise "2002" is near the top.
