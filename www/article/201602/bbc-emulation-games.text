@@ -1,7 +1,7 @@
-BBC Micro games
-Date: 2016-02-17 14:45
-Status: Draft
-Summary: Some stats on emulated games
+jsbeeb top 20 images
+Date: 2016-02-17 15:24
+Status: Public
+Summary: Some stats on emulated images
 Label: Emulation
 
 A quick one this. Last night while I ought to be doing more
@@ -40,5 +40,9 @@ loaded from the "Stairway to Hell" archive are:
 | CastleQuest | 65 | 0.70% |
 | 1984 | 61 | 0.65% |
 
-Interesting, eh? I can only guess "100OfTheBestGames" is because it appears at the
-top of the list if you don't filter it. Likewise "2002" is near the top.
+Interesting, eh? I can only guess "100OfTheBestGames" and "2002" are so
+popular because they appear near the top of the image picker dialog if
+you don't filter it.
+
+For what it's worth this doesn't include all the hits to the built-in Elite
+image. That numbers 8,500 hits over the same period.
