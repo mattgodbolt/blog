@@ -167,9 +167,6 @@ def CheckConfig(globalData):
             
     IsDir("ArticleDirectory")
     IsPresent("ArticleURLPrefix")
-    CreateDummy("RenderTitlePipeline")
-    CreateDummy("RenderHTMLPipeline")
-    CreateDummy("RenderXHTMLPipeline")
     IsFile("ArticleTemplate")
     
     if not CreateDummy("FrontPageTemplate"):
