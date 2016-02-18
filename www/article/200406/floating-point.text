@@ -12,7 +12,7 @@ explains why and how all those things happen, as well as being an excellent
 grounding in all things floating point.
 
 When you work on systems with retarded
-FPUs (read: ps2) this kind of thing is nice to know, even if it's actual usage
+FPUs (read: ps2) this kind of thing is nice to know, even if its actual usage
 is academic!
 
 Ok, not strictly C++ specific, but still interesting, and of relevance if you do
