@@ -24,7 +24,14 @@
     <div class="small-12 columns article">
         <h2>[%= article.title %]</h2>
 
-        [%= article.contentHTML %]
+        [%= article.introHTML %]
+        [%- if article.introHTML != article.contentHTML -%]
+        <div class="more">
+            <div class="medium-12 columns">
+                <p align="center"><a href="[%= article.permalink %]" class="permalink">Read more...</a></p>
+            </div>
+        </div>
+        [%- end -%]
     </div>
 </div>
 <div class="row">

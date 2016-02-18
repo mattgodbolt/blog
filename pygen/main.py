@@ -8,9 +8,11 @@ from cache import Cache, SqlBackend
 from pytz import timezone, utc
 import codecs
 import ETL
+from precis import PrecisExtension
 
 pygments.lexers.LEXERS['AsmLexer'] = ('asm_lexer', 'AsmLexer', ('asm',), ('*.asm',), ('text/asm'))
 pygments.lexers.LEXERS['BasicLexer'] = ('basic_lexer', 'BasicLexer', ('basic',), ('*.basic',), ('text/basic'))
+
 
 # TODO: make this a per-article and config thing
 defaultTimeZone = timezone('Europe/London')
@@ -74,6 +76,7 @@ class Article:
         self.Via = ""
         self.ArticleText = ""
         self.HtmlText = ""
+        self.HtmlIntro = ""
         self.XHtmlText = ""
         self.RawTitle = ""
         self.Title = ""
@@ -85,6 +88,7 @@ class Article:
         name = name.lower()
         if name == "title": return self.Title
         elif name == "contenthtml": return self.HtmlText
+        elif name == "introhtml": return self.HtmlIntro
         elif name == "contentxhtml": return self.XHtmlText
         elif name == "basename": return self.BaseName
         elif name == "summary": return self.Summary
@@ -297,18 +301,19 @@ def CleanUpXHtml(xhtml):
 
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (18, article.ArticleText)
+    cacheObj = (23, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
         print "Read cached article", article.RawTitle
-        article.XHtmlText, article.HtmlText = resultObj
+        article.XHtmlText, article.HtmlText, article.HtmlIntro = resultObj
     else:
         print "Caching article", article.RawTitle
         extensions = ["markdown.extensions.extra", "markdown.extensions.codehilite"]
         ex_conf = {"markdown.extensions.codehilite": {'guess_lang': False}}
         article.XHtmlText = CleanUpXHtml(markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml1"))
         article.HtmlText = markdown(article.ArticleText, extensions=extensions+["markdown.extensions.smarty"], extension_configs=ex_conf, output_format="html5")
-        globalData.cache.Add(cacheObj, (article.XHtmlText, article.HtmlText))
+        article.HtmlIntro = markdown(article.ArticleText, extensions=extensions+["markdown.extensions.smarty", PrecisExtension()], extension_configs=ex_conf, output_format="html5")
+        globalData.cache.Add(cacheObj, (article.XHtmlText, article.HtmlText, article.HtmlIntro))
 
 def FormatHtmlDate(date):
     suffix = "th"
