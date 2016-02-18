@@ -12,7 +12,7 @@ article on [Beebdroid][bd].
 [bd]: https://en.wikipedia.org/wiki/Beebdroid "A fab emulator by my pal Reuben"
 
 I noticed it had the top 20 played games...and I thought I'd do the same for
-[jsbeeb](https://bbc.godbolt.org/).
+ [jsbeeb](https://bbc.godbolt.org/).
 
 So for the period 1st January 2015 to 16th February 2016, the top 20 disc images
 loaded from the "Stairway to Hell" archive are:
