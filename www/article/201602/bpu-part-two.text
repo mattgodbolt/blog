@@ -135,4 +135,6 @@ In order to find out what's going on, I decided to further lift the lid and
 try and work out the size, arrangement and eviction policies of the BTB in my
 Arrendale.
 
-More on that next time though!
+More on that [next time][next] though!
+
+[next]: /201602/bpu-part-three
