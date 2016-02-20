@@ -52,7 +52,8 @@ Broadly the same results. Again a curious low number of resteers at
 2<sup>16</sup> for 4 branches. More evidence for address hashing, I suppose.
 
 Worth noting is that all these studies have been done with logical memory
-addresses. The initial branch is aligned to a 4MB boundary. There could be yet
+addresses, and only within a "sensible" amount of RAM -- not taxing the higher
+bits of the 64-bit address space. The initial branch is aligned to a 4MB boundary. There could be yet
 physical memory issues to consider: I'd expect the BPU to work purely in
 logical addreeses though.
 
