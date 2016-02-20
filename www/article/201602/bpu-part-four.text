@@ -1,0 +1,65 @@
+Branch Target Buffer, part 2
+Date: 2016-02-20 00:10
+Status: Public
+Summary: How many tag bits are used in the Arrendale BTB?
+Label: Coding, Microarchitecture
+
+Continuing on from my [previous][prev] ramblings on the branch target buffer, I thought
+I'd do a quick follow-up with a little more investigation.
+
+[prev]: /201602/bpu-part-three "BTBs last time"
+
+The next thing I looked in to was how many bits of the address are used for
+the tag. My approach for this was as follows: set N=2 and use very large D to
+place two different branches in the same set. Ordinarily we'd expect no
+resteers at all: the BTB is four-way so our two branches fit with room to
+spare.
+
+However, if only a subset of the address is used as the tag, then if the
+branch addresses differ only in bits not used in the tag, then we should
+expect resteers. This is because the BTB erroneously thinks the two branches
+are the same. The mistake is found and corrected at the decoder, but a resteer
+is caused.
+
+<p class="picture">
+<a href="/201602/btb_arrendale_set_bits.png">
+<img src="/201602/btb_arrendale_set_bits_resteers.png" width="300" height="259" 
+ alt="Resteers by branch count and alignment"/></a>
+ <br/>Resteers by branch count and alignment. Click for full details.
+ Alignment is log scale.
+</p>
+
+Here it's pretty clear that no bits between 2<sup>21</sup> and 2<sup>28</sup> are used in
+the tag: we have pretty much a 100% resteer rate. Below 2<sup>12</sup> (given
+the results from the last investigation) we aren't hitting the same set each
+time, so wouldn't expect any resteers anyway.
+
+The unusual results at 2<sup>8</sup> and 2<sup>9</sup> may be another
+manifestation of the "hashing" of address theorised last time too.
+
+Running with a few more branches (but with D values not varying quite so
+high), we get:
+
+<p class="picture">
+<a href="/201602/btb_arrendale_bits_in_set.png">
+<img src="/201602/btb_arrendale_bits_in_set_resteers.png" width="300" height="255" 
+ alt="Resteers by branch count and alignment"/></a>
+ <br/>Resteers by branch count and alignment. Click for full details.
+ Alignment is log scale.
+</p>
+
+Broadly the same results. Again a curious low number of resteers at
+2<sup>16</sup> for 4 branches. More evidence for address hashing, I suppose.
+
+Worth noting is that all these studies have been done with logical memory
+addresses. The initial branch is aligned to a 4MB boundary. There could be yet
+physical memory issues to consider: I'd expect the BPU to work purely in
+logical addreeses though.
+
+Next time I'll run the tests on other CPUs and see what we get. I'd love to
+try and confirm the set address hashing too, and to fathom out the replacement
+algorithm.  Ideas welcomed! I've been somewhat distracted by further posts on 
+the [Mechanical Sympathy][ms] mailing list with extra pointers to follow up on modern branch prediction, so I'm a little
+behind on where I'd like to be!
+
+[ms]: https://groups.google.com/d/msg/mechanical-sympathy/UFscifOU8AQ/iz_1uHmDFAAJ

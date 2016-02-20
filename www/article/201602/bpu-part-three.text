@@ -1,7 +1,7 @@
 The BTB in contemporary Intel chips
 Date: 2016-02-19 04:00
 Status: Public
-Summary: Inside the BTB
+Summary: Inside the Arrendale Branch Target Buffer
 Label: Coding, Microarchitecture
 
 I'm in the middle of an investigation of the branch predictor on modern Intel
@@ -162,5 +162,6 @@ As before the code is on [GitHub][gh], and the code was at revision
 [gh]: https://github.com/mattgodbolt/agner
 [this]: https://github.com/mattgodbolt/agner/tree/203499a84f58bdf021cad0c506f6f89b0227692a
 
-In another post I'll look at how many tag bits are used, and try out this
-approach on other CPUs.
+In [another post][next] I'll look at how many tag bits are used. 
+
+[next]: /201602/bpu-part-four
