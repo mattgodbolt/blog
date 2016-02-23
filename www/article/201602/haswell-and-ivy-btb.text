@@ -1,6 +1,6 @@
 Inside the Ivy Bridge and Haswell BTB
 Date: 2016-02-23 03:00
-Status: Draft
+Status: Public
 Summary: In which I apply what I've learned about BTBs to Ivy Bridge and Haswell
 Label: Coding, Microarchitecture
 
@@ -15,7 +15,7 @@ with the code at MD5 hash [ab8cbd1d][this].
 [code]: https://github.com/mattgodbolt/agner
 [this]: https://github.com/mattgodbolt/agner/tree/ab8cbd1dd6a1722e4b9e9899644956ef9e4d0c0a
 
-The Ivy Bridge I tests was an E5 2667v2 and the Haswell was an E5 2697v3.
+The Ivy Bridge I tested was an E5 2667v2 and the Haswell was an E5 2697v3.
 
 ### Total size
 
@@ -86,7 +86,7 @@ allowed to evict the others and is just flatly mispredicted, yielding a 1 in
 Either way, the pathological case of N+1 branches landing in the same set seems to 
 no longer happen.
 
-*Verdict:* Both have 4-ways; Haswell is much smarter about replacing them.
+*Verdict:* Both have 4 ways; Haswell is much smarter about replacing them.
 
 ### Set determination bits
 

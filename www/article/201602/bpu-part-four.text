@@ -57,10 +57,11 @@ bits of the 64-bit address space. The initial branch is aligned to a 4MB boundar
 physical memory issues to consider: I'd expect the BPU to work purely in
 logical addreeses though.
 
-Next time I'll run the tests on other CPUs and see what we get. I'd love to
+[Next time][next] I'll run the tests on other CPUs and see what we get. I'd love to
 try and confirm the set address hashing too, and to fathom out the replacement
 algorithm.  Ideas welcomed! I've been somewhat distracted by further posts on 
 the [Mechanical Sympathy][ms] mailing list with extra pointers to follow up on modern branch prediction, so I'm a little
 behind on where I'd like to be!
 
+[next]: /201602/haswell-and-ivy-btb
 [ms]: https://groups.google.com/d/msg/mechanical-sympathy/UFscifOU8AQ/iz_1uHmDFAAJ
