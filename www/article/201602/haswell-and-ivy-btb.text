@@ -9,7 +9,7 @@ take a look at more contemporary CPUs. At work I have access to Haswell and
 Ivy Bridge machines. Before I got too far into interpretation, I spent a while
 making it as easy as possible to remotely run tests, and graph. The [code] has
 improved a little in this regard. For completeness, this article was written
-with the code at MD5 hash [ab8cbd1d][this].
+with the code at SHA hash [ab8cbd1d][this].
 
 [prev]: /201602/bpu-part-four "BTB sizes"
 [code]: https://github.com/mattgodbolt/agner
