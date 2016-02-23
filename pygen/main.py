@@ -298,7 +298,7 @@ def CleanUpXHtml(xhtml):
 
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (23, article.ArticleText)
+    cacheObj = (24, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
         print "Read cached article", article.RawTitle
