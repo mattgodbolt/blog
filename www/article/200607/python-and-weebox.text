@@ -21,7 +21,7 @@ attendant OS packages in the mid 90s, I still expect a four hour head-scratching
 session every time I build anything.
 
 Fearful that the executable would be too bloated to use,  I checked its size: A
-<a href="http://unixhelp.ed.ac.uk/CGI/man-cgi?strip">strip</a>ped python weighs
+<a href="http://linux.die.net/man/1/strip">strip</a>ped python weighs
 in at 1.1MB, not half as bad as I feared.  Admittedly it requires a few other
 support dynamic libraries; but none that won't already be on the system.  Also,
 it'll need the python libraries themselves, which are rather more wieghty at
