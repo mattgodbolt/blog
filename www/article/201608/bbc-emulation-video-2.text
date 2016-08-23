@@ -1,0 +1,19 @@
+BBC emulation talk - video available
+Date: 2016-08-23 03:30
+Status: Draft
+Summary: Another video on how to emulate a BBC Microcomputer in Javascript
+Label: Emulation
+
+Earlier this year I gave another presentation on [jsbeeb][] at the GOTO
+Chicago conference. The good folks at GOTO have just uploaded the video to
+YouTube and you can watch it here:
+
+<p align="center"><iframe width="420" height="315"
+src="https://www.youtube.com/embed/7WuRq-Wmw5o" frameborder="0"
+allowfullscreen></iframe></p>
+
+The slides are [available][slides] (use the arrows to navigate), and of course you can play with the
+emulator on the [jsbeeb][] site.
+
+[slides]: https://mattgodbolt.github.io/bbc-micro-emulation/goto/ "Emulating a BBC Micro in Javascript"
+[jsbeeb]: https://bbc.godbolt.org/
