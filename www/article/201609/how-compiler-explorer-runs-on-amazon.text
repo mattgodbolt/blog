@@ -1,4 +1,4 @@
-How gcc.godbolt.org and others are set up on Amazon
+How it works: Compiler Explorer
 Date: 2016-09-03 16:00
 Status: Draft
 Summary: I explain how Compiler Explorer runs on Amazon's cloud computing infrastructure
@@ -18,7 +18,7 @@ I've been asked by a couple of people recently how everything works, and so I
 thought I'd put some notes down here, in case it should help anyone else
 considering something similar.
 
-In brief: Compiler Explorer runs on some [Amazon EC2][] instances, behind a load-balancer.
+In brief: Compiler Explorer runs on some [Amazon EC2][EC2] instances, behind a load-balancer.
 [DNS][] routes to the load balancer, which then picks one of the instances to
 actually send the request to. In fairness, most of the time I only have one
 instance running, but during rolling updates (and high load) I can have two or
@@ -30,14 +30,14 @@ so.
 The number of instances running is controlled by some Amazon alerts based on
 CPU load: as CPU load on the instances goes up, more are added. The autoscaling
 stuff is something I only put in after I got "[Hacker News][hn]ed"
-(the new [Slashdot][]ted) a few times: it's nice to stay up even if you get a 100x
-traffic spike!
+(the new [Slashdot][]ted) a few times: it's nice to stay up even if you get a
+30x traffic spike!
 
 [hn]: https://news.ycombinator.com/
 [Slashdot]: https://www.slashdot.org/
 
 <p class="picture">
-<img src="/201505/hn-spike.png" width="600" height="9"
+<img src="/201609/hn-spike.png" width="600" height="9"
      alt="Compiler Explorer traffic graph"/>
  <br/>
 Spot the Hacker News posts...
@@ -84,7 +84,7 @@ The reason they've dropped in size recently is I've started migrating the
 compilers I can build myself to [EFS][]: Amazon's cloud filesystem. Basically it
 appears like an NFS mount and I put the majority (8GBish) of compilers there
 now, then mount that read-only into each docker container. When locally
-testing, I put the same data in the same place (/opt/gcc-explorer) but it's
+testing, I put the same data in the same place (`/opt/gcc-explorer`) but it's
 stored locally and not on EFS.
 
 [EFS]: https://aws.amazon.com/efs "Elastic File System"
@@ -92,9 +92,10 @@ stored locally and not on EFS.
 On the EC2 instance itself I run [nginx][]. nginx is configured to route traffic
 to each of the sites to ports 10240, 10241, 10242 etc (where each site's
 node.js listens). This allows all my sites to live on the same box(es). nginx
-also serves up my static content, like my blog and the jsbeeb website.
+also serves up my static content, like this blog and the [jsbeeb][] website.
 
 [nginx]: https://www.nginx.com/
+[jsbeeb]: https://bbc.godbolt.org/
 
 To build the AMI I use [packer][], which remote-controls an EC2 instance, running
 all the commands I need to set it up, then does a snapshot to build an AMI.
@@ -110,7 +111,7 @@ boots it picks up the latest of everything (via some scripts it runs on
 bootup). Then I wait for it to become "healthy" (i.e. the load balancer
 internal checks for it to pass) and then I kill the old instance. This gives
 me a fresh-start VM, plus it also tests the scale-up/scale-down behaviour. It
-also means that nobody sees the site down while I do it.
+also means the site stays up during upgrades.
 
 The updates are all triggered by [GitHub] checkin hooks: if I check in to a
 "release" branch, then the whole process is driven automatically. Which is
@@ -118,15 +119,16 @@ pretty cool.
 
 [github]: https://github.com/
 
-All of this stuff is actually available in my very messy repo at:
-https://github.com/mattgodbolt/gcc-explorer-image/ including the packer
-configuration, the `Docker` files, the `Makefile` I use to drive the whole show,
+All of this stuff is actually available in a [very messy repo on GitHub][rp],
+including the packer configuration, the `Docker` files, the `Makefile` I use to drive the whole show,
 the GitHub hook (I run on my home computer), the scripts I use to build
-compilers and update the EFS...the whole lot. Totally undocumented but picking
-through there may give some clues as to what's going on.
+compilers and update the EFS...the whole lot. It's totally undocumented but picking
+through there may give some further clues as to what's going on.
+
+[rp]: https://github.com/mattgodbolt/gcc-explorer-image/ "Scripts and configuration for building Compiler Explorer"
 
 Compiler Explorer started out as me manually running a single instance
-with no load balancer: I'd just ssh on and `git pull` to upgrade, etc. 
+with no load balancer: I'd just `ssh` on and `git pull` to upgrade. 
 As things grew and I wanted to be be less susceptible to accidentally breaking
 it I automated more and more.
 
