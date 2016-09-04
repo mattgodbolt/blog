@@ -1,0 +1,134 @@
+How gcc.godbolt.org and others are set up on Amazon
+Date: 2016-09-03 16:00
+Status: Draft
+Summary: I explain how Compiler Explorer runs on Amazon's cloud computing infrastructure
+Label: Coding
+
+I've been running [Compiler Explorer][ce] for over four years now, and a lot
+has changed in that time. In addition to C++, it now supports [Go][], [Rust][]
+and [D][]. It scales up and down to support demand. It has many different
+compilers, many self-built.
+
+[ce]: https://gcc.godbolt.org/ "Interactive web C++ compiler"
+[Go]: https://go.godbolt.org/
+[Rust]: https://rust.godbolt.org/
+[D]: https://d.godbolt.org/
+
+I've been asked by a couple of people recently how everything works, and so I
+thought I'd put some notes down here, in case it should help anyone else
+considering something similar.
+
+In brief: Compiler Explorer runs on some [Amazon EC2][] instances, behind a load-balancer.
+[DNS][] routes to the load balancer, which then picks one of the instances to
+actually send the request to. In fairness, most of the time I only have one
+instance running, but during rolling updates (and high load) I can have two or
+so.
+
+[EC2]: https://aws.amazon.com/ec2 "Elastic Compute Cloud, by Amazon"
+[DNS]: https://dnsimple.com/ "I highly recommend dnsimple for DNS"
+
+The number of instances running is controlled by some Amazon alerts based on
+CPU load: as CPU load on the instances goes up, more are added. The autoscaling
+stuff is something I only put in after I got "[Hacker News][hn]ed"
+(the new [Slashdot][]ted) a few times: it's nice to stay up even if you get a 100x
+traffic spike!
+
+[hn]: https://news.ycombinator.com/
+[Slashdot]: https://www.slashdot.org/
+
+<p class="picture">
+<img src="/201505/hn-spike.png" width="600" height="9"
+     alt="Compiler Explorer traffic graph"/>
+ <br/>
+Spot the Hacker News posts...
+</p>
+
+The EC2 instances boot up a custom AMI (Amazon machine instance image) I
+prepare offline. That AMI has a base Ubuntu, plus [Docker][] and a bunch of web
+server stuff.  It's configured to boot up and then pull down some Docker
+images from a private repository. These images are the "VMs" for each of the
+sites (two for gcc.godbolt.org, d.godbolt.org, rust.godbolt.org and go.godbolt.org).
+Each contains either Ubuntu or Alpine Linux with node.js and a bunch of
+compilers.
+
+[Docker]: https://www.docker.com/
+
+The reason for Docker (basically extremely lightweight VMs) is manyfold, even
+though I dislike the tooling it provides:
+
+* I can make and test Docker images locally. Then I can be sure the exact same
+  code/binary/etc will be running on the EC2 instance. No funny "missing
+  shared object" errors in the compilers, or other misconfigurations.
+* The Docker container is even more restricted than the EC2 instance it runs in:
+  should someone find a remote exploit then at best they can fiddle with the
+  contents of that (ephemeral) container and not actually do any lasting damage.
+* I have some compilers which only want to install on "Ubuntu 12.04" (an ancient
+  version). A "12.04" docker instance is enough to get them installed without
+  issue. This is why there's two gcc.godbolt.org Docker containers: one is
+  only there to provide a host for the few compilers I can only find for
+  Ubuntu 12.04
+
+The drawbacks are:
+
+* Docker's clunkiness. As I've learnt more about how to use Docker, this is
+  less and less of an issue: perhaps it was never really an issue at all but
+  instead me misuing it. But I've always felt a bit like the `Dockerfile` you
+  write is hard to maintain. I have to use some `Makefile` trickery to prevent
+  having to repeat parts of the Dockerfile amongst each of the containers.
+* The images I build are pretty large (2GBish). That said: they used to be ~10GB
+  each...that meant a long boot-up and build time for the AMI. For speed of
+  booting new instances I build in the most recent Docker images into each
+  AMI.
+
+The reason they've dropped in size recently is I've started migrating the
+compilers I can build myself to [EFS][]: Amazon's cloud filesystem. Basically it
+appears like an NFS mount and I put the majority (8GBish) of compilers there
+now, then mount that read-only into each docker container. When locally
+testing, I put the same data in the same place (/opt/gcc-explorer) but it's
+stored locally and not on EFS.
+
+[EFS]: https://aws.amazon.com/efs "Elastic File System"
+
+On the EC2 instance itself I run [nginx][]. nginx is configured to route traffic
+to each of the sites to ports 10240, 10241, 10242 etc (where each site's
+node.js listens). This allows all my sites to live on the same box(es). nginx
+also serves up my static content, like my blog and the jsbeeb website.
+
+[nginx]: https://www.nginx.com/
+
+To build the AMI I use [packer][], which remote-controls an EC2 instance, running
+all the commands I need to set it up, then does a snapshot to build an AMI.
+
+[packer]: https://packer.io/
+
+The Docker images are built using `Dockerfile`s with some `Makefile` stuff to
+script everything up. That all runs locally; I can
+test that as I said before before pushing the images.
+
+To do upgrades I actually just start up a fresh instance: as the instance
+boots it picks up the latest of everything (via some scripts it runs on
+bootup). Then I wait for it to become "healthy" (i.e. the load balancer
+internal checks for it to pass) and then I kill the old instance. This gives
+me a fresh-start VM, plus it also tests the scale-up/scale-down behaviour. It
+also means that nobody sees the site down while I do it.
+
+The updates are all triggered by [GitHub] checkin hooks: if I check in to a
+"release" branch, then the whole process is driven automatically. Which is
+pretty cool.
+
+[github]: https://github.com/
+
+All of this stuff is actually available in my very messy repo at:
+https://github.com/mattgodbolt/gcc-explorer-image/ including the packer
+configuration, the `Docker` files, the `Makefile` I use to drive the whole show,
+the GitHub hook (I run on my home computer), the scripts I use to build
+compilers and update the EFS...the whole lot. Totally undocumented but picking
+through there may give some clues as to what's going on.
+
+Compiler Explorer started out as me manually running a single instance
+with no load balancer: I'd just ssh on and `git pull` to upgrade, etc. 
+As things grew and I wanted to be be less susceptible to accidentally breaking
+it I automated more and more.
+
+It's taken many years to get to this level of sophistication -- indeed the EFS
+only went in last weekend. I'm pretty happy with how it now works.
