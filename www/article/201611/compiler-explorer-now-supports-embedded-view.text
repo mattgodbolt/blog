@@ -1,0 +1,34 @@
+Compiler Explorer's embedded view
+Date: 2016-11-02 16:00
+Status: Public
+Summary: A new feature in Compiler Explorer: embedded views
+Label: Coding
+
+Today I updated [Compiler Explorer][ce] to support better sharing,
+specifically to allow embedding a Compiler Explorer view into another site,
+useful for blog posts that wish to demonstrate how compilers generate code, or
+how language constructs actually become assembly.
+
+[ce]: https://gcc.godbolt.org/
+
+For example, maybe you want to show off how well the compiler optimizes
+multiplying by a constant:
+
+<iframe width="1000px" height="200px"
+src="https://gcc.godbolt.org/e#compiler:g62,filters:'colouriseAsm,compileOnChange,labels,directives,commentOnly,intel',options:'-O2',source:'//+Notice+how+the+compiler+is+smart+enough+to+%0A//+use+the+LEA+instruction+and+a+subtract+to%0A//+do+the+multiply.%0Aint+multiplyBySeven(int+x)+%7B+%0A++return+x+*+7%3B+%0A%7D'"></iframe>
+
+Or perhaps you'd like to demonstrate how little overhead there is in using
+lambdas (as demonstrated in [Jason Turner](http://articles.emptycrate.com/)'s excellent
+[C++ Weekly](https://www.youtube.com/channel/UCxHAlbZQNFU2LgEtiqd2Maw) [video](https://www.youtube.com/watch?v=_CbBfuQQQI8)):
+
+<iframe width="1000px" height="200px"
+src="https://gcc.godbolt.org/e#compiler:g62,filters:'colouriseAsm,compileOnChange,labels,directives,commentOnly,intel',options:'-O3',source:'//+Using+lambdas+is+very+cheap!!+And+you+can%0A//+define+and+use+a+lambda+inline+in+a+single%0A//+statement!!%0Aint+test()+%7B%0A++return+%5B%5D()+%7B+return+5%3B+%7D()%3B%0A%7D'"></iframe>
+
+To use the new functionality, click the "Share" icon and pick "Embed" from the
+dropdown.
+
+The embed feature is limited to single-pane output: only a single editor and
+compiler are supported. The options you have selected at the time of making
+the link are hard-coded into the embed URL. If you have deselected "compile on
+type", then the embedded link will be made non-editable (that is, the code in
+the embedded site will not be editable).
