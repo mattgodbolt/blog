@@ -4,7 +4,7 @@ Status: Draft
 Summary: I finally accept that maybe some financial help would be useful
 Label: Coding
 
-Today I launched Compiler Explorer on Patreon - essentially a site where
+Today I launched [Compiler Explorer on Patreon][ce] - a site where
 one can pledge ongoing donations to content creators.
 
 It was tougher decision than I expected. I spend a fair amount of cash and an awful lot of
@@ -12,4 +12,6 @@ time on Compiler Explorer, but I've always seen it as a hobby. This now puts
 me a little closer to seeing it as a "job" of sorts. I hope this works out!
 
 If you enjoy using Compiler Explorer and want to help out, please visit the
-[new page on Patreon](https://patreon.com/mattgodbolt).
+[new page on Patreon][ce].
+
+ce: https://patreon.com/mattgodbolt "Support Compiler Explorer on Patreon"
