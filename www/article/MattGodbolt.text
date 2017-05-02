@@ -116,8 +116,8 @@ You can learn more about my working life at [my LinkedIn profile][linkedin].
 
 In 2012 I released my first major open source tool - [GCC Explorer][gccex]
 which has been a runaway success.  Go check it out if you're ever intrigued
-how your C++ code ends up looking after compilation.  I've followed it up with
-both [D][dex] language and [Rust][rex] support.
+how your C++ code ends up looking after compilation.  I've followed it up with 
+[D][dex], [Go][goex] and [Rust][rex] support.
 
 Another spare-time-sink is my passion for resurrecting old computers and
 writing emulators for them -- now in Javascript.  Building on the Miracle
@@ -128,6 +128,7 @@ it a go!
 
 [gccex]: http://gcc.godbolt.org/ "GCC Explorer. A fine way to waste some time tinkering with C++ code"
 [dex]: http://d.godbolt.org/ "D Explorer"
+[goex]: http://go.godbolt.org/ "Go Explorer"
 [rex]: http://rust.godbolt.org/ "Rust explorer"
 [smse]: http://xania.org/miracle/miracle.html "A SMS emulator, but in your browser"
 [jsb]: http://bbc.godbolt.org/ "A Javascript BBC Micro emulator"
