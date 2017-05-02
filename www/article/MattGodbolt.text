@@ -126,12 +126,12 @@ emulator that Rich and I wrote many years before, I made a Javascript
 almost-perfect BBC Micro emulator.  Both run directly in your browser -- give
 it a go!
 
-[gccex]: http://gcc.godbolt.org/ "GCC Explorer. A fine way to waste some time tinkering with C++ code"
-[dex]: http://d.godbolt.org/ "D Explorer"
-[goex]: http://go.godbolt.org/ "Go Explorer"
-[rex]: http://rust.godbolt.org/ "Rust explorer"
-[smse]: http://xania.org/miracle/miracle.html "A SMS emulator, but in your browser"
-[jsb]: http://bbc.godbolt.org/ "A Javascript BBC Micro emulator"
+[gccex]: https://gcc.godbolt.org/ "GCC Explorer. A fine way to waste some time tinkering with C++ code"
+[dex]: https://d.godbolt.org/ "D Explorer"
+[goex]: https://go.godbolt.org/ "Go Explorer"
+[rex]: https://rust.godbolt.org/ "Rust explorer"
+[smse]: https://xania.org/miracle/miracle.html "A SMS emulator, but in your browser"
+[jsb]: https://bbc.godbolt.org/ "A Javascript BBC Micro emulator"
 
 <img width="200" height="187" class="pic-right" alt="My lovely wife, Ness Godbolt" src="http://xania.org/media/NessGodbolt.jpg" />
 
