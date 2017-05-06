@@ -45,8 +45,8 @@ header.  So how to improve this?
 Well, let's look at the include graph (courtesy of [IncludeManager][]):
 
 <p class="picture">
-<a href="/200712/graph-thanks-to-includemanager">
-<img src="/200712/graph-thanks-to-includemanager-thumb" width="280" height="240"
+<a href="/200712/graph-thanks-to-includemanager.png">
+<img src="/200712/graph-thanks-to-includemanager-thumb.png" width="280" height="240"
   title="oh what a tangled web we weave"
   alt="[A saved graph from IncludeManager showing the inclusion graph on the code in this article]"/>
 </a>
@@ -141,8 +141,8 @@ But how much difference does this really make?  Of course, this depends on your 
 dependencies.  Using [IncludeManager][]'s project view you can see the cost of the files:
 
 <p class="picture">
-<a href="/200712/project-details">
-<img src="/200712/project-details-thumb" width="440" height="401" 
+<a href="/200712/project-details.png">
+<img src="/200712/project-details-thumb.png" width="440" height="401" 
   title="some include file costs thanks to IncludeManager"
   alt="[An IncludeManager screenshot showing the relative compilation costs of the files in this article]"/>
 </a>

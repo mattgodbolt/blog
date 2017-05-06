@@ -24,7 +24,7 @@ configuration options for your remote connection, and then go to the
 Connection-&gt;SSH-&gt;Tunnels page:
 
 <p align="center"><img width="456" height="442"
-src="http://xania.org/media/rds_tunnel_1.PNG" alt="" /></p>  Put
+src="/media/rds_tunnel_1.PNG" alt="" /></p>  Put
 "127.0.0.1:13389" in the 'local port' box, and then the remote IP and 3389 in
 the remote port, then click 'Add'.  The window should update to look similar to
 the one above --- in my example the selected line is the one you're looking for
@@ -67,7 +67,7 @@ Connection), and expand the options.  Set all the options as you would normally,
 but ensure the host name is 'localhost':
 
 <p align="center"><img width="411" height="471"
-src="http://xania.org/media/rds_tunnel_2.PNG" alt="" /></p>  Now save
+src="/media/rds_tunnel_2.PNG" alt="" /></p>  Now save
 the connection settings (remember where though!), and close the window.  The
 settings file is a simple text file, and we need to tweak it now.
 

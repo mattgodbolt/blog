@@ -15,11 +15,11 @@ If you're not sure what I'm talking about, hopefully these images'll help.
 After going to the menu bar and choosing 'Tools' then 'Options...' you should
 get this:
 <img width="567" height="464"
-src="http://xania.org/media/googlegmailprob_1.png" alt="" />
+src="/media/googlegmailprob_1.png" alt="" />
 Click 'Privacy' then 'View Cookies' --- you should get another box popping up
 like this:
 <img width="365" height="389"
-src="http://xania.org/media/googlegmailprob_2.png" alt="" />
+src="/media/googlegmailprob_2.png" alt="" />
 On this, scroll all the way down to the '<a
 href="http://www.google.com">www.google.com</a>' cookies (in the screenshot
 above there's only one; but when gmail was broken for me I had about 8-9 google

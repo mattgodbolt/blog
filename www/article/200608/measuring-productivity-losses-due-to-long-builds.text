@@ -57,7 +57,7 @@ for a day's work, but without the evidence from the build monitor we'd never
 have been able to justify spending the time working on something not directly
 involved with completing the project.
 
-<img src="http://xania.org/media/BuildMonitor.png" alt="BuildMonitor Icon"
+<img src="/media/BuildMonitor.png" alt="BuildMonitor Icon"
 align="left" height="200" width="200" />
 
 We're hoping to release the tool, BuildMonitor, as a free download soon on the

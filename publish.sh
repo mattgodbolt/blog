@@ -18,3 +18,21 @@ mkdir -p www/feed
 # an option, but this is easier.
 rsync -vc -rlp --exclude=.svn/ --exclude=/article www/ htdocs
 rsync -vc -rlp --exclude=.svn/ --include='*.html' --include='*.png' --include='*.jpeg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ htdocs
+
+aws s3 sync htdocs/ s3://www.xania.org/
+
+fixup() {
+    EXT=$1
+    CT=$2
+    rm -rf htdocs2
+    mkdir -p htdocs2
+    for file in $(cd htdocs && find . -name "*.${EXT}"); do
+        mkdir -p htdocs2/$(dirname ${file})
+        cp -a htdocs/${file} htdocs2/${file%.${EXT}}
+    done
+    aws s3 sync htdocs2/ s3://www.xania.org/ --content-type ${CT}
+    rm -rf htdocs2
+}
+
+fixup html text/html
+fixup atom application/rss+xml
