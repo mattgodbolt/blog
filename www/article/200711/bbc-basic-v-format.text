@@ -47,7 +47,7 @@ still _de rigeur_ to use `GOTO` and `GOSUB` --- which require line numbers --- a
 line number is stored in a 3-byte binary format instead of the equivalent ASCII digits.
 This format is described in more detail in [another blog post][goto].
 
-[goto]: http://xania.org/200711/bbc-basic-line-number-format "The binary format that GOTO/GOSUB line numbers are encoded with"
+[goto]: /200711/bbc-basic-line-number-format "The binary format that GOTO/GOSUB line numbers are encoded with"
 
 The tokens are broken into four categories:
 
@@ -66,4 +66,4 @@ which is available [here][py].
 
 After all that effort, my old programs were...interesting --- more on them another time.
 
-[py]: http://xania.org/200711/BBCBasicToText.py "BBC BASIC V to text converter, written in Python"
+[py]: /200711/BBCBasicToText.py "BBC BASIC V to text converter, written in Python"

@@ -12,7 +12,7 @@ bytes of screen.  The controller allows me to set and clear bits in bytes of
 screen memory, or set bytes to specific values.  It also has a register which
 controls the start of the displayed image in RAM.
 
-[Weebox]: http://xania.org/WeeBox-Project-archive "Other notes on the Weebox"
+[Weebox]: /WeeBox-Project-archive "Other notes on the Weebox"
 [lcdc]: http://www.datasheetcatalog.org/datasheets2/17/177932_1.pdf "The HD61830 data sheet"
 
 My [driver code][dc] currently just points the start of screen to the beginning of the screen

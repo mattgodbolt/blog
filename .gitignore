@@ -1,4 +1,6 @@
 htdocs/
+htdocs2/
+miracle/
 *.swp
 *.pyc
 conf/pycache.db

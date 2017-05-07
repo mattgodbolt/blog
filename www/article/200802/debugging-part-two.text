@@ -8,7 +8,7 @@ I'm spending a fair amount of time [debugging][prev] at the moment.
 The particular application I'm looking at is a suite of related server processes which
 spawn each other and are very multithreaded.  
 
-[prev]: http://xania.org/200802/things-I-didn't-know-about-visual-studio's-debugger "more debugging things"
+[prev]: /200802/things-I-didn't-know-about-visual-studio's-debugger "more debugging things"
 
 I've been looking for was a way of 
 getting my debugger "in" right at the start of the one of the servers, even when it was

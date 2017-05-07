@@ -10,8 +10,8 @@ stuff, or the [second part][sp] which focuses on the video hardware. This post
 will cover the subtleties of the 6502's instruction timings. In the next post
 I'll cover how interrupts and hardware timers fit into the mix.
 
-[fp]: http://xania.org/201405/jsbeeb-emulating-a-bbc-micro-in-javascript "General overview on BBCs and emulating them"
-[sp]: http://xania.org/201405/jsbeeb-part-two "On the video hardware"
+[fp]: /201405/jsbeeb-emulating-a-bbc-micro-in-javascript "General overview on BBCs and emulating them"
+[sp]: /201405/jsbeeb-part-two "On the video hardware"
 
 This time around the thanks really have to go to my good chum Rich
 Talbot-Watkins. He and I have been friends since we were twelve years old and

@@ -53,7 +53,7 @@ implemented in the kernel library only, which doesn't seem to get linked in.  My
 somewhat cheesey solution was to copy the div64.S file from
 linux/arch/arm/lib/div64.S into the driver's folder, and then patch the Makefile
 to build and link with that file too.  (I've made a <a
-href="http://xania.org/media/zd1211-arm.patch">patch</a> for this, which can be
+href="/media/zd1211-arm.patch">patch</a> for this, which can be
 installed with patch -p1 &lt; path\_to\_patch\_file from within an unpacked
 driver folder.  You'll still need to edit the Makefile to edit for your kernel
 version and location as appropriate.)

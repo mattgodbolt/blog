@@ -7,8 +7,8 @@ Summary: Conditional expressions in Python 2.5
 As you've probably noticed over the last few days, I like [Python][] [a][py1] [lot][py2].
 
 [Python]: http://www.python.org/ "Hissssss.  But not boo"
-[py1]: http://xania.org/200710/cool-python-things "Things I didn't know about Python"
-[py2]: http://xania.org/200711/easy-installation-with-ez-setup "Installing new packages is easy in Python"
+[py1]: /200710/cool-python-things "Things I didn't know about Python"
+[py2]: /200711/easy-installation-with-ez-setup "Installing new packages is easy in Python"
 
 Last night I found a new (to me) thing.  It's a new to Python 2.5, which might preclude
 it from being useful in older projects.  In C and C++, one of the more useful constructs in expressions

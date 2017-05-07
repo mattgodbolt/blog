@@ -68,7 +68,7 @@ if __name__ == "__main__":
             self.datesAtom = "date"
             self.dateHTML = "<date>"
             self.dateISO = "<date>"
-            self.permalink = "http://xania.org"
+            self.permalink = "https://xania.org"
 
     code, deps = Compile(r'C:\Codebase\mbs\conf\frontpage-template.html', r'C:\Codebase\mbs\conf')
     globalDict = dict()

@@ -8,7 +8,7 @@ you might not have known about.  Almost all python packages are available at the
  [Cheeseshop][] in Python EGG files (geddit?), and the easiest way to install them is using
  [setuptools][]'s [ez_setup.py][ezsetup] bootstrap script.
 
-[prev]: http://xania.org/200710/cool-python-things "previously on 'why Python is so great'"
+[prev]: /200710/cool-python-things "previously on 'why Python is so great'"
 [cheeseshop]: http://pypi.python.org/pypi "the Python Cheeseshop.  It doesn't sell cheese"
 [setuptools]: http://peak.telecommunity.com/DevCenter/setuptools "setuptools extensions to distutils"
 [ezsetup]: http://peak.telecommunity.com/dist/ez_setup.py "the ez_setup.py bootstrap file"

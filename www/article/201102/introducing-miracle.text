@@ -19,7 +19,7 @@ I borrowed the Z80 emulator from JSSpeccy and thankfully Richard's [Master Syste
 
 You can take it for a spin [here][miracle] (I'll hack it later to allow me to embed it here). Keys are W, S, A and D for movement, Enter and Space for the fire buttons. I've rather cheekily embedded two ROMs that work quite well, Sonic and Teddy Boy. 
 
-[miracle]: http://xania.org/miracle/miracle.html "Miracle, a JavaScript Sega Master System emulator."
+[miracle]: /miracle/miracle.html "Miracle, a JavaScript Sega Master System emulator."
 
 The source code is on [github](https://github.com/mattgodbolt/Miracle) if you want to take a peek.
 

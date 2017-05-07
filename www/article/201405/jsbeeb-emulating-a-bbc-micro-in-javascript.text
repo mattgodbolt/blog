@@ -35,7 +35,7 @@ the 256 possible opcodes is not the best way to optimize.  Chrome's v8 at
 least bails out its JIT process if a function is either too big, or if it has
 too many entries in the switch statement.
 
-[Miracle]: http://xania.org/miracle/miracle.html "A Sega Master System emulator, also in Javascript"
+[Miracle]: /miracle/miracle.html "A Sega Master System emulator, also in Javascript"
 
 Instead, I use a 256-entry array of function pointers, each to its own
 instruction handling routine.  The main despatch then becomes something like:

@@ -8,7 +8,7 @@ With regards to the BBC BASIC [line number encoding][prev], [Malcolm][] asked th
 question "Why the exclusive `OR` with `0x54` for the third byte?  Why not `OR` with `0x40`
 like the other two?"
 
-[prev]: http://xania.org/200711/bbc-basic-line-number-format "Previously on WTF BBC OMG"
+[prev]: /200711/bbc-basic-line-number-format "Previously on WTF BBC OMG"
 [malcolm]: http://www.farside.org.uk/ "He of the twins"
 
 The answer emerges when you look at how the values are decoded at run

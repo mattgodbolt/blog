@@ -9,9 +9,9 @@ I'd recommend reading the [previous part][pp] on 6502 internal timings before
 reading this post. It's also handy to have read read the [first part][fp] which covers general
 stuff, and the [second part][sp] which focuses on the video hardware.
 
-[pp]: http://xania.org/201405/jsbeeb-getting-the-timings-right-cpu "6502 CPU timings""
-[fp]: http://xania.org/201405/jsbeeb-emulating-a-bbc-micro-in-javascript "General overview on BBCs and emulating them"
-[sp]: http://xania.org/201405/jsbeeb-part-two "On the video hardware"
+[pp]: /201405/jsbeeb-getting-the-timings-right-cpu "6502 CPU timings""
+[fp]: /201405/jsbeeb-emulating-a-bbc-micro-in-javascript "General overview on BBCs and emulating them"
+[sp]: /201405/jsbeeb-part-two "On the video hardware"
 
 Again thanks to my good chum Rich Talbot-Watkins who helped demystify
 what goes on in the Beeb.

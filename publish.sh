@@ -36,3 +36,16 @@ fixup() {
 
 fixup html text/html
 fixup atom application/rss+xml
+
+if [ ! -d miracle ]; then
+    git clone git@github.com:mattgodbolt/miracle.git
+fi
+if [ ! -d miracle/roms ]; then
+    aws s3 cp s3://xania.org/miracle-roms.tar.gz /tmp/
+    pushd miracle
+    tar zxf /tmp/miracle-roms.tar.gz
+    popd
+fi
+
+(cd miracle && git pull && make dist)
+aws s3 sync miracle/ s3://www.xania.org/miracle/ --exclude=".git/*"

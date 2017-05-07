@@ -8,7 +8,7 @@ into the EP93xx processor's IO ports.
 To apply the patch you'll need to be able to build from <a
 href="http://www.lirc.org/cvs.html">LIRC's CVS repository</a>.  Grab the latest
 lirc down and then get this <a
-href="http://xania.org/media/ep93xx.patch.gz">gzipped patch</a>.  From there,
+href="/media/ep93xx.patch.gz">gzipped patch</a>.  From there,
 apply the patch and build lirc.  Detailed instructions:
 
 

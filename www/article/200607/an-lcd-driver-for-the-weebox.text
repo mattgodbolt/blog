@@ -37,7 +37,7 @@ my kernel's 2.4.26 that's not something I can test just yet.  Once I'm happy
 I've got all the bugs out, and pending a reply from the author, I'll either
 submit my patch to him or make a new lcdmod distribution with my changes in.
 For now I've made a <a
-href="http://xania.org/media/lcdmod-1.0.2-ts7200.tar.bz2">snapshot of the
+href="/media/lcdmod-1.0.2-ts7200.tar.bz2">snapshot of the
 current code</a> available.
 
 With my nice new shiny LCD module installed and working, I made the

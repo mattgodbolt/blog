@@ -12,8 +12,8 @@ href="http://www.geeklog.net/article.php/geeklog-1.4.0rc2">GeekLog 1.4.0rc2</a>.
 The new version sports several nice new features --- trackback and pingback with
 spam filter support, an <a href="http://www.fckeditor.net/">advanced HTML
 editor</a>, better syndication support and a more modular design with the <a
-href="http://xania.org/polls/index.php">poll system</a> and the <a
-href="http://xania.org/links/index.php">links system</a> now being plugins.
+href="/polls/index.php">poll system</a> and the <a
+href="/links/index.php">links system</a> now being plugins.
 
 The installation went fairly well --- because I had previously patched my
 geeklog with trackback and pingback support (prior to the spam support that is),

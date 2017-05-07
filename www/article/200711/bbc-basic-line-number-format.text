@@ -10,7 +10,7 @@ Richard Talbot-Watkins I've learnt [the reason][rich] it's not stored in pure `H
 interpreter can skip quickly along a line, looking for the `ELSE` token during `IF` statement
 parsing.
 
-[yesterday]: http://xania.org/200711/bbc-basic-v-format "Yesterday, all my troubles...ahem"
+[yesterday]: /200711/bbc-basic-v-format "Yesterday, all my troubles...ahem"
 [rich]: http://www.nelsonit.net/~jon/BBCMicro/2005/06/27/165311.html "Rich explains why"
 
 If the line numbers were stored naïvely in most significant byte/least significant byte (`HI/LO`)
@@ -54,4 +54,4 @@ with `0x54` gives us the first byte, `0x74`. The remaining six bits of the two b
 
 If you're wondering why the first byte is exclusive `OR`red with `0x54`, I go into more detail in [another article][ooh].
 
-[ooh]: http://xania.org/200711/bbc-basic-line-number-format-part-2 "So, why EOR with 0x54?  Why not OR with 0x40 like the other bytes?"
+[ooh]: /200711/bbc-basic-line-number-format-part-2 "So, why EOR with 0x54?  Why not OR with 0x40 like the other bytes?"

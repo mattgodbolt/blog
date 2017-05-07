@@ -8,7 +8,7 @@ In an [earlier post][listpyt] I waxed lyrical about list comprehensions in Pytho
  [Justin Fletcher][gerph] mailed me and gave me a version of most my examples using Perl.  I've used
 Perl very little, but never really got on with it, so it was interesting to see how the two compared.
 
-[listpyt]: http://xania.org/200711/list-comprehension "Previously on this blog..."
+[listpyt]: /200711/list-comprehension "Previously on this blog..."
 [gerph]: http://gerph.org/ "Justin Fletcher's website and diary"
 
 Justin says:

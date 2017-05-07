@@ -9,7 +9,7 @@ emulating the video hardware of a BBC Micro. Firstly, a big credit to Tom
 Walker for his [b-em][bem] emulator upon which much of the jsbeeb video code is
 based. Thanks Tom!
 
-[pp]: http://xania.org/201405/jsbeeb-emulating-a-bbc-micro-in-javascript "Last time on Godbolt witters in a blog post"
+[pp]: /201405/jsbeeb-emulating-a-bbc-micro-in-javascript "Last time on Godbolt witters in a blog post"
 [bem]: http://b-em.bbcmicro.com/ "Thanks Tom!"
 
 The video hardware

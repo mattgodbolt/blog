@@ -46,7 +46,7 @@ A bit of experimentation and it seemed about 30% of the time the sound would
 go nuts about a minute into the demo, squeaking and missing half the notes.
 
 At first I suspected the sound chip emulation. The emulation was taken from my
-earlier [Sega Master System emulator](http://xania.org/miracle/miracle.html)
+earlier [Sega Master System emulator](/miracle/miracle.html)
 which happened to use the same chip, and I had recently updated the emulation
 there to fix up some other problems that Rich had noticed. I'd taken the
 information from the [SMS Power](http://www.smspower.org/Development/SN76489)
