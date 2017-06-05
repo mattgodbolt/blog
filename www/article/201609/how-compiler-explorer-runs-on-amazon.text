@@ -5,14 +5,14 @@ Summary: I explain how Compiler Explorer runs on Amazon's cloud computing infras
 Label: Coding
 
 I've been running [Compiler Explorer][ce] for over four years now, and a lot
-has changed in that time. In addition to C++, it now supports [Go][], [Rust][]
-and [D][]. It scales up and down to support demand. It has many different
+has changed in that time. In addition to C++, it now supports [Go][], [Rust][], [D][] and [ispc]. It scales up and down to support demand. It has many different
 compilers, many self-built.
 
 [ce]: https://gcc.godbolt.org/ "Interactive web C++ compiler"
 [Go]: https://go.godbolt.org/
 [Rust]: https://rust.godbolt.org/
 [D]: https://d.godbolt.org/
+[ispc]: https://ispc.godbolt.org/
 
 I've been asked by a couple of people recently how everything works, and so I
 thought I'd put some notes down here, in case it should help anyone else
