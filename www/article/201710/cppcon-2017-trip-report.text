@@ -1,5 +1,5 @@
 CppCon 2017 Trip Report
-Date: 2017-10-02 18:00:00
+Date: 2017-10-02 21:00:00
 Status: Public
 Summary: My experiences at my first C++ conference
 Label: Coding
@@ -14,7 +14,7 @@ was flattered to have a fair number of people spot my name badge and come up
 and thank me for [Compiler Explorer][ce] -- a very surreal experience. I got a
 tiny taste of what it must be to be "famous"! I also got a lot of advice and
 ideas on how to improve the site, and once the dust settles a little I look
-forward to getting stuck into improvements, like more Microsoft Compilers (and
+forward to getting stuck into improvements, like more Microsoft compilers (and
 a better compilation experience for those using it), and execution support.
 
 [ce]: https://gcc.godbolt.org/
