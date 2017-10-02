@@ -1,0 +1,155 @@
+CppCob 2017 Trip Report
+Date: 2017-09-02 18:00:00
+Status: Draft
+Summary: My experiences at my first C++ conference
+Label: Coding
+
+Until last week I had never been to a C++ conference before. I'm rather glad
+to say that I've now experienced the wonder of having a firehose of C++
+knowledge plugged into my brain and turned on.
+
+Most of the best times at the conference were in between talks, where random
+meetings in the hallways over coffee would yield fascinating discussions. I
+was flattered to have a fair number of people spot my name badge and come up
+and thank me for [Compiler Explorer][ce] -- a very surreal experience. I got a
+tiny taste of what it must be to be "famous"! I also got a lot of advice and
+ideas on how to improve the site, and once the dust settles a little I look
+forward to getting stuck into improvements, like more Microsoft Compilers (and
+a better compilation experience for those using it), and execution support.
+
+[ce]: https://gcc.godbolt.org/
+
+While the hallway chance encounters (and lunches and dinners) yielded a lot of
+great conversations, the talks were also full of information. Below is a small
+taste of some of the talks that left an impression with me:
+
+## Keynotes
+
+The keynotes were by and large great. Bjarne gave a talk on 
+[Learning and Teaching Modern C++](https://www.youtube.com/watch?v=fX2W3nNjJIo) which 
+was a great call to action for us folks trying to make C++ more accessible to
+newcomers (we are all teachers!), as well as a reminder to old fuddy-duddies like me that Modern C++
+is approachable, especially with things like the C++ Core Guidelines to, well,
+guide us.
+
+Titus Winters from Google expoused the idea of 
+[C++ as a "Live At Head" language](https://www.youtube.com/watch?v=tISy7EJQPzI) 
+-- an idea I particularly like, although my time at Google might be the reason
+for that! He argued convincingly for building our code against the head
+revision of all dependencies, and for library vendors to provide tooling
+to make updates less painful. `clang-tidy`, in particular, can be taught to
+give hints on API changes to make the process of deprecating old functionality
+easier on end users. As part of the keynote he announced the open sourcing of
+[Abseil](https://abseil.io/) -- Google's internal library of handy functions.
+I've missed having a lot of those functions (like `StrCat`) and have ended up
+writing my own (inferior) versions, so look forward to introducing Abseil into
+our codebase at work.
+
+Herb's talk "[Thoughts on Generative C++][tgc]" was my favourite plenary
+session. I'm so excited about the idea of metaclasses -- in whatever form they
+may take in the future -- and it was great to hear all about it. Herb even
+used the [cppx][] version of Compiler Explorer live (brave man) to demonstrate
+how some C# interface code could basically be ported directly to C++.
+
+[tgc]: https://www.youtube.com/watch?v=4AfRAVcThyA
+[cppx]: https://cppx.godbolt.org/
+
+Lars Knoll gave a presentation on the [history and future of Qt][qt]. I didn't enjoy this
+keynote as much as the others; I felt that he spent too long explaining the
+history of a library I know little about without first explaining its use to
+general C++ programmers. Perhaps I'm in the minority here.
+
+[qt]: https://www.youtube.com/watch?v=YWiAUUblD34
+
+## Other talks of note
+
+There were _so_ many other talks to choose from. In each one to one and half
+hour segment there were usually about six talks going on. The days ran from
+8am in the morning til way past 10pm on most days -- it was pretty exhausting!
+
+Some highlights to draw attention to:
+
+* [Ben Deane][ben] and [Jason Turner][jt]'s `constexpr` all the things talk. Some inspiration
+  here on where to put the `constexpr` keyword (basically anywhere you can),
+  culminating in a compile-time JSON parser. Enjoyable and practical stuff.
+* A new packaging solution -- [conan.io](https://www.conan.io/). In an
+  world where C++ needs to be easier to use (something Bjarne touched on in
+  his keynote), tooling can help. conan.io seems like one of the more sensible
+  solutions out there, though I question some of its defaults (semantic
+  versioning instead of exact versioning, for example). Hopefully it will
+  continue to gain traction.
+* Jason's Practical C++17 was a great intro to how a codebase can start to
+  take advantage of the new stuff in C++17.
+* My favourite non-keynote was Teresa Johnson from Google's [ThinLTO][] talk.
+  I'm a big fan of LTO, and it was really instructive to hear how the scalable
+  version of LTO in clang works.
+* A real C++ hero of mine, [John Regehr](https://blog.regehr.org/) had a
+  fantastic and illimunating two-part talk on undefined behaviour. Was fantastic to see him in person,
+  and have a chance to meet him too.
+* [Andrew Sutton][as] gave a talk on how he implemented the proof-of-concept for
+  metaclasses in clang. It was great to hear how (relatively) straight-forward
+  it was to extend the language, and to get to see some of the thinking behind
+  how such a big change could be implemented.
+* Phil Nash from Jetbrains (he of catch.hpp test library fame) spoke about the
+  holy grail of algorithms: Hashed Array-mapped Tries. It was a fun data
+  structure to learn about!
+* Chandler Carruth from Google gave another great example of optimization:
+  this time how to profile, understand and optimize loops. He did a fantastic
+  job of live-coding the whole thing, including one surprising result which he
+  was able to work out and get back on track with, despite doing so in a huge
+  roomful of onlookers. He's a real pro (and a tough act to follow, as I now
+  know...)
+* Sara Chipps of [Jewelbots](https://jewelbots.com/) gave a great talk on how
+  her STEM-focused bracelets are helping reach a demographic not traditionally
+  targeted by teachers of C++: pre-teen girls. Some of the girls were there
+  and gave presentations on what they were doing with their bots. It was
+  brilliant to see what they were achieving in C++ on these little embedded
+  systems, and their presentation skills and confidence made most of the
+  professional speakers look nervous and amateur! The future of C++ is in good
+  hands!
+
+I have a list as long as my arm of other great talks, both ones that I saw and
+ones I anxiously await being uploaded to YouTube so I can catch up with them!
+
+[ben]: http://www.elbeno.com/blog/
+[jt]: https://www.youtube.com/user/lefticus1
+[ThinLTO]: https://cppcon2017.sched.com/event/Bgto/thinlto-building-c-applications-with-scalable-whole-program-optimization
+[as]: https://sites.google.com/site/andrewnsutton/
+
+## One last thing
+
+So, this was my first C++ conference. But it won't be my last; I enjoyed it so
+much. What was it that changed my mind, and made me attend in the first place?
+
+Well, in this case, I was invited...to speak. So on Friday, after Chandler's
+fantastic optimization talk, I got to stand up on stage and wax on about
+Compiler Explorer. It was an amazing opportunity, and I can't thank Jon Kalb
+enough for the invite. And for handling my bag-of-nerves self during both the
+run-up to the conference and during it too.
+
+The talk went very well, and seems to have been well received (at least by the
+folks I know...they're probably just being nice!)  I really enjoyed it too:
+anyone who followed my twitter stream in the weeks leading up to the
+conference knows I was more than a little stressed by it. All the hard work
+payed off I think.  It was recorded is [available on YouTube][my], should you wish
+to watch it.
+
+[my]: https://www.youtube.com/watch?v=bSkpMdDe4g4
+
+I was did an open-content jsbeeb talk (not recorded) one morning, and was on a
+[panel][] on compiler optimizations, sandwiched between Chandler Carruth and
+Jim Radigan from Microsoft, feeling quite fraudulent in such company. It was a
+lot of fun though!
+
+[panel]: https://www.youtube.com/watch?v=9RFYVbHRoLg
+
+## Conclusion
+
+All in all, I had an amazing time. I have a set of notes on things I'd like to
+try out in my own code now, and there will be a lot of further research on
+ideas I heard about at the conference.
+
+Most of all, the feeling I was left with was how amazing the C++ community is.
+I thoroughly enjoyed meeting other C++ programmers, putting faces to names I
+only had seen on Slack or email, and meeting the next generation of C++
+coders.
