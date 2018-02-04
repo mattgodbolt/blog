@@ -1,0 +1,65 @@
+Some YouTube videos
+Date: 2018-02-04 19:00
+Status: Public
+Summary: Some videos I've uploaded to YouTube
+Label: Coding
+
+Almost on a whim, I've started re-recording some presentations I've done at
+work on a variety of programming topics, and have uploaded them to YouTube.
+
+I enjoy giving these presentations -- you really have to know your topic to be
+able to effecitvely talk about it in front of people! I plan on recording
+more, and indeed creating new content just for YouTube.
+
+So far I've uploaded:
+
+* [Meltdown & Spectre][melt] -- the technical details behind the recent
+  security issues found in most modern processors.
+* [Memory & Caches][mandc] -- a detailed explanation of how cache RAM and
+  dynamic RAM work, how caches work, and some performance measurements showing
+  how important it can be to understand memory access patterns.
+* [Five things you didn't realise your CPU did for you][five] -- a lightning
+  talk I gave at the [Chicago Open Source Open Mic][osom] to give some
+  grounding on some of the cool things your computer's processor does behind
+  the scenes.
+* [zindex -- index your gzipped files][zindexv] -- another OS:OM talk, this
+  time about my [zindex][] open source tool for indexing compressed text
+  files.
+* [Emulating a BBC Micro in JavaScript][jsbeebv] -- a talk I recorded at work a
+  few years ago on my crazy side project to bring back my childhood computer.
+  Source is on [GitHub][jsbeebg], and of course you can try it out in your
+  [browser][jsbeeb] too!
+
+
+[five]: https://www.youtube.com/watch?v=S4mKJxbrkT4 "Surprising things your CPU does"
+[osom]: https://www.meetup.com/Chicago-Open-Source-Open-Mic/?_cookie-check=ZU6ndogGaYwy0qrJ "In Chicago? Join us!"
+[mandc]: https://www.youtube.com/watch?v=4_smHyqgDTU "Everything you ever wanted to know about RAM"
+[zindexv]: https://www.youtube.com/watch?v=6NX6NvQN7UQ
+[zindex]: https://github.com/mattgodbolt/zindex "Index and query your gzip compressed text files"
+[melt]: https://www.youtube.com/watch?v=IPhvL3A-e6E
+[jsbeebv]: https://www.youtube.com/watch?v=37jyHQT7fXQ "How to relive your lost youth"
+[jsbeebg]: https://github.com/mattgodbolt/jsbeeb "JavaScript source for a cycle-perfect BBC Micro emulator"
+[jsbeeb]: https://bbc.godbolt.org/ "Boooo..... beep!"
+
+My channel is [here][channel] if you want to subscribe to catch new videos as
+I upload them.
+
+[channel]: https://www.youtube.com/user/mattatgodboltorg/videos "Matt Godbolt's YouTube videos"
+
+There are few other videos of me speaking at conferences out there too:
+
+* [What Has My Compiler Done for Me Lately?][cppcon] -- my CppCon 2017 plenary.
+* [x86 Internals for Fun and Profit][x86] -- GOTO Chicago 2014 talk on how the
+  internals of the x86 work.
+* [Another jsbeeb talk][jsbeebv2] -- GOTO Chicago 2016 on jsbeeb.
+
+[cppcon]: https://www.youtube.com/watch?v=bSkpMdDe4g4 "My first keynote!!"
+[x86]: https://www.youtube.com/watch?v=hgcNM-6wr34
+[jsbeebv2]: https://www.youtube.com/watch?v=7WuRq-Wmw5o
+
+Finally, I'll be talking at [GOTO Chicago 2018][goto] -- [C++ - the Newest Old
+Language][gotot], where I'll try and convince some folks who may have given up
+on C++ that it's now a really great language to develop in.
+
+[goto]: https://gotochgo.com/
+[gotot]: https://gotochgo.com/2018/sessions/359

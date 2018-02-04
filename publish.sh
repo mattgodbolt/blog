@@ -30,7 +30,7 @@ fixup() {
         mkdir -p htdocs2/$(dirname ${file})
         cp -a htdocs/${file} htdocs2/${file%.${EXT}}
     done
-    aws s3 sync htdocs2/ s3://www.xania.org/ --content-type ${CT}
+    aws s3 sync htdocs2/ s3://www.xania.org/ --content-type ${CT} --cache-control max-age=30
     rm -rf htdocs2
 }
 
