@@ -30,7 +30,7 @@ fixup() {
         mkdir -p htdocs2/$(dirname ${file})
         cp -a htdocs/${file} htdocs2/${file%.${EXT}}
     done
-    aws s3 sync htdocs2/ s3://www.xania.org/ --content-type ${CT} --cache-control max-age=30
+    aws s3 sync htdocs2/ s3://www.xania.org/ --content-type ${CT} --cache-control max-age=30 --metadata-directive REPLACE
     rm -rf htdocs2
 }
 
@@ -48,4 +48,4 @@ if [ ! -d miracle/roms ]; then
 fi
 
 (cd miracle && git pull && make dist)
-aws s3 sync miracle/ s3://www.xania.org/miracle/ --exclude=".git/*"
+aws s3 sync miracle/ s3://www.xania.org/miracle/ --exclude=".git/*" --cache-control max-age=30 --metadata-directive REPLACE
