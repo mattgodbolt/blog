@@ -1,0 +1,37 @@
+March update
+Date: 2018-03-03 23:50
+Status: Public
+Summary: Compiler Explorer logo and shop, and more videos
+Label: Coding
+
+Compiler Explorer now has a logo!
+
+<p class="picture">
+<a href="https://github.com/mattgodbolt/compiler-explorer-image/tree/master/logo/primary">
+<img src="/201803/ce-logo.png" width="400" height="394"
+ alt="Compiler Explorer"/>
+</a>
+</p>
+
+If you like it and want to support Compiler Explorer, I set up an
+[online shop](https://shop.spreadshirt.com/compiler-explorer/) where you can
+create your own T shirts, bags, mugs and so on! By doing so you're supporting
+Compiler Explorer's development, as I get a small commission for any sales. Of 
+course, it's all open source, so you can make your own with the logo too!
+
+In other news, since last month I've uploaded a few more videos:
+
+* [Miracle - a JavaScript Sega Master System emulator][miracle]. Another emulation talk,
+  this time on a games console.
+* [Performance Tuning][perf]. A worked example of tuning performance for a latency-sensitive
+  application, similar to the kinds of things I do in my day job.
+* [Wolfenstein 3D's map renderer][wolf]. A short explanation of the main "trick" used to get
+  this amazing 1992 classic game working on the hardware of the day.
+* [Seasocks - a C++ embeddable WebSockets server][seasocks]. A lightning talk on my [open source][ss]
+  web server project.
+
+[miracle]: https://www.youtube.com/watch?v=8-3rCVWbea4
+[perf]: https://www.youtube.com/watch?v=fV6qYho-XVs
+[wolf]: https://www.youtube.com/watch?v=eOCQfxRQ2pY
+[seasocks]: https://www.youtube.com/watch?v=6drfdswsFVw
+[ss]: https://github.com/mattgodbolt/seasocks
