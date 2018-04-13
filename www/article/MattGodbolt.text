@@ -107,19 +107,21 @@ Towards the end of my time at Google I also briefly worked on the mobile app
 that eventually became Google+.
 
 All good things come to an end, however. After two happy years at Google I moved on to try my hand at something quite different:
-I now work for a private trading company, DRW, and have been working there for
-over three years on fun and exciting (but somewhat secret) projects. DRW
+I went to work for a trading company, DRW, and worked there for over 7 years
+on fun and exciting (but somewhat secret) projects. DRW
 offered my family and me a fantastic opportunity to move to the United States,
 and we are now very happily based just outside of Chicago, Illinois.
+
+All good things come to an end, and in April 2018 I left DRW to pursue a new opportunity,
+still in Chicago.
 
 You can learn more about my working life at [my LinkedIn profile][linkedin]. 
 
 [linkedin]: http://www.linkedin.com/in/godbolt "Matt Godbolt's LinkedIn Profile"
 
-In 2012 I released my first major open source tool - [GCC Explorer][gccex]
+In 2012 I released my first major open source tool - [Compiler Explorer][gccex]
 which has been a runaway success.  Go check it out if you're ever intrigued
-how your C++ code ends up looking after compilation.  I've followed it up with 
-[D][dex], [Go][goex] and [Rust][rex] support.
+how your C++, Go, D, Rust, or other compiled language code ends up looking after compilation.
 
 Another spare-time-sink is my passion for resurrecting old computers and
 writing emulators for them -- now in Javascript.  Building on the Miracle
@@ -128,10 +130,7 @@ emulator that Rich and I wrote many years before, I made a Javascript
 almost-perfect BBC Micro emulator.  Both run directly in your browser -- give
 it a go!
 
-[gccex]: https://gcc.godbolt.org/ "GCC Explorer. A fine way to waste some time tinkering with C++ code"
-[dex]: https://d.godbolt.org/ "D Explorer"
-[goex]: https://go.godbolt.org/ "Go Explorer"
-[rex]: https://rust.godbolt.org/ "Rust explorer"
+[gccex]: https://godbolt.org/ "Compiler Explorer. A fine way to waste some time tinkering with C++ code"
 [smse]: https://xania.org/miracle/miracle.html "A SMS emulator, but in your browser"
 [jsb]: https://bbc.godbolt.org/ "A Javascript BBC Micro emulator"
 
@@ -150,6 +149,6 @@ growing up fast and I'm so proud of them both.
 [warg]: /200806/godbolt-v2
 [ibg]: /201004/another-godbolt
 
-So that's me, in a wordy nutshell (if that's not an oxymoron) --- I'll try and keep this up-to-date with news and
+So that's me --- I'll try and keep this up-to-date with news and
 more embellishments --- there's so much I've missed out, but then there's so much you won't care about!  Who reads
 these things anyway?
