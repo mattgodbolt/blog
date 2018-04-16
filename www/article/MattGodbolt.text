@@ -112,8 +112,7 @@ on fun and exciting (but somewhat secret) projects. DRW
 offered my family and me a fantastic opportunity to move to the United States,
 and we are now very happily based just outside of Chicago, Illinois.
 
-All good things come to an end, and in April 2018 I left DRW to pursue a new opportunity,
-still in Chicago.
+In April 2018 I left DRW to pursue a new opportunity, still in Chicago.
 
 You can learn more about my working life at [my LinkedIn profile][linkedin]. 
 
@@ -130,7 +129,7 @@ emulator that Rich and I wrote many years before, I made a Javascript
 almost-perfect BBC Micro emulator.  Both run directly in your browser -- give
 it a go!
 
-[gccex]: https://godbolt.org/ "Compiler Explorer. A fine way to waste some time tinkering with C++ code"
+[gccex]: https://godbolt.org/ "Compiler Explorer. A fine way to waste some time tinkering with C++, Go, D Rust, or other compiled code"
 [smse]: https://xania.org/miracle/miracle.html "A SMS emulator, but in your browser"
 [jsb]: https://bbc.godbolt.org/ "A Javascript BBC Micro emulator"
 
