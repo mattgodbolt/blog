@@ -1,0 +1,26 @@
+All change for me
+Date: 2018-04-19 16:30
+Status: Public
+Summary: Big news, I've left DRW, have some spare time, and a new job in the summer
+Label: Blog
+
+Last week I took the momentous decision to wave goodbye to my
+friends and colleagues at [DRW](https://drw.com/), and try something new.
+
+I had an amazing 7½ years at DRW, learning so much and making some firm friends. DRW is an
+excellent company to work for, and this was the longest job I'd ever had. That made the decision to
+leave extremely hard, but I felt it was time to try something new.
+
+I'm taking a few months off, and then I'm very excited to start work at [Coinbase](https://coinbase.com)
+in the summer, where I will be working on making their exchange software even more awesome. 
+I'll be staying in the Chicago area, so disruption to my family is minimal.
+
+In the next few weeks I'll be spending a lot of time with my wife and kids, but I also hope to use
+the time to
+work on [Compiler Explorer][ce] and other [open][zindex] [source][seasocks] 
+[projects][jsbeeb]. And finally complete Zelda: Breath of the Wild too!
+
+[ce]: https://godbolt.org/ "Compiler Explorer a.k.a. 'godbolt'"
+[zindex]: https://github.com/mattgodbolt/zindex "Index your gzipped files"
+[seasocks]: https://github.com/mattgodbolt/seasocks "Serve up some websocket goodness from C++"
+[jsbeeb]: https://github.com/mattgodbolt/jsbeeb "Recapturing a lost youth, in Javascript"
