@@ -19,7 +19,7 @@
   <link href="http://xania.org/feed/[%= label.name %]" rel="self" />
 [%- else -%]
   <link href="http://xania.org/?utm_source=feed&amp;utm_medium=rss" />
-  <link href="http://xania.org/feed" rel="self" />
+  <link href="http://xania.org/feed.atom" rel="self" />
 [%- end -%]
   <updated>[%= latestUpdateISO %]</updated>
   <rights>Copyright [%= year %] Matt Godbolt. Unless otherwise stated, all content is licensed under the Creative Commons Attribution-NonCommercial 2.5 License.</rights>

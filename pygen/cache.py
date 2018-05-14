@@ -4,7 +4,7 @@ class SqlBackend:
     """A sqlite3/pysqlite2 database backend for the cache.
     Attempts to use sqlite3 first, and if that fails, tries
     pysqlite2."""
-    currentVersion = 15
+    currentVersion = 16
     def __init__(self, filename):
         try:
             import sqlite3
