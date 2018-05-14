@@ -1,10 +1,10 @@
 C++Now - trip report
-Date: 2018-05-14 18:30
-Status: Draft
+Date: 2018-05-14 22:30
+Status: Public
 Summary: A last-minute decision to head to C++Now ends up with an even-more last-minute talk
 Label: Blog, Coding
 
-As I've [mentioned previously](https://xania.org/201804/all-change), I'm currently on a break
+As I've [mentioned previously](/201804/all-change), I'm currently on a break
 between jobs. With my copious spare time I decided -- rather late in the day -- to head to
 [C++Now](http://cppnow.org/), a C++ Conference held yearly in Aspen, Colorado. Several C++
 folks had recommended that I come to it: it's a smaller and more intimate conference than
@@ -14,13 +14,13 @@ I was not disappointed! Firstly, Aspen is a beautiful place to hold a conference
 the thin air at 9,000 feet up takes a bit of getting used to.
 
 <p class="picture">
-<a href="/201805/conference-pic.jpg">
-<img src="/201805/conference-pic-thumb.jpg" width="300" height="225" alt="The Aspen Center of Physics"/></a>
+<a href="/201805/conference-pic.jpeg">
+<img src="/201805/conference-pic-thumb.jpeg" width="300" height="225" alt="The Aspen Center of Physics"/></a>
  <br/>The conference rooms used for C++Now nestle in a beautiful meadow.
 </p>
 
 After deciding to go, I thought it would be odd to attend a conference and not speak. Of course,
-submissions for talks had closed months earlier, but thankfully the conference runs lightning talk
+submissions for talks had closed months earlier, but thankfully the conference has lightning talk
 sessions. I love these kinds of things, and so prepared a 5-minute talk: "Trip Report: 7 years in
 finance with C++". I submitted the idea on the Thursday before the conference. To my surprise,
 one of the organisers -- the amazing [Jon Kalb][jk] -- contacted me the next day to ask a favour. One of the
@@ -33,14 +33,14 @@ something together pretty quickly!
 Aspen has a small airport but many people fly in to Denver and drive the remaining 4 hours. I'm blessed that
 [Jason Turner][jt] (of [C++ Weekly][cpw] and [CppCast][] fame) lives in Denver and offered to let me stay the
 night before (and the night of my return). I'm even more lucky that [Charley Bay][cb] offered to drive me to
-Aspen...and also to let me share his room! All the rooms were booked. _Thank you_ so much Charley!
+Aspen...and also to let me share his room! As all the rooms were booked, this was a life-saver. _Thank you_ so much Charley!
 
 [jt]: http://articles.emptycrate.com/about.html "A lovely person, and a fantastic coach. You should hire him to come and do training at your company!"
 [cpw]: https://www.youtube.com/channel/UCxHAlbZQNFU2LgEtiqd2Maw "Bite-sized videos explaining C++ concepts"
 [CppCast]: http://cppcast.com/ "A (mostly) weekly podcast on all things C++, presented by Rob Irving and Jason Turner"
 [cb]: http://cppcast.com/2017/06/charley-bay/ "One of the nicest people I've ever met, and an amazingly sharp mind hidden behind his avuncular jocularity"
 
-Sunday night was a reception and checkin. It was great to meet so many great people. The conference is so much
+Sunday night was conference registration and a reception. It was great to meet so many great people. The conference is
 smaller than others I've been too: around 150 attendees. By the end of the week I knew pretty much everyone by name, which is
 a refreshing change from the anonymity of some larger conferences.
 
@@ -54,7 +54,7 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
 
 [bash]: http://www.bashfilms.com
 
-## Monday 7th June
+### Monday 7th June
 
 * Lisa Lippincott's opening keynote was a mind-blowing explanation of how she's working on some theories of how imperative
   programs migth be modeled and perhaps even proven correct or otherwise. Beautiful slides, well presented, but mostly over
@@ -68,7 +68,7 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
 * Mateusz Putz gave a great overview of some of the features coming in C++20.
 * The first night of lightning talks was great fun!
 
-## Tuesday 8th June
+### Tuesday 8th June
 
 * Tony Van Eerd updated us on his quest for a lock-free queue. Tony's an amazing presenter, and I enjoyed part 3/N of his
   ongoing talk series very much.
@@ -84,12 +84,14 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
   year and made a (mostly) new talk showing yet more ways compilers can amaze us with their ability to optimize our code. The talk
   went about as well as I could possibly hope -- mainly because of the many wise and learned folks in the room helping me out with
   great observations and questions as we went through the examples. I hope the video does this justice: I can imagine this kind of
-  back-and-forth talk where the audience is more involved might not be captured well. We will see! Slides are on [GitHub](https://github.com/mattgodbolt/cppcon-talk)
+  back-and-forth talk where the audience is more involved might not be captured well. We will see! Slides are on [GitHub](https://github.com/mattgodbolt/cppcon-talk).
 
+<div align="center">
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I heard you like to compiler explorer while watching a compiler explorer talk... <a href="https://twitter.com/mattgodbolt?ref_src=twsrc%5Etfw">@mattgodbolt</a> <a href="https://t.co/BCnmqayUuV">pic.twitter.com/BCnmqayUuV</a></p>&mdash; Peter Bindels (@dascandy42) <a href="https://twitter.com/dascandy42/status/993982967562170370?ref_src=twsrc%5Etfw">May 8, 2018</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
 
-## Wednesday 9th June
+### Wednesday 9th June
 
 * Tony Van Eerd gave some sage "Words of Wisdom" in another triumph of well-reasoned observations on how to be a better programmer.
 * My favourite technical talk of the whole conference was given by Malte Skarupke: a fast hash map. Malte has a series of blog posts
@@ -101,7 +103,7 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
 * The second evening of lightning talks was an absolute blast too. Despite my giving a full-length talk, I still did my lightning talk too.
   Slides are on [GitHub](https://github.com/mattgodbolt/cppnow-lightning).
 
-## Thursday 10th June
+### Thursday 10th June
 
 * Ben Deane explained the use of the declarative style in C++. This was an illuminating introduction (to me at least!) to the style of
   putting more logic into declarations, using I+FE (Immediately Invoked Inline Function Expressions) to push setup code into discrete
@@ -118,7 +120,7 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
 * Titus Winters gave a polished and eloquent talk on modern C++ API design. As always, it has a skew towards Google's way of doing things
   (which I mostly agree with), but others may differ. Either way, the talk was informative and worth a watch when the videos are out.
 
-## Friday 11th June
+### Friday 11th June
 
 * The closing keynote was from one of my favourite presenters, [John Regehr](http://www.cs.utah.edu/~regehr/). His specialist subject
   is undefined behaviour, and in this talk he gave a great overview of why we have undefined behaviour and why it's so useful. This is
