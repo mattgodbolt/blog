@@ -1,0 +1,136 @@
+C++Now - trip report
+Date: 2018-05-14 18:30
+Status: Draft
+Summary: A last-minute decision to head to C++Now ends up with an even-more last-minute talk
+Label: Blog, Coding
+
+As I've [mentioned previously](https://xania.org/201804/all-change), I'm currently on a break
+between jobs. With my copious spare time I decided -- rather late in the day -- to head to
+[C++Now](http://cppnow.org/), a C++ Conference held yearly in Aspen, Colorado. Several C++
+folks had recommended that I come to it: it's a smaller and more intimate conference than
+[CppCon](https://cppcon.org/).
+
+I was not disappointed! Firstly, Aspen is a beautiful place to hold a conference, although
+the thin air at 9,000 feet up takes a bit of getting used to.
+
+<p class="picture">
+<a href="/201805/conference-pic.jpg">
+<img src="/201805/conference-pic-thumb.jpg" width="300" height="225" alt="The Aspen Center of Physics"/></a>
+ <br/>The conference rooms used for C++Now nestle in a beautiful meadow.
+</p>
+
+After deciding to go, I thought it would be odd to attend a conference and not speak. Of course,
+submissions for talks had closed months earlier, but thankfully the conference runs lightning talk
+sessions. I love these kinds of things, and so prepared a 5-minute talk: "Trip Report: 7 years in
+finance with C++". I submitted the idea on the Thursday before the conference. To my surprise,
+one of the organisers -- the amazing [Jon Kalb][jk] -- contacted me the next day to ask a favour. One of the
+scheduled presenters had dropped out: could I possibly fill in? With the over-confidence of someone
+who doesn't do this enough to know better, I said yes! My talk was to be on Tuesday, so I had to cobble
+something together pretty quickly!
+
+[jk]: http://exceptionsafecode.com/ "Jon Kalb's awesome site"
+
+Aspen has a small airport but many people fly in to Denver and drive the remaining 4 hours. I'm blessed that
+[Jason Turner][jt] (of [C++ Weekly][cpw] and [CppCast][] fame) lives in Denver and offered to let me stay the
+night before (and the night of my return). I'm even more lucky that [Charley Bay][cb] offered to drive me to
+Aspen...and also to let me share his room! All the rooms were booked. _Thank you_ so much Charley!
+
+[jt]: http://articles.emptycrate.com/about.html "A lovely person, and a fantastic coach. You should hire him to come and do training at your company!"
+[cpw]: https://www.youtube.com/channel/UCxHAlbZQNFU2LgEtiqd2Maw "Bite-sized videos explaining C++ concepts"
+[CppCast]: http://cppcast.com/ "A (mostly) weekly podcast on all things C++, presented by Rob Irving and Jason Turner"
+[cb]: http://cppcast.com/2017/06/charley-bay/ "One of the nicest people I've ever met, and an amazingly sharp mind hidden behind his avuncular jocularity"
+
+Sunday night was a reception and checkin. It was great to meet so many great people. The conference is so much
+smaller than others I've been too: around 150 attendees. By the end of the week I knew pretty much everyone by name, which is
+a refreshing change from the anonymity of some larger conferences.
+
+The sessions started early and finished late, with plenty of social activities in between. Most sessions were 90 minutes
+long: it seems a long time, but the small nature of the rooms and the informal setting lend themselves to a very
+interactive presentation style. That meant that even the best-planned talk would take a fair bit longer answer questions
+as the talk progressed. I love this style!
+
+Here's a list of all the talks I saw, along with a short description of them. [Bash films][bash] has recorded them all,
+so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/user/BoostCon) once they're postproduced.
+
+[bash]: http://www.bashfilms.com
+
+## Monday 7th June
+
+* Lisa Lippincott's opening keynote was a mind-blowing explanation of how she's working on some theories of how imperative
+  programs migth be modeled and perhaps even proven correct or otherwise. Beautiful slides, well presented, but mostly over
+  my head! Although maybe it was the early start and lack of coffee...
+* Charley Bay presented in his inimitable high-energy style a history of quantum computing, along with his thoughts and
+  intuitions about how quantum phenomena might actually be easier for computer programmers to understand than physicists.
+  Great fun, and thought-provoking.
+* Arthur O'Dwyer gave a talk on `std::pmr` and why an allocator is more accurately described as a handle to a heap. (Although
+  later he gave a lightning talk correcting this position!) I hadn't heard of the new `std::pmr` allocators, so this added to
+  my reading list!
+* Mateusz Putz gave a great overview of some of the features coming in C++20.
+* The first night of lightning talks was great fun!
+
+## Tuesday 8th June
+
+* Tony Van Eerd updated us on his quest for a lock-free queue. Tony's an amazing presenter, and I enjoyed part 3/N of his
+  ongoing talk series very much.
+* Mateusz spoke again, giving some insight into how Conan is used.
+* Jason Rice introduced us to [cppdock](https://github.com/ricejasonf/cppdock), a novel container-based build system.
+* Not a talk, but at lunch I spoke with Eberhard Gräther, and he showed me [SourceTrail](https://www.sourcetrail.com/) which looks
+  like a fantastic way to start dipping into a novel codebase, or even to gain insight into your own existing code.
+* I was very excited to meet Vittorio Romeo and hear his talk on `std::future`-like things which don't need allocations. A very
+  polished presentation, and a great "science report" of his findings along the way, which I think is worth pursuing further.
+  Always good to see some allocation-free code too, alongside some expression template-type stuff. I'm a bit of an old
+  fuddy-duddy about some of the new-fangled concepts in C++, but talks like Vittorio cause me to rethink my position in a very healthy way.
+* My talk... "What else has my compiler done for me lately?". I took all the cutting-room floor examples from my CppCon talk last
+  year and made a (mostly) new talk showing yet more ways compilers can amaze us with their ability to optimize our code. The talk
+  went about as well as I could possibly hope -- mainly because of the many wise and learned folks in the room helping me out with
+  great observations and questions as we went through the examples. I hope the video does this justice: I can imagine this kind of
+  back-and-forth talk where the audience is more involved might not be captured well. We will see! Slides are on [GitHub](https://github.com/mattgodbolt/cppcon-talk)
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I heard you like to compiler explorer while watching a compiler explorer talk... <a href="https://twitter.com/mattgodbolt?ref_src=twsrc%5Etfw">@mattgodbolt</a> <a href="https://t.co/BCnmqayUuV">pic.twitter.com/BCnmqayUuV</a></p>&mdash; Peter Bindels (@dascandy42) <a href="https://twitter.com/dascandy42/status/993982967562170370?ref_src=twsrc%5Etfw">May 8, 2018</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+## Wednesday 9th June
+
+* Tony Van Eerd gave some sage "Words of Wisdom" in another triumph of well-reasoned observations on how to be a better programmer.
+* My favourite technical talk of the whole conference was given by Malte Skarupke: a fast hash map. Malte has a series of blog posts
+  on this, and will post his source code on [his website](https://probablydance.com/) soon. I can't wait to see how it looks. Great talk, fantastic data-driven research
+  and the kind of thing that gets me really excited about programming in C++!
+* Jason Turner's presentation was a great explanation of all the things wrong (and right) with initializer lists.
+* Phil Nash's talk on "Option(al) is Not a Failure" discussed many different strategies for error handling in programs. It introduced Herb Sutter's 
+  [early ideas](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0709r0.pdf) on how static `throw` might be part of the solution.
+* The second evening of lightning talks was an absolute blast too. Despite my giving a full-length talk, I still did my lightning talk too.
+  Slides are on [GitHub](https://github.com/mattgodbolt/cppnow-lightning).
+
+## Thursday 10th June
+
+* Ben Deane explained the use of the declarative style in C++. This was an illuminating introduction (to me at least!) to the style of
+  putting more logic into declarations, using I+FE (Immediately Invoked Inline Function Expressions) to push setup code into discrete
+  scopes, making more things const, and just generally making code even easier to reason about. This was a fantastic talk, and I believe it
+  won the "talk of the conference" award. Well done, Ben!
+* Peter Bindels gave a great overview of views, and how they can be implemented in a fairly straightforward way. Ranges is coming down the 
+  pipeline (it seems!) but Peter's talk gave practical insight into how one can implement and benefit from views and lazy evaluation with
+  existing codebases.
+* Anastasiia Kazakova showed some of the cool things IDEs (not just her own, CLion, but others too!) can do to make our lives better.
+* In the most interactive talk I went to, Gašper Ažman presented a novel paper on how to accept `this` in different ways, opening the
+  door to less repetition of code in reference-qualified member functions and more excitingly lots of novel ways to do unified call syntax.
+  An awful lot of back and forth with the audience made this an awful lot of fun. I suspect the video won't work very well as a result. I
+  guess you just had to be there!
+* Titus Winters gave a polished and eloquent talk on modern C++ API design. As always, it has a skew towards Google's way of doing things
+  (which I mostly agree with), but others may differ. Either way, the talk was informative and worth a watch when the videos are out.
+
+## Friday 11th June
+
+* The closing keynote was from one of my favourite presenters, [John Regehr](http://www.cs.utah.edu/~regehr/). His specialist subject
+  is undefined behaviour, and in this talk he gave a great overview of why we have undefined behaviour and why it's so useful. This is
+  a pretty mind-mendingly complex subject, but John handled it well. I finally learnt the difference between `undef` and `poison` values
+  in LLVM!
+
+## Conclusion
+
+The notes above don't do the conference justice. So much of the cool stuff happens during the breaks, or at dinners or lunches. I met some
+amazing people, and was inspired to read up on about 12 new papers, and to investigate more libraries. A special thanks to 
+[Michael Caisse](https://ciere.com/) for inviting me to dinner and giving me a great opportunity to speak with many of the boost
+developers. And again, huge thanks to Jason Turner for the pre- and post-conference accomodation and airport taxi service, Jon Kalb
+for giving me the opportunity to talk, and of course Charley Bay for letting me car-share and room-share with him.
+
+I'm already looking forward to attending again next year!
