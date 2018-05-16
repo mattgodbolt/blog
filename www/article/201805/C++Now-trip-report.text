@@ -65,7 +65,7 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
 * Arthur O'Dwyer gave a talk on `std::pmr` and why an allocator is more accurately described as a handle to a heap. (Although
   later he gave a lightning talk correcting this position!) I hadn't heard of the new `std::pmr` allocators, so this added to
   my reading list!
-* Mateusz Putz gave a great overview of some of the features coming in C++20.
+* Mateusz Pusz gave a great overview of some of the features coming in C++20.
 * The first night of lightning talks was great fun!
 
 ### Tuesday 8th June
