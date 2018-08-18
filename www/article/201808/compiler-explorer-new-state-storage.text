@@ -1,0 +1,39 @@
+Compiler Explorer's new state storage
+Date: 2018-08-18 18:00
+Status: Public
+Summary: Some notes on Compiler Explorer's new storage
+Label: Coding
+
+Hello! As of today's update, [Compiler Explorer][ce] now has its own storage solution
+for when you click "Share" and pick "Short" from the dropdown. We used to store
+all the state in the URL itself, then we used goo.gl to shorten it. When Stack
+Overflow banned goo.gl, we rewrote goo.gl URLs to be godbolt.org/g/blah, where
+blah was the bit from goo.gl. So, your data was still stored with Google.
+
+That's all changed! Now short URLs are derived from data stored on the Compiler
+Explorer website itself. This has some very important changes:
+
+* You'll get a new Privacy Policy to agree to: we changed the policy to be clear 
+  that we will now store your data if you shorten links.
+* The limit on URL length which previously prevented some longer code snippets
+  or more complex layouts from being shortened is now lifted. There's no
+  practical limit any more: though we might pragmatically have to put one in.
+* The short link unfurling that happens when you paste a link into Slack,
+  Discord, or Twitter is much improved.
+* Compiler Explorer admins are now responsible for your data. We understand
+  this is a huge responsibility and take it very seriously. We have a number
+  of safeguards in place to keep everything as safe and secure as we can.
+
+If you have _any_ issues with the new system please get in contact as soon as
+possible. You can [email][] me, or [tweet][] at me, or direct message me on the 
+[Cpplang Slack][slack].
+
+Over the next few weeks we hope to augment this system with further
+improvements. Watch this space!
+
+As ever, huge thanks to Compiler Explorer's main developer, Rubén Rincon!
+
+[ce]: https://godbolt.org
+[email]: mailto:matt@godbolt.org
+[tweet]: https://twitter.com/mattgodbolt
+[slack]: https://cpplang.now.sh/
