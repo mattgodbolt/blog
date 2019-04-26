@@ -38,7 +38,7 @@ fixup html text/html
 fixup atom application/rss+xml
 
 if [ ! -d miracle ]; then
-    git clone git@github.com:mattgodbolt/miracle.git
+    git clone git@github.com:mattgodbolt/Miracle.git miracle
 fi
 if [ ! -d miracle/roms ]; then
     aws s3 cp s3://xania.org/miracle-roms.tar.gz /tmp/

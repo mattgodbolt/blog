@@ -13,12 +13,13 @@ from precis import PrecisExtension
 pygments.lexers.LEXERS['AsmLexer'] = ('asm_lexer', 'AsmLexer', ('asm',), ('*.asm',), ('text/asm'))
 pygments.lexers.LEXERS['BasicLexer'] = ('basic_lexer', 'BasicLexer', ('basic',), ('*.basic',), ('text/basic'))
 
-
 # TODO: make this a per-article and config thing
 defaultTimeZone = timezone('Europe/London')
 
+
 class GlobalData:
     """A holding structure for global data.  Nicer than global variables."""
+
     def __init__(self):
         self.config = {}
         self.articles = {}
@@ -45,7 +46,7 @@ class GlobalData:
             wildcardName = value + ".*"
             if wildcardName in self.config:
                 return self.config[wildcardName].replace("*", label.filename)
-            
+
         return self.config[value]
 
     def GetInheritedInt(self, value, label):
@@ -56,13 +57,15 @@ class GlobalData:
             func = lambda a: a.Status == "public" and label in a.Labels
         else:
             func = lambda a: a.Status == "public"
-        return filter(func, self.articles.values())
-        
+        return list(filter(func, list(self.articles.values())))
+
     def SetCache(self, cache):
         self.cache = cache
 
+
 class Article:
     """An article"""
+
     def __init__(self, globalData, name):
         self.BaseName = name.replace('\\', '/')
         self.ArticleModified = 0
@@ -83,49 +86,66 @@ class Article:
         self.URLPrefix = globalData.config['ArticleURLPrefix']
         self.PrevArticle = None
         self.NextArticle = None
-        
+
     def __getattr__(self, name):
         name = name.lower()
-        if name == "title": return self.Title
-        elif name == "contenthtml": return self.HtmlText
-        elif name == "introhtml": return self.HtmlIntro
-        elif name == "contentxhtml": return self.XHtmlText
-        elif name == "basename": return self.BaseName
-        elif name == "summary": return self.Summary
-        elif name == "via": return self.Via
+        if name == "title":
+            return self.Title
+        elif name == "contenthtml":
+            return self.HtmlText
+        elif name == "introhtml":
+            return self.HtmlIntro
+        elif name == "contentxhtml":
+            return self.XHtmlText
+        elif name == "basename":
+            return self.BaseName
+        elif name == "summary":
+            return self.Summary
+        elif name == "via":
+            return self.Via
         elif name == "basenamename":
             return 'a' + re.sub('[^a-zA-Z0-9.-]', '_', self.BaseName)
         elif name == "datehtml":
             return FormatHtmlDate(self.Dates[0])
         elif name == "dateiso":
             return FormatISODate(self.Dates[0])
-        elif name == "datesatom": return FormatAtomDates(self.Dates)
+        elif name == "datesatom":
+            return FormatAtomDates(self.Dates)
         elif name == "datemonth":
             return self.Dates[0].strftime('%B %Y')
-        elif name == "permalink": return self.URLPrefix + self.BaseName
-        elif name == "datemonthprev": return self.PrevArticle and self.PrevArticle.DateMonth or ""
-        elif name == "labels": return self.Labels
-        
-        raise AttributeError, "Unknown attribute " + name
+        elif name == "permalink":
+            return self.URLPrefix + self.BaseName
+        elif name == "datemonthprev":
+            return self.PrevArticle and self.PrevArticle.DateMonth or ""
+        elif name == "labels":
+            return self.Labels
+
+        raise AttributeError("Unknown attribute " + name)
+
 
 class Label:
     """Holds information about a label."""
+
     def __init__(self, name):
         self.name = name
         self.filename = name.replace(" ", "-")
-        
-    def __cmp__(self, other):
-        return cmp(self.name, other.name)
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def __eq__(self, other):
+        return self.name == other.name
 
     def __hash__(self):
         return hash(self.name)
-        
+
     def __repr__(self):
         return "Label(%s)" % self.name
 
+
 def ReadGeneratorConfig(filename, globalData):
     lineNumber = 0
-    
+
     for line in open(filename, 'r'):
         lineNumber += 1
         line = line.strip()
@@ -141,34 +161,39 @@ def ReadGeneratorConfig(filename, globalData):
         except ValueError:
             warn("%s:%d : Missing ':'" % (filename, lineNumber))
 
+
 def CheckConfig(globalData):
     def IsPresent(key):
         if not key in globalData.config:
-            raise Exception, "Missing required configuration option '%s'" % key
+            raise Exception("Missing required configuration option '%s'" % key)
+
     def IsDir(key):
         IsPresent(key)
         if not os.path.isdir(globalData.config[key]):
-            raise Exception, "Missing directory '%s' for configuration option '%s'" % (globalData.config[key], key)
+            raise Exception("Missing directory '%s' for configuration option '%s'" % (globalData.config[key], key))
+
     def IsFile(key):
         IsPresent(key)
         if not os.path.isfile(globalData.config[key]):
-            raise Exception, "Missing file '%s' for configuration option '%s'" % (globalData.config[key], key)
-    def CreateDummy(key, value = ""):
+            raise Exception("Missing file '%s' for configuration option '%s'" % (globalData.config[key], key))
+
+    def CreateDummy(key, value=""):
         if not key in globalData.config:
             globalData.config[key] = value
+
     def IsNumber(key):
         IsPresent(key)
         try:
             value = int(globalData.config[key])
             if value <= 1:
-                raise Exception, "Invalid numeric value %d (< 1) for configuration option '%s'" % (value, key)
+                raise Exception("Invalid numeric value %d (< 1) for configuration option '%s'" % (value, key))
         except ValueError:
-            raise Exception, "Invalid numeric value '%s' for configuration option '%s'" % (globalData.config[key], key)
-            
+            raise Exception("Invalid numeric value '%s' for configuration option '%s'" % (globalData.config[key], key))
+
     IsDir("ArticleDirectory")
     IsPresent("ArticleURLPrefix")
     IsFile("ArticleTemplate")
-    
+
     if not CreateDummy("FrontPageTemplate"):
         IsFile("FrontPageTemplate")
         IsPresent("FrontPageArticleCount")
@@ -189,10 +214,12 @@ def CheckConfig(globalData):
     IsNumber("FrontPageArticleCount")
     IsNumber("AtomFeedArticleCount")
 
+
 def GetArticle(globalData, name):
     if name not in globalData.articles:
         globalData.articles[name] = Article(globalData, name)
     return globalData.articles[name]
+
 
 def ScanArticleDirectory(globalData):
     articleDir = os.path.abspath(globalData.config["ArticleDirectory"])
@@ -210,6 +237,7 @@ def ScanArticleDirectory(globalData):
         if ".svn" in dirs:
             dirs.remove(".svn")
 
+
 def ParseDate(date):
     """Parse date (a string in the format "YYYY-MM-DD[ HH[:MM[:SS]]]"""
     match = re.match(r'\s*(\d\d\d\d)-(\d\d)-(\d\d)(?:\s+(\d\d)(?::(\d\d)(?::(\d\d))?)?)?\s*', date)
@@ -217,7 +245,8 @@ def ParseDate(date):
         year, month, day, hour, minute, second = [int(i or 0) for i in match.groups()]
         local_dt = datetime.datetime(year, month, day, hour, minute, second, 0)
         return defaultTimeZone.localize(local_dt, is_dst=None)
-    raise ValueError, 'Invalid date string "' + date + '"'
+    raise ValueError('Invalid date string "' + date + '"')
+
 
 def ReadArticle(globalData, article):
     processingHeader = True
@@ -225,12 +254,12 @@ def ReadArticle(globalData, article):
     try:
         fileHandle = codecs.open(filename, 'r', 'utf8')
     except IOError:
-        print "Ignoring article '%s' as cannot open" % filename
+        print("Ignoring article '%s' as cannot open" % filename)
         return
     article.RawTitle = fileHandle.readline().strip()
     # Strip the BOM, if needed.
-    article.RawTitle = article.RawTitle.lstrip(unicode(codecs.BOM_UTF8, 'utf8'))
-    print "Read article", article.RawTitle
+    article.RawTitle = article.RawTitle.lstrip(str(codecs.BOM_UTF8, 'utf8'))
+    print("Read article", article.RawTitle)
     article.ArticleText = ""
     headers = {}
     lineNumber = 1
@@ -249,14 +278,14 @@ def ReadArticle(globalData, article):
                     warn("%s:%d : Duplicate key '%s'" % (filename, lineNumber, key))
                 headers[key] = value
             except ValueError:
-                raise Exception, "%s:%d : Missing ':''" % (filename, lineNumber)
+                raise Exception("%s:%d : Missing ':''" % (filename, lineNumber))
         else:
             article.ArticleText += line
-    for key, value in headers.items():
+    for key, value in list(headers.items()):
         if key == 'status':
             value = value.lower()
             if value not in ['public', 'private', 'draft']:
-                raise Exception, "Invalid status: '" + value + "'"
+                raise Exception("Invalid status: '" + value + "'")
             article.Status = value
         elif key == 'date':
             article.Dates = [ParseDate(val) for val in value.split(',')]
@@ -271,13 +300,14 @@ def ReadArticle(globalData, article):
         elif key == 'label':
             article.Labels = [Label(label.strip()) for label in value.split(",")]
         else:
-            raise Exception, "Invalid header: '" + key + "'"
+            raise Exception("Invalid header: '" + key + "'")
     # Only count labels with public articles.
     if article.Status == "public":
         for label in article.Labels:
             globalData.labels.add(label)
     if not article.Dates:
-        raise Exception, "Missing article date(s)"
+        raise Exception("Missing article date(s)")
+
 
 def ProcessTitle(title):
     title = re.sub('&(?!#)', '&amp;', title)
@@ -285,32 +315,42 @@ def ProcessTitle(title):
     title = title.replace('>', '&gt;')
     return title
 
+
 xhtmlToHtmlRe = re.compile(r'(<(hr|br|img|param)[^<>]*)/>')
+
+
 def XHtmlToHtml(xhtml):
     """As Markdown.py doesn't have the --html4tags option, this is my quick and dirty
     xhtml to html converter."""
     return xhtmlToHtmlRe.sub(r'\1>', xhtml).replace('&nbsp;', '&#160;')
+
 
 def CleanUpXHtml(xhtml):
     xhtml = xhtml.replace('&nbsp;', '&#160;')
     xhtml = re.sub('&(?!(#|amp|gt|lt|quot))', '&amp;', xhtml)
     return xhtml
 
+
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
     cacheObj = (24, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
-        print "Read cached article", article.RawTitle
+        print("Read cached article", article.RawTitle)
         article.XHtmlText, article.HtmlText, article.HtmlIntro = resultObj
     else:
-        print "Caching article", article.RawTitle
+        print("Caching article", article.RawTitle)
         extensions = ["markdown.extensions.extra", "markdown.extensions.codehilite"]
         ex_conf = {"markdown.extensions.codehilite": {'guess_lang': False}}
-        article.XHtmlText = CleanUpXHtml(markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml1"))
-        article.HtmlText = markdown(article.ArticleText, extensions=extensions+["markdown.extensions.smarty"], extension_configs=ex_conf, output_format="html5")
-        article.HtmlIntro = markdown(article.ArticleText, extensions=extensions+["markdown.extensions.smarty", PrecisExtension()], extension_configs=ex_conf, output_format="html5")
+        article.XHtmlText = CleanUpXHtml(
+            markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml1"))
+        article.HtmlText = markdown(article.ArticleText, extensions=extensions + ["markdown.extensions.smarty"],
+                                    extension_configs=ex_conf, output_format="html5")
+        article.HtmlIntro = markdown(article.ArticleText,
+                                     extensions=extensions + ["markdown.extensions.smarty", PrecisExtension()],
+                                     extension_configs=ex_conf, output_format="html5")
         globalData.cache.Add(cacheObj, (article.XHtmlText, article.HtmlText, article.HtmlIntro))
+
 
 def FormatHtmlDate(date):
     suffix = "th"
@@ -319,15 +359,18 @@ def FormatHtmlDate(date):
     if date.day in [3, 23]: suffix = "rd"
     return date.strftime('%X %Z on ' + str(date.day) + '<sup>' + suffix + '</sup> %B %Y')
 
+
 def FormatISODate(date):
     localDate = date.astimezone(utc)
     return localDate.strftime('%Y-%m-%dT%XZ')
 
+
 def FormatAtomDates(dates):
     if len(dates) == 1:
         return "<updated>" + FormatISODate(dates[0]) + "</updated>"
-    return "<published>" +FormatISODate(dates[0]) + "</published>" + \
+    return "<published>" + FormatISODate(dates[0]) + "</published>" + \
            "\n".join(["<updated>" + FormatISODate(date) + "</updated>" for date in dates[1:]])
+
 
 def GetArticleDict(globalData, article):
     d = dict()
@@ -350,8 +393,9 @@ def GetArticleDict(globalData, article):
     d['year'] = str(datetime.datetime.now().year)
     d['labels'] = article.Labels
     d['allLabels'] = globalData.labels
-    
+
     return d
+
 
 def GetTemplateDependencies(globalData, template, includePath):
     # See if we have this cached - using the name of the template and its modification time.
@@ -366,12 +410,13 @@ def GetTemplateDependencies(globalData, template, includePath):
     if fileList:
         return fileList
     # If we failed then reconstruct the include, and cache them.
-    ignored, fileList = ETL.ProcessIncludes(template, includePath)
+    ignored, fileList = ETL.process_includes(template, includePath)
     fileList.add(template)
     globalData.cache.Add(cacheObj, fileList)
     # Remember to look up the file times and return those.
     fileList = [os.path.getmtime(file) for file in fileList]
     return fileList
+
 
 def OutputArticleHtml(globalData, article):
     template = globalData.config['ArticleTemplate']
@@ -382,19 +427,19 @@ def OutputArticleHtml(globalData, article):
     cacheObj = (dictionary, dependencyTimes)
     result = globalData.cache.Find(cacheObj)
     if result:
-        print "Found cached article", article.RawTitle
+        print("Found cached article", article.RawTitle)
         html = result
     else:
-        print "Processing article", article.RawTitle
-        html, deps = ETL.Process(template, '.', dictionary)
+        print("Processing article", article.RawTitle)
+        html, deps = ETL.process(template, '.', dictionary)
         globalData.cache.Add(cacheObj, html)
-    
+
     # See if the existing version we've found is the most up-to-date anyway.
     cacheObj = html
     if os.path.exists(articleHtml):
         expectedModTime = os.path.getmtime(articleHtml)
         if expectedModTime == globalData.cache.Find(cacheObj):
-            print "  article is already up to date."
+            print("  article is already up to date.")
             return
 
     output = codecs.open(articleHtml, 'w', "utf-8")
@@ -402,10 +447,11 @@ def OutputArticleHtml(globalData, article):
     output.close()
     globalData.cache.Add(cacheObj, os.path.getmtime(articleHtml))
 
+
 def MyMax(objects, key):
     """Replacement for max(obj, key) as python 2.4 doens't have it"""
     if not objects:
-        raise ValueError, "max() arg is empty"
+        raise ValueError("max() arg is empty")
     maximum = objects[0]
     maximumValue = key(maximum)
     for value in objects[1:]:
@@ -415,63 +461,63 @@ def MyMax(objects, key):
             maximum = value
     return maximum
 
+
 def OutputArticles(globalData, articles, template, label, outputName):
     latestUpdate = MyMax(articles, key=lambda a: a.Dates[-1]).Dates[-1]
-    d = { 
-        'year' : str(datetime.datetime.now().year),
-        'label' : label,
-        'articles' : articles,
-        'latestUpdateISO' : FormatISODate(latestUpdate),
-        'allLabels' : globalData.labels
-        }
-    html, deps = ETL.Process(template, '.', d)
+    d = {
+        'year': str(datetime.datetime.now().year),
+        'label': label,
+        'articles': articles,
+        'latestUpdateISO': FormatISODate(latestUpdate),
+        'allLabels': globalData.labels
+    }
+    html, deps = ETL.process(template, '.', d)
     output = codecs.open(outputName, 'w', 'utf-8')
     output.write(html)
     output.close()
+
 
 def GenerateArticleIndices(globalData, label):
     htmlTemplate = globalData.GetInheritedValue("FrontPageTemplate", label)
     atomTemplate = globalData.GetInheritedValue("AtomFeedTemplate", label)
     archiveTemplate = globalData.GetInheritedValue("ArchiveTemplate", label)
-    
+
     if not htmlTemplate and not atomTemplate and not archiveTemplate:
         return
-    
+
     articleCount = globalData.GetInheritedInt("FrontPageArticleCount", label)
     feedCount = globalData.GetInheritedInt("AtomFeedArticleCount", label)
-    
+
     articles = globalData.GetPublicArticles(label)
-    def SortDate(x, y):
-        if x.Dates[0] < y.Dates[0]: return 1
-        elif x.Dates[0] > y.Dates[0]: return -1
-        return 0
-    articles.sort(SortDate)
+
+    articles.sort(key=lambda x: x.Dates[0], reverse=True)
     for i in range(len(articles)):
         if i == 0:
             articles[i].PrevArticle = None
         else:
-            articles[i].PrevArticle = articles[i-1]
-        if i == len(articles)-1:
+            articles[i].PrevArticle = articles[i - 1]
+        if i == len(articles) - 1:
             articles[i].NextArticle = None
         else:
-            articles[i].NextArticle = articles[i+1]
-    
+            articles[i].NextArticle = articles[i + 1]
+
     htmlOutput = globalData.GetValue("FrontPageOutput", label)
     if htmlOutput and htmlTemplate:
         OutputArticles(globalData, articles[:articleCount], htmlTemplate, label, htmlOutput)
-        
+
     atomOutput = globalData.GetValue("AtomFeedOutput", label)
     if atomOutput and atomTemplate:
         OutputArticles(globalData, articles[:feedCount], atomTemplate, label, atomOutput)
-        
+
     archiveOutput = globalData.GetValue("ArchiveOutput", label)
     if archiveOutput and archiveTemplate:
         OutputArticles(globalData, articles, archiveTemplate, label, archiveOutput)
 
+
 def Generate(forceGenerate):
     globalData = GlobalData()
     ReadGeneratorConfig("generator.conf", globalData)
-    
+
     CheckConfig(globalData)
     if forceGenerate:
         globalData.config["ForceRefresh"] = True
@@ -481,37 +527,37 @@ def Generate(forceGenerate):
 
     ScanArticleDirectory(globalData)
 
-    for article in globalData.articles.itervalues():
+    for article in globalData.articles.values():
         try:
             ReadArticle(globalData, article)
         except Exception:
-            print "Failed to read article '%s'" % article.BaseName
+            print("Failed to read article '%s'" % article.BaseName)
             raise
-    
+
     # Remove invalid articles
-    for articleName in globalData.articles.keys():
+    for articleName in list(globalData.articles.keys()):
         if not globalData.articles[articleName].Dates:
-            print "Ignoring article (no dates)", articleName
+            print("Ignoring article (no dates)", articleName)
             del globalData.articles[articleName]
-    
-    for article in globalData.articles.values():
+
+    for article in list(globalData.articles.values()):
         CacheArticle(globalData, article)
-        
-    for article in globalData.articles.values():
+
+    for article in list(globalData.articles.values()):
         OutputArticleHtml(globalData, article)
-    
-    print "Generating indices: main page"
+
+    print("Generating indices: main page")
     GenerateArticleIndices(globalData, None)
-    
+
     for label in globalData.labels:
-        print "Generating indices:", label.name
+        print("Generating indices:", label.name)
         GenerateArticleIndices(globalData, label)
 
-    print "Flushing cache"
+    print("Flushing cache")
     globalData.cache.Flush()
-    print "Done"
-        
+    print("Done")
+
+
 if __name__ == "__main__":
     os.chdir(os.path.join(os.path.realpath(os.path.dirname(__file__)), r'../conf'))
     Generate(False)
-    

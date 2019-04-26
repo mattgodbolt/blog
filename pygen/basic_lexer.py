@@ -6,7 +6,7 @@ __all__ = ['BasicLexer']
 tokens = [
     'OTHERWISE',
     'AND', 'DIV', 'EOR', 'MOD', 'OR', 'ERROR', 'LINE', 'OFF',
-    'STEP', 'SPC', 'TAB(', 'ELSE', 'THEN', '<line>' , 'OPENIN', 'PTR',
+    'STEP', 'SPC', 'TAB(', 'ELSE', 'THEN', '<line>', 'OPENIN', 'PTR',
     'PAGE', 'TIME', 'LOMEM', 'HIMEM', 'ABS', 'ACS', 'ADVAL', 'ASC',
     'ASN', 'ATN', 'BGET', 'COS', 'COUNT', 'DEG', 'ERL', 'ERR',
     'EVAL', 'EXP', 'EXT', 'FALSE', 'FN', 'GET', 'INKEY', 'INSTR(',
@@ -14,7 +14,7 @@ tokens = [
     'POINT(', 'POS', 'RAD', 'RND', 'SGN', 'SIN', 'SQR', 'TAN',
     'TO', 'TRUE', 'USR', 'VAL', 'VPOS', 'CHR$', 'GET$', 'INKEY$',
     'LEFT$(', 'MID$(', 'RIGHT$(', 'STR$', 'STRING$(', 'EOF',
-    'WHEN', 'OF', 'ENDCASE', 'ELSE' , 'ENDIF', 'ENDWHILE', 'PTR',
+    'WHEN', 'OF', 'ENDCASE', 'ELSE', 'ENDIF', 'ENDWHILE', 'PTR',
     'PAGE', 'TIME', 'LOMEM', 'HIMEM', 'SOUND', 'BPUT', 'CALL', 'CHAIN',
     'CLEAR', 'CLOSE', 'CLG', 'CLS', 'DATA', 'DEF', 'DIM', 'DRAW',
     'END', 'ENDPROC', 'ENVELOPE', 'FOR', 'GOSUB', 'GOTO', 'GCOL', 'IF',
@@ -23,16 +23,19 @@ tokens = [
     'RETURN', 'RUN', 'STOP', 'COLOUR', 'TRACE', 'UNTIL', 'WIDTH', 'OSCLI',
     'SUM', 'BEAT',
     'APPEND', 'AUTO', 'CRUNCH', 'DELET', 'EDIT', 'HELP', 'LIST', 'LOAD',
-    'LVAR', 'NEW', 'OLD', 'RENUMBER', 'SAVE', 'TEXTLOAD', 'TEXTSAVE', 'TWIN'
+    'LVAR', 'NEW', 'OLD', 'RENUMBER', 'SAVE', 'TEXTLOAD', 'TEXTSAVE', 'TWIN',
     'TWINO', 'INSTALL',
     'CASE', 'CIRCLE', 'FILL', 'ORIGIN', 'PSET', 'RECT', 'SWAP', 'WHILE',
     'WAIT', 'MOUSE', 'QUIT', 'SYS', 'INSTALL', 'LIBRARY', 'TINT', 'ELLIPSE',
     'BEATS', 'TEMPO', 'VOICES', 'VOICE', 'STEREO', 'OVERLAY']
 
+
 def escape(tok):
     return tok.replace("$", "\$").replace("(", "\(").replace(")", "\)")
 
+
 tokenRe = "|".join(escape(token) for token in tokens)
+
 
 class BasicLexer(RegexLexer):
     name = 'BasicLexer'

@@ -6,6 +6,7 @@ from markdown.treeprocessors import Treeprocessor
 
 class PrecisProcessor(Treeprocessor):
     def __init__(self, md):
+        super().__init__()
         self.md = md
 
     def run(self, tree):
