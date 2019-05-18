@@ -1,0 +1,20 @@
+Live streaming on YouTube
+Date: 2019-05-18 18:35:00
+Status: Public
+Summary: Join me on YouTube for some live coding!
+Label: Blog
+
+Hey all! Since last time I'm glad to say I've landed a new job (more info to follow), and
+I'll be starting in June.
+
+Til then I've been hacking on Compiler Explorer, and as per the announcement on my
+[Patreon page](https://patreon.com/mattgodbolt), I've been working on executing arbitrary
+user code! We're really close to being able to turn that on!
+
+I've been live streaming a lot of the development process, and you can see the prior streams
+in [this playlist][pl]. If yo uwant to join me live, I'd suggest subscribing for notifications
+on [my YouTube channel][ytc]. It's been a lot of fun, and I'll miss it once I start my job,
+but I'm also super excited about that!
+
+[ytc]: https://www.youtube.com/channel/UCC3kVzi4cWpLl16KmzsEtiQ "Matt Godbolt's YouTube channel"
+[pl]: https://www.youtube.com/playlist?list=PL2HVqYf7If8dNAM3VTcRq1feE3SLGPuuH "Previous live streamed Compiler Explorer sessions"
