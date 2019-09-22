@@ -1,0 +1,87 @@
+CppCon 2019 Trip Report
+Date: 2019-09-22 00:00:00
+Status: Public
+Summary: All the best things that happened at CppCon 2019
+Label: Coding
+
+I'm on my way back from the 2019 CppCon conference and my head is
+buzzing with ideas! What an amazing experience!
+
+### The venue
+
+This was the first year CppCon was based out of a new venue, the
+[Gaylord Rockies](https://www.marriott.com/hotels/hotel-photos/dengr-gaylord-rockies-resort-and-convention-center/) in Aurora, Colorado. First up: the Gaylord is **huge**!
+It was clear we had outgrown the previous venue in Bellevue, but there's
+plenty of room to expand at the new venue. This changed the feel of the conference
+a little: I literally didn't leave the hotel from Sunday evening through to
+Friday evening.
+
+Most of the attendees also stayed in the hotel, which meant more opportunities
+to bump into other attendees. Food was good, but not exceptional, but, boy it was
+expensive! They know they have a captive audience!
+
+There was a beautiful pool and slide...but I didn't think to pack any swimming
+gear. I arrived a couple of days before the conference and locked myself in my
+hotel room to finish my slide decks anyway...
+
+### The keynotes
+
+The keynotes were all brilliant, and nearly all are already up on YouTube so you can check
+them out there. Briefly:
+
+* [Bjarne Stroustrup - C++ at 20](https://www.youtube.com/watch?v=u_ij0YNkFUs&t=10s). A good, if unsurprising
+state of the language address from its creator. Nice to see some new module syntax!
+* [Andrei Alexandrescu - Speed is Found in the Minds of People](https://www.youtube.com/watch?v=FJJTYQYB1JQ) - by far
+the most entertaining talk. Andrei is a loose cannon in the C++ community (or "free radical" as he described himself later in the week).
+This talk really makes you rethink how to optimise and how we need to think out of the box more often.
+* [Ben Smith - Applied WebAssembly: Compiling and Running C++ in Your Web Browser](https://www.youtube.com/watch?v=5N4b-rU-OAA) - this caught
+my attention for obvious reasons :). Ben detailed his work in bringing a decent compilation environment in the browser (with more than one nod
+to [Compiler Explorer](https://godbolt.org/)). Amusingly I was in the front row and had a bit of minor interaction with him (I was the person who
+prompted him on the `-c` command-line option!).
+* [Sean Parent - Better Code: Relationships](https://www.youtube.com/watch?v=ejF6qqohp3M) - my first time seeing Sean present live.
+An excellent theoretical founding in how relationships between objects affect the architecture of code.
+* Herb Sutter -
+ De-fragmenting C++: Making Exceptions and RTTI More Affordable and Usable ("Simplifying C++" #6 of N) - more on Herb's
+ quest to make C++ better for all users, and to heal the rift with those unable to use RTTI or exceptions.
+ 
+### The best of the rest
+
+There were **so many** to choose from at each timeslot it was very hard
+not to suffer from Fear Of Missing Out! Here's some random thoughts on some of the talks I attended:
+
+* [Kate Gregory](http://gregcons.com/)'s talk on naming was excellent as always. Kate's an amazing presenter, and her instinct
+on what makes good code is spot on. We learned a number of good naming practices, and how to apply them.
+* JF Bastien's "Let's Deprecate `volatile`" was a masterpiece. Simple, but elegant slides (with some neat little touches),
+an animated speaker who is passionate about the subject, and lots and lots of funny edge cases in C and C++. Fabulous.
+* Hana Dusíková's talk on her latest updates to her [compile-time regular expression library](https://github.com/hanickadot) was fabulous.
+Her interactive slides that show how the DFAs and NFAs are built really help get the point across, and of course she's just 
+so knowledgeable about how to efficiently and effectively use compile-time programming.
+* Matt Kulukundis gave an expert presentation (with cameos from [Hyrum Wright](https://www.hyrumslaw.com)) on the latest
+in the abseil hash map implementation. The topic's 100% up my street, of course, but Matt is a great presenter (and advertiser of Mountain Dew).
+* Kostas Kyrimis presented all of ADL and its gotchas in an ambitious first talk. Never have I been so scared to make a top-level function! :)
+* Peter Bindels and Sy Brand, somehow, managed to explain "Hello World from Scratch". From compiler, optimiser, assembler, linker and loader...it was quite a ride in 60m!
+They're a great presenting duo, too.
+* Talking of presenting duos, [Barbara and Ansel](https://copperspice.com) presented their vision of a GPU-driven UI library, with
+UHD graphics for all. Definitely one to watch!
+
+There were many other great talks too; these are just the first few that I had notes to hand as I write this
+on the plane on the way back to Chicago.
+
+### My talks
+
+I was really pleased with how my talks went. I had a lot of comments on my path tracer talk, and I'll be
+blogging about it (with some follow-up investigations) over the next few weeks.
+
+The slides:
+
+* [Path Tracing Three Ways](https://mattgodbolt.github.io/pt-three-ways-pres) - in which I showcase three versions of a path
+tracer written in different C++ styles, with a performance surprise detour at the end.
+* [Compiler Explorer: Behind the Scenes](https://mattgodbolt.github.io/ce-behind-the-scenes) - in which I further ride on
+the coat-tails of other, smarter folks and explain how I duct-taped together Compiler Explorer.
+
+### Conclusions
+
+Conferences are a fantastic place to learn new things. Often things you didn't know that you didn't know. They're
+also a place to stregnthen relationships between disparate groups of the community, meet new friends, and put
+faces to Twitter handles. CppCon is absolutely the best conference for C++: if you can only get to one
+conference a year, make CppCon 2020 a priority!
