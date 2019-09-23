@@ -26,7 +26,7 @@ hotel room to finish my slide decks anyway...
 
 ### The keynotes
 
-The keynotes were all brilliant, and nearly all are already up on YouTube so you can check
+The keynotes were all brilliant, and all are already up on YouTube so you can check
 them out there. Briefly:
 
 * [Bjarne Stroustrup - C++ at 20](https://www.youtube.com/watch?v=u_ij0YNkFUs&t=10s). A good, if unsurprising
@@ -41,7 +41,7 @@ prompted him on the `-c` command-line option!).
 * [Sean Parent - Better Code: Relationships](https://www.youtube.com/watch?v=ejF6qqohp3M) - my first time seeing Sean present live.
 An excellent theoretical founding in how relationships between objects affect the architecture of code.
 * Herb Sutter -
- De-fragmenting C++: Making Exceptions and RTTI More Affordable and Usable ("Simplifying C++" #6 of N) - more on Herb's
+ [De-fragmenting C++: Making Exceptions and RTTI More Affordable and Usable ("Simplifying C++" #6 of N)](https://www.youtube.com/watch?v=ARYP83yNAWk) - more on Herb's
  quest to make C++ better for all users, and to heal the rift with those unable to use RTTI or exceptions.
  
 ### The best of the rest
