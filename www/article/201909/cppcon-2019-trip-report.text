@@ -51,15 +51,15 @@ not to suffer from Fear Of Missing Out! Here's some random thoughts on some of t
 
 * [Kate Gregory](http://gregcons.com/)'s talk on naming was excellent as always. Kate's an amazing presenter, and her instinct
 on what makes good code is spot on. We learned a number of good naming practices, and how to apply them.
-* JF Bastien's "Let's Deprecate `volatile`" was a masterpiece. Simple, but elegant slides (with some neat little touches),
+* [JF Bastien](https://twitter.com/jfbastien)'s "Let's Deprecate `volatile`" was a masterpiece. Simple, but elegant slides (with some neat little touches),
 an animated speaker who is passionate about the subject, and lots and lots of funny edge cases in C and C++. Fabulous.
-* Hana Dusíková's talk on her latest updates to her [compile-time regular expression library](https://github.com/hanickadot) was fabulous.
+* [Hana Dusíková](https://twitter.com/hankadusikova)'s talk on her latest updates to her [compile-time regular expression library](https://github.com/hanickadot) was fabulous.
 Her interactive slides that show how the DFAs and NFAs are built really help get the point across, and of course she's just 
 so knowledgeable about how to efficiently and effectively use compile-time programming.
 * Matt Kulukundis gave an expert presentation (with cameos from [Hyrum Wright](https://www.hyrumslaw.com)) on the latest
 in the abseil hash map implementation. The topic's 100% up my street, of course, but Matt is a great presenter (and advertiser of Mountain Dew).
-* Kostas Kyrimis presented all of ADL and its gotchas in an ambitious first talk. Never have I been so scared to make a top-level function! :)
-* Peter Bindels and Sy Brand, somehow, managed to explain "Hello World from Scratch". From compiler, optimiser, assembler, linker and loader...it was quite a ride in 60m!
+* [Kostas Kyrimis](https://twitter.com/kkyrimis) presented all of ADL and its gotchas in an ambitious first talk. Never have I been so scared to make a top-level function! :)
+* [Peter Bindels](https://twitter.com/dascandy) and [Sy Brand](https://twitter.com/tartanllama), somehow, managed to explain "Hello World from Scratch". From compiler, optimiser, assembler, linker and loader...it was quite a ride in 60m!
 They're a great presenting duo, too.
 * Talking of presenting duos, [Barbara and Ansel](https://copperspice.com) presented their vision of a GPU-driven UI library, with
 UHD graphics for all. Definitely one to watch!
