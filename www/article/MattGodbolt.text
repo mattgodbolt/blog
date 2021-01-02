@@ -17,16 +17,17 @@ what I saw in it all --- but for me it was just the beginning!
 
 <img width="162" height="130" class="pic-left" alt="Onslaught!" src="http://www.stairwaytohell.com/lostandfound/Onslaught-scr.jpg" />
 
-During my school years I met like-minded Richard Talbot-Watkins, and we started making little programs
+During my school years I met like-minded [Richard Talbot-Watkins](https://twitter.com/richtw1), and we started making little programs
 for our computers.  By now I'd upgraded to a BBC Master computer (via a [Spectrum +3][plus3]), and Rich
 and I had a fairly lucrative (for 15 year olds!) side-job doing little snippets of code for UK magazine
-Acorn User.  We even wrote a few games (you'll need a good BBC emulator for this) --- [Frogman][frogman], 
+[Acorn User][au].  We even wrote a few games (you'll need a good BBC emulator for this) --- [Frogman][frogman], 
 and were in negotiations for a 4-part series in Acorn User on our game [Onslaught][onslaught] when sadly
 the publication ceased covering the BBC computer.
 
 [plus3]: http://en.wikipedia.org/wiki/ZX_Spectrum#ZX_Spectrum_.2B3_.281987.29 "The Spectrum +3"
 [frogman]: http://www.stairwaytohell.com/bbc/archive/diskimages/Unreleased/Frogman-demo.zip "ZIP archive of unreleased BBC game Frogman"
 [onslaught]: http://bbc.godbolt.org/?disc=%7CUnreleased%2FOnslaught-demo.zip&autoboot  "ZIP archive of unreleased BBC type-in game Onslaught"
+[au]: https://en.wikipedia.org/wiki/Acorn_User "Acorn User magazine"
 
 At school I was always into science, in particular physics.  During secondary school I used to write
 little applications to demonstrate things like fluids and gases, and gravitational attraction.  By now
@@ -112,7 +113,8 @@ on fun and exciting (but somewhat secret) projects. DRW
 offered my family and me a fantastic opportunity to move to the United States,
 and we are now very happily based just outside of Chicago, Illinois.
 
-In April 2018 I left DRW to pursue a new opportunity, still in Chicago.
+In April 2018 I left DRW to pursue a new opportunity, still in Chicago. I'm currently
+working at [Aquatic](htts://aquatic.com), a quantative hedge fund.
 
 You can learn more about my working life at [my LinkedIn profile][linkedin]. 
 
@@ -129,9 +131,20 @@ emulator that Rich and I wrote many years before, I made a Javascript
 almost-perfect BBC Micro emulator.  Both run directly in your browser -- give
 it a go!
 
+Some of my other open source projects include:
+
+* A simple, embeddable websockets server, [Seasocks][seasocks].
+* Resurrecting [Xania MUD][xmud2] using modern C++.
+* A way of indexing and searching large gzipped archives, [zindex][zindex].
+
 [gccex]: https://godbolt.org/ "Compiler Explorer. A fine way to waste some time tinkering with C++, Go, D Rust, or other compiled code"
 [smse]: https://xania.org/miracle/miracle.html "A SMS emulator, but in your browser"
 [jsb]: https://bbc.godbolt.org/ "A Javascript BBC Micro emulator"
+[seasocks]: https://github.com/mattgodbolt/seasocks "Seasocks, an embeddable C++ websocket server"
+[xmud2]: https://github.com/mattgodbolt/xania "Xania, a multi-user dungeon"
+[zindex]: https://github.com/mattgodbolt/zindex "Index and search your gzipped files"
+
+In late 2020, I started a programming podcast with my friend [Ben Rady](https://benrady.com) called [Two's Complement](https://www.twoscomplement.org).
 
 <img width="200" height="187" class="pic-right" alt="My lovely wife, Ness Godbolt" src="/media/NessGodbolt.jpg" />
 
