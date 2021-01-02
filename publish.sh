@@ -1,9 +1,10 @@
 #!/bin/bash
 
 set -e
-
+PATH=$PWD/venv/bin:$PATH
 mkdir -p www/feed
-(cd pygen && ./main.py)
+
+(cd pygen && python ./main.py)
 
 # Publish the generated and static content from www/ into htdocs/.
 #
@@ -24,9 +25,10 @@ aws s3 sync htdocs/ s3://www.xania.org/
 fixup() {
     EXT=$1
     CT=$2
+    DIR=$3
     rm -rf htdocs2
     mkdir -p htdocs2
-    for file in $(cd htdocs && find . -name "*.${EXT}"); do
+    for file in $(cd htdocs && find ${DIR} -name "*.${EXT}"); do
         mkdir -p htdocs2/$(dirname ${file})
         cp -a htdocs/${file} htdocs2/${file%.${EXT}}
     done
@@ -34,8 +36,9 @@ fixup() {
     rm -rf htdocs2
 }
 
-fixup html text/html
-fixup atom application/rss+xml
+fixup html text/html .
+fixup atom application/rss+xml feed
+aws s3 cp htdocs/feed.atom s3://www.xania.org/feed --content-type application/rss+xml --cache-control max-age=30 --metadata-directive REPLACE
 
 if [ ! -d miracle ]; then
     git clone git@github.com:mattgodbolt/Miracle.git miracle

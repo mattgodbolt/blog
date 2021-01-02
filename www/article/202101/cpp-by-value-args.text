@@ -1,0 +1,49 @@
+C++ and passing by value
+Date: 2021-01-02 17:35:00
+Status: Public
+Summary: Some thoughts on passing by value versus reference
+Label: Coding
+
+I was recently responding to some [code review feedback](https://github.com/mattgodbolt/xania/pull/252#discussion_r550894493)
+ and it occurred to me I could write it up for this blog. Which also means I start 2021 with a blog post, not something
+ I've done in ages.
+
+The question was around why I passed an non-trivial object by value to a function. The recipient function was
+ going to copy the object, and the short version is "clang tidy complains if you don't pass by value and move".
+
+For the longer version, consider this super simple example:
+
+```cpp
+#include <string>
+
+struct Thing {
+  std:string s_;
+  void set_s(std::string s) { s_ = std::move(s); }
+};
+```
+
+Now consider what happens when we do something like `set_s("moo");`:
+
+* The `const char*` gets converted into a temporary `string` via the `string` constructor that takes a `const char*`.
+  That does allocations[^sso] etc and copies the `"moo"` into the new temporary `string` object.
+* That temporary is used to construct the parameter value `s` in the `set_s`. 
+  The argument to the constructor of this `s` is a temporary -- so it's of type `string &&`. 
+  The `string&&` constructor can "steal" the contents of the temporary string&& which makes it super cheap (no allocations, just swapping pointers).
+* The `s_ = std::move()` runs. The `s_`'s `operator=(string &&)` is called (as the move turns the `string` into an r-value). This also does the steal-the-innards trick.
+* All the destructors for the temporaries run -- the original `"moo"` temporary object and the pass-by-copy param `s`. They have no work to do as they've been "stolen" from.
+
+Short version: exactly one "real" string construction is done, and then there's a bit of pointer movement, but nothing more expensive.
+
+If, however, we change the parameter to a `const string &` in `set_s`, and remove the `move` in `set_s()`:
+
+* The `const char *` gets converted into a temporary string as before.
+* It is passed by reference (very cheaply) to `set_s()` - no work done here at all.
+* In the `s_ = s;` we copy the `string` object. This is another allocation and copy, as we can't "steal" anything from anyone.
+* We then destroy the temporary `string`.
+
+This means we do the allocation twice, copy the string data twice, and do a deallocation once. This is more expensive!
+
+You can see in [Compiler Explorer](https://godbolt.org/z/xr1bno) that the `string::_M_create` method is called twice in
+the second case, whereas for this small string it's all inlined in the first case.
+
+[^sso]: In this case, with a short string like `"moo"` no real allocations are done in this case. There's an thing called the "small string optimization" (SSO) kicking in; the `string` object holds small strings by value inside itself directly. If you change the string to something longer you see more work -- [see here](https://godbolt.org/z/G4hYrT).
