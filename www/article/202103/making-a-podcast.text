@@ -1,0 +1,110 @@
+Recording and editing Two's Complement
+Date: 2021-03-22 23:30:00
+Status: Draft
+Summary: How we record and edit Two's Complement
+Label: Personal
+
+Like so many, I started a podcast -- [Two's Complement][tc] -- during the pandemic, with
+my good friend and colleague [Ben Rady][br].
+
+[tc]: https://www.twoscomplement.org "Two's Complement - a Programming Podcast"
+[br]: https://www.benrady.com/ "Ben Rady; a lovely chap"
+
+Some folks asked how we made it sound so "professional", and so I'm sharing here how we do it.
+
+### Microphone and setup
+
+Most importantly: get everyone to record their audio locally. [Audacity][aud] is free and works
+perfectly for this. Make sure you test that you can't hear each other's sound in the mix.  Start
+recording, make sure the right microphone is in use by tapping it and observing the wiggly lines
+and then get others to make noise and ensure you hear them but don't see the wiggly lines on
+your side.
+
+[aud]: https://www.audacityteam.org/
+
+I use a Blue snowball mic on a boom with a pop filter, but Ben uses a simple headset mic, not
+unlike anything you'd use for normal video conferencing.
+
+We use a Google meet to talk to each other (and a guest if we have one), and make sure again that
+the recording is working while Google meet is up and running.
+
+Of course, we ask folks to stay close to the mic, near enough that the wiggly lines approach --
+but don't hit -- the top of the recording chart. We ask people to minimise external noise, though
+it's amazing what you can edit out.
+
+At the end of the recording we ask everyone to export their side of the conversation as an MP3
+and we upload them all to a shared google drive.
+
+### Editing
+
+I use Audacity to edit everything. The first thing I do is bring in all the MP3s into one workspace,
+one above each other. I then align them so the conversations are lined up.
+
+I like to position each speaker in stereo, using the little L<->R slider on each channel. That helps
+make it sound more like a conversation.
+
+I can't remember if it's on by default, but I have Audacity set up so I can click in the timeline
+and just start playing at that point.
+
+Once lined up, I'll find the beginning and end of the "take" and cut them off. Hotkeys are essential
+here!
+
+* F1 is "select mode", click and find the beginning of the podcast.
+* Shift-J will select backwards to the beginning of the cliop
+* Ctrl-Shift-K selects the same region across all the channels
+* Backspace deletes
+* Shift-K selects to the end of the clip
+
+I do a super rough cut out to start with.
+
+Next up some filters to make things sound nicer, for each track:
+
+* Select an area of blank sound on a track (you should have lots of these where the other person is
+  talking). Go to Effects->Noise Reduction and then click "Get Noise Profile". Now select the whole
+  track (there's a button on the far left to do so). Go back to Effects->Noise Reduction and hit ok.
+  I find the defaults work, and the amount of background hiss it reduces is magic.
+* Pick "Amplify" and accept the defaults. This should bring everything up to "max" volume without
+  overdoing anything. We will later address the fact folks get louder and quieter (compression) but
+  we'll do that after editing.
+
+Now the long spot: actually editing. I find it quite therapeutic. My flow is typically:
+
+* Listen to the podcast.
+* If I spot an egregious pause or "umm" or "err", I select it (F1 and drag over it). If it's
+  only affecting one track I'll hit 'Z' (which expands the selection to the next zero crossing,
+  slightly reducing pops). I'll then hit ctrl-shift-K to expand the selection to all tracks, then
+  hit backspace to delete both tracks together (keeping them in step).
+* If there's background noise from a person who's not speaking, I'll select the offending part of that
+  track and hit Ctrl-Alt-K which cuts out their track but unlike Backspace does not move everything down,
+  instead leaving a "hole".
+* If there's more surgery required between the two speakers, I "cut around" the blank spaces where each
+  person is silent, using Ctrl-Alt-K, then I'll use the Move Tool (F5) to slide the remaining uncut parts
+  where each person is speaking around relative to each other. This takes the most care as it's easy to
+  get things out of sync. But it's the most powerful thing to do, allowing for removing people accidentally
+  talking over each other and so on.
+
+Once all the editing is done, I then "compress" the audio -- this has nothing to do with data compression
+but to do with normalising the loudness. I select each track in turn and then Effect->Compressor with
+
+* Threshold (at which loudness the amplifier kicks in) as low as reasonable. I'm currently at about -20dB.
+* Noise Floor (below which no amplification happens) as high as can be. Mine's set to -60dB but I fiddle with
+  this to try and get rid of more noise.
+* Ratio (how much amplification happens in the quiet bits) - Play around - mine's at 4:1 right now. Too low
+  and quiet bits are still quiet. Too high and EVERYTHING SEEMS A BIT ANGRY.
+* Attack and release times as low as possible.
+* Make sure "compress based on peaks" is set.
+
+It's easy to go overboard, and remove every "lip smack" and "umm" and "err". Doing so makes for an exhausting
+listening experience; humans _do_ um and err, and they can be a way for the listener to get a short break.
+So don't edit too heavily. The first few episodes of TC suffer from this, if you want a "how not to".
+
+Editing on music and such is probably enough work to put in a separate post if anyone is interested.
+
+### Transcripting
+
+It's important to have a transcript for hearing impaired folks, non-native speakers, for SEO, and to help
+people understand what you're talking about without listening in. We use [Temi][temi], which has worked out
+fairly well, costing us around $10 an episode.
+
+[temi]: https://www.temi.com/
+
