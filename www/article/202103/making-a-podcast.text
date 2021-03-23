@@ -1,6 +1,6 @@
 Recording and editing Two's Complement
 Date: 2021-03-22 23:30:00
-Status: Draft
+Status: Public
 Summary: How we record and edit Two's Complement
 Label: Personal
 
@@ -40,7 +40,7 @@ and we upload them all to a shared google drive.
 I use Audacity to edit everything. The first thing I do is bring in all the MP3s into one workspace,
 one above each other. I then align them so the conversations are lined up.
 
-I like to position each speaker in stereo, using the little L<->R slider on each channel. That helps
+I like to position each speaker in stereo, using the little `L<->R` slider on each channel. That helps
 make it sound more like a conversation.
 
 I can't remember if it's on by default, but I have Audacity set up so I can click in the timeline
@@ -60,10 +60,10 @@ I do a super rough cut out to start with.
 Next up some filters to make things sound nicer, for each track:
 
 * Select an area of blank sound on a track (you should have lots of these where the other person is
-  talking). Go to Effects->Noise Reduction and then click "Get Noise Profile". Now select the whole
-  track (there's a button on the far left to do so). Go back to Effects->Noise Reduction and hit ok.
+  talking). Go to `Effects->Noise Reduction` and then click "Get Noise Profile". Now select the whole
+  track (there's a button on the far left to do so). Go back to `Effects->Noise Reduction` and hit ok.
   I find the defaults work, and the amount of background hiss it reduces is magic.
-* Pick "Amplify" and accept the defaults. This should bring everything up to "max" volume without
+* Pick `Effects->Amplify` and accept the defaults. This should bring everything up to "max" volume without
   overdoing anything. We will later address the fact folks get louder and quieter (compression) but
   we'll do that after editing.
 
@@ -84,7 +84,7 @@ Now the long spot: actually editing. I find it quite therapeutic. My flow is typ
   talking over each other and so on.
 
 Once all the editing is done, I then "compress" the audio -- this has nothing to do with data compression
-but to do with normalising the loudness. I select each track in turn and then Effect->Compressor with
+but to do with normalising the loudness. I select each track in turn and then `Effect->Compressor` with
 
 * Threshold (at which loudness the amplifier kicks in) as low as reasonable. I'm currently at about -20dB.
 * Noise Floor (below which no amplification happens) as high as can be. Mine's set to -60dB but I fiddle with
