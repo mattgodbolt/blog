@@ -1,6 +1,7 @@
 #!/usr/bin/python
+import xml.etree.ElementTree
 
-from markdown import markdown, Extension
+from markdown import Extension
 from markdown.treeprocessors import Treeprocessor
 
 
@@ -9,9 +10,9 @@ class PrecisProcessor(Treeprocessor):
         super().__init__()
         self.md = md
 
-    def run(self, tree):
+    def run(self, tree: xml.etree.ElementTree.Element):
         count = 0
-        kids = list(tree.getchildren())
+        kids = list(tree)
         limit = 3
         if len(kids) < 5:
             limit = 5
