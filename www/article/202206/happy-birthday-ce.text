@@ -1,12 +1,12 @@
 Happy 10th Birthday Compiler Explorer!
-Date: 2022-06-22 09:00:00
-Status: Draft`
+Date: 2022-06-22 15:45:00
+Status: Public
 Summary: Wishing Compiler Explorer a very happy tenth birthday
 Label: Personal, Coding, Blog
 
 Today is [Compiler Explorer’s](https://godbolt.org) 10th Birthday:
 
-```
+```bash
 commit 15ea5e164b55c2b5ee0d3b432e3984b8f361afd2
 Author: Matt Godbolt <matt@godbolt.org>
 Date:   Tue May 22 21:07:40 2012 -0500
@@ -16,31 +16,52 @@ Date:   Tue May 22 21:07:40 2012 -0500
 
 Ten years ago I got permission to open source a little tool called [GCC Explorer](https://web.archive.org/web/20120525042912/https://gcc.godbolt.org/). I’d developed it over a week or so of spare time at my then-employer [DRW](https://www.drw.com) in node.js, and the rest, as they say, is history.
 
+<p class="picture">
+<a href="/202206/gcc-explorer.png">
+<img src="/202206/gcc-explorer-thumb.png" width="600" height="357"
+ alt="Screen capture of the GCC Explorer website as of its first commit"/>
+</a>
+<br/>The site as it looked back in the day - amazingly if you check out the first commit from GitHub and run it, this is what you get!
+</p>
+
+
 After a few years it became clear that GCC Explorer was more than just GCC, and on 30th April 2014 the site became “Compiler Explorer” for the first time.
 
 Since that time we’ve gone from supporting only C++ to supporting over 30 other languages including C#, Fortran, Ada, ispc, Rust, Kotlin, Java and even Python! We even have several super experimental language variants, like Herb Sutter’s metaclasses extensions for C++.
 
 We perform around 3,000,000 compilations a week, and have done around 410 million compilations in total since I started keeping stats in 2015. C++ is our most popular language, racking up over 300,000 compilations a day during the week. In total we have 1.4 terabytes of built compilers and libraries, and to date we’ve stored just under a million short links totalling 5.3 GB of saved state.
 
+<p class="picture">
+<a href="https://www.stathat.com/s/SO1rSvjtT07k">
+<img src="/202206/stats.png" width="600" height="267"
+ alt="Compiler Explorer's overall compilation statistics">
+ </a>
+<br/>OUr stats - I'm trying to find a way to make our dashboards publically available so you can see more. But so far have failed to do so; this is the best I have for now.
+</p>
+
+
 I’m extremely proud of how well received the site has been, and how it seems to have become part of the daily life for a number of developers, particularly those whose work the site absolutely builds on: the compiler authors themselves.
 
 While Compiler Explorer was always a "scratch my own itch" site for answering questions about compiler optimizations, I’m delighted to see it gets used by some as a scratchpad for ideas, or to test out ideas on a variety of compilers quickly. In particular I’m so happy it’s being used to help teach people how to program, and to help the next generation of compiler developers hone their skills.
 
-I take the responsibility and trust the community has placed in the site, and by extension me and the team of folks that run the site, very seriously. I’m very proud of our high uptime and our privacy policy and openness. Almost every line of code, infrastructure, installation script, shell script, tooling, AWS administration, terraform configuration, library and compiler binary we use or build is freely available on [GitHub](https://github.com/compiler-explorer/).
+I take the responsibility and trust the community has placed in the site, and by extension me and the team of folks that run the site, very seriously. I’m very proud of our high uptime and our [privacy policy](https://godbolt.org/#privacy) and openness. Almost every line of code, infrastructure, installation script, shell script, tooling, AWS administration, terraform configuration, library and compiler binary we use or build is freely available on [GitHub](https://github.com/compiler-explorer/).
 
 It takes a village to run a site like Compiler Explorer, and without the more than [278 contributors](https://github.com/compiler-explorer/compiler-explorer/graphs/contributors) over the years, we wouldn’t be in the position we are now. I want to extend a huge thanks to anyone who’s contributed a PR, or filed [an issue](https://github.com/compiler-explorer/compiler-explorer/issues), or asked a question on [Twitter](https://twitter.com/CompileExplore), [Slack](https://cppalliance.org/slack/) or [our Discord server](https://discord.gg/B5WacA7), or even [emailed me directly](mailto:matt@godbolt.org). Thank you: interacting with such lovely people is part of what makes this something I still enjoy doing.
 
 I want to give a special thanks to a few individuals who have been absolutely core in the development of Compiler Explorer:
 
-- [Partouf](https://twitter.com/partouf) - for being one of the few people trusted with administering the site, and our most prolific developer. You’re amazing, Partouf: I can’t thank you enough.
-- [Rubén](https://twitter.com/rubenrbs) - one of our first big contributors and one of our longest contributors (first commit in 2017), and for also being an administrator. Thanks Rubén!
+- [Partouf](https://twitter.com/partouf) - for being one of the few people trusted with administering the site, and our most prolific developer. You’re amazing, Partouf: I can’t thank you enough. Partouf gave me a Compiler Explorer birthday present of my own: adding [support for my beloved BBC Micro](https://godbolt.org/z/4G7EcP66x)!
+- [Rubén](https://twitter.com/rubenrbs) - one of our first big contributors and one of our first contributors, and for also being an administrator. Thanks Rubén!
 - [Jason Turner](https://twitter.com/lefticus) - a huge part of why Compiler Explorer is so well known is that Jason has been using it for many years in presentations and in C++ Weekly. Thanks for getting the message out, Jason!
 - [Austin](https://twitter.com/apmorton) - another administrator and our hacker-in-residence, helping shore up the site’s security and sandboxing, as well as keeping me on my toes at work (Austin also has to put up with me at our day job!)
 - [Mats](https://github.com/matsjla), [Mark](https://github.com/dkm) and [Jeremy](https://twitter.com/JeremyRifkin) for being our most recent full committers and for spurring the project on with their suggestions and improvements. And for helping me learn Typescript at last!
 - [Nicole](https://twitter.com/strega_nil), Tim and [Dale](https://twitter.com/dalehirt) at Microsoft for adding and supporting the Windows-based compilers.
 - [Luka](https://twitter.com/luka_prebil) and [Chedy](https://twitter.com/CppChedy) for friendship, conversation and advice over the years.
+- And last but not least, [my wife](https://twitter.com/nessgodbolt) and kids for being so supportive to me, and forgiving when I'm busy with my weird hobby.
 
 I’d also like to thank all the folks who support Compiler Explorer financially. I’m very grateful to those who support me on [Patreon](https://www.patreon.com/mattgodbolt) and [GitHub Sponsors](https://github.com/sponsors/mattgodbolt/) - for a long time your contributions were the only thing keeping the infrastructure paid for! Recently I was fortunate enough to add some [corporate sponsors](https://godbolt.org/#sponsors) too: thank you all!
+
+On a personal note, Compiler Explorer has brought me a number of amazing opportunities: I've attended lots of C++ conferences; started [public speaking](https://www.youtube.com/playlist?list=PL2HVqYf7If8euXBctCl0F2D_4zlDBFYDf); I've become friends with a number of luminaries in the community (!); and in some circles my last name is used as a verb! That last one takes a while to get used to...
 
 What does the future bring for Compiler Explorer? Well, right now I feel a bit like we're drowning a little in issues and so our forward progress has stalled a little. If I had all the time in the world I'd love to add things like:
 
