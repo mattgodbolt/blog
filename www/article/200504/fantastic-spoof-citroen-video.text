@@ -11,7 +11,13 @@ href="http://www.citroen.co.uk/">Citroen</a> ad running on European TV!
 [xbam]: http://x-bam.com/ "Very clever people"
 
 <p align="center">
-<object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/BBo6Lldd72k&hl=en&fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/BBo6Lldd72k&hl=en&fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
+<object width="425" height="344">
+<param name="movie" value="http://www.youtube.com/v/BBo6Lldd72k&amp;hl=en&amp;fs=1"></param>
+<param name="allowFullScreen" value="true"></param>
+<param name="allowscriptaccess" value="always"></param>
+<embed src="http://www.youtube.com/v/BBo6Lldd72k&amp;hl=en&amp;fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344">
+</embed>
+</object>
 <br/>
 <a href="http://x-bam.com"><img src="/media/X-BAM01.gif" alt="" /></a>
 </p>

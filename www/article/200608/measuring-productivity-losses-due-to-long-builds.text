@@ -64,8 +64,7 @@ We're hoping to release the tool, BuildMonitor, as a free download soon on the
 ProFactor website and we're currently looking for beta testers.  So if you're
 suffering from long build times and want some evidence to show your manager, or
 you're just curious as to how long you spend each day, week and month waiting
-for your compiler, drop me an email at <a
-href="mailto:matt@profactor.co.uk">matt@profactor.co.uk</a> and I'll add 
+for your compiler, drop me an email at <pre>now-defunct-email-address</pre> and I'll add
 you to the
 beta test trial.  The beta currently works in Visual Studio 2003 and Visual
 Studio 2005, but we hope to get a generic 'build' wrapper to cover any Windows

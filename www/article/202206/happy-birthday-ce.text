@@ -34,9 +34,9 @@ We perform around 3,000,000 compilations a week, and have done around 410 millio
 <p class="picture">
 <a href="https://www.stathat.com/s/SO1rSvjtT07k">
 <img src="/202206/stats.png" width="600" height="267"
- alt="Compiler Explorer's overall compilation statistics">
+ alt="Compiler Explorer's overall compilation statistics"/>
  </a>
-<br/>OUr stats - I'm trying to find a way to make our dashboards publically available so you can see more. But so far have failed to do so; this is the best I have for now.
+<br/>Our stats - I'm trying to find a way to make our dashboards publicly available so you can see more. But so far have failed to do so; this is the best I have for now.
 </p>
 
 
@@ -46,7 +46,7 @@ While Compiler Explorer was always a "scratch my own itch" site for answering qu
 
 I take the responsibility and trust the community has placed in the site, and by extension me and the team of folks that run the site, very seriously. I’m very proud of our high uptime and our [privacy policy](https://godbolt.org/#privacy) and openness. Almost every line of code, infrastructure, installation script, shell script, tooling, AWS administration, terraform configuration, library and compiler binary we use or build is freely available on [GitHub](https://github.com/compiler-explorer/).
 
-It takes a village to run a site like Compiler Explorer, and without the more than [278 contributors](https://github.com/compiler-explorer/compiler-explorer/graphs/contributors) over the years, we wouldn’t be in the position we are now. I want to extend a huge thanks to anyone who’s contributed a PR, or filed [an issue](https://github.com/compiler-explorer/compiler-explorer/issues), or asked a question on [Twitter](https://twitter.com/CompileExplore), [Slack](https://cppalliance.org/slack/) or [our Discord server](https://discord.gg/B5WacA7), or even [emailed me directly](mailto:matt@godbolt.org). Thank you: interacting with such lovely people is part of what makes this something I still enjoy doing.
+It takes a village to run a site like Compiler Explorer, and without the more than [278 contributors](https://github.com/compiler-explorer/compiler-explorer/graphs/contributors) over the years, we wouldn't be in the position we are now. I want to extend a huge thanks to anyone who’s contributed a PR, or filed [an issue](https://github.com/compiler-explorer/compiler-explorer/issues), or asked a question on [Twitter](https://twitter.com/CompileExplore), [Slack](https://cppalliance.org/slack/) or [our Discord server](https://discord.gg/B5WacA7), or even [emailed me directly](mailto:matt@godbolt.org). Thank you: interacting with such lovely people is part of what makes this something I still enjoy doing.
 
 I want to give a special thanks to a few individuals who have been absolutely core in the development of Compiler Explorer:
 

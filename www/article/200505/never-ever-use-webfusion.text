@@ -94,15 +94,13 @@ check to see if it all worked...'file not found' --- oh?  The executable file
 wouldn't download.  Hmm...we renamed it to .TXT and all was well.  O-kay, so I
 contacted tech support again:
 
-<i>Thank you for your email.
-
-For security purposes the use of .exe is not allowed on our servers. The best
+> Thank you for your email.
+> For security purposes the use of .exe is not allowed on our servers. The best
 work arouns (sic) is either to rename the file as you have been doing or to Zip
 the file.
+> I hope that this helps.
 
-I hope that this helps.
-
-</i>  **NO IT BLOODY DOESN'T HELP!!!**  It's hardly very professional to hand
+**NO IT BLOODY DOESN'T HELP!!!**  It's hardly very professional to hand
 out a URL to our customers and tell them to 'rename it from a TXT to an EXE'.
 Nor is it much better to unnecessarily ZIP up our already-highly-compressed-
 self-installing executable, just because it's "a security risk".  What security

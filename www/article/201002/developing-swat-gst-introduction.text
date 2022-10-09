@@ -40,13 +40,13 @@ We made some videos demoing the main characters, some test environments and scen
 [e3]: http://www.e3expo.org/
 
 <p class="picture">
- <iframe width="420" height="315" src="https://www.youtube.com/embed/XiYDCJN9csc" frameborder="0" allowfullscreen></iframe>
+ <iframe width="420" height="315" src="https://www.youtube.com/embed/XiYDCJN9csc" frameborder="0" allowfullscreen="true"></iframe>
  <br/>
  A demo render of the three main characters. Very early version of the engine.
 </p>
 
 <p class="picture">
- <iframe width="420" height="315" src="https://www.youtube.com/embed/DF_1P6cprnM" frameborder="0" allowfullscreen></iframe>
+ <iframe width="420" height="315" src="https://www.youtube.com/embed/DF_1P6cprnM" frameborder="0" allowfullscreen="true"></iframe>
  <br/>
  A demo scene where the leader character (the player) has ordered the other two characters to take down the targets. Things of note here: the annoying idle animation of the main character, the glitch in the shadow algorithm that causes big spikes of black to emanate from the weapons of the other characters.
 </p>

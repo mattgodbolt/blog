@@ -9,6 +9,7 @@ from pytz import timezone, utc
 import codecs
 import ETL
 from precis import PrecisExtension
+from xml.etree import ElementTree
 
 pygments.lexers.LEXERS['AsmLexer'] = ('asm_lexer', 'AsmLexer', ('asm',), ('*.asm',), ('text/asm'))
 pygments.lexers.LEXERS['BasicLexer'] = ('basic_lexer', 'BasicLexer', ('basic',), ('*.basic',), ('text/basic'))
@@ -325,7 +326,14 @@ def XHtmlToHtml(xhtml):
     return xhtmlToHtmlRe.sub(r'\1>', xhtml).replace('&nbsp;', '&#160;')
 
 
-def CleanUpXHtml(xhtml):
+def CleanUpXHtml(title, xhtml):
+    full = f'<html><body>\n{xhtml}\n</body></html>'
+    try:
+        ElementTree.fromstring(full)
+    except Exception as e:
+        for line, s in enumerate(full.splitlines(keepends=False)):
+            print(f'{line+1: 10}: {s}')
+        raise RuntimeError(f"Bad XHTML in {title}") from e
     xhtml = xhtml.replace('&nbsp;', '&#160;')
     xhtml = re.sub('&(?!(#|amp|gt|lt|quot))', '&amp;', xhtml)
     return xhtml
@@ -333,7 +341,7 @@ def CleanUpXHtml(xhtml):
 
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (24, article.ArticleText)
+    cacheObj = (25, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
         print("Read cached article", article.RawTitle)
@@ -343,6 +351,7 @@ def CacheArticle(globalData, article):
         extensions = ["markdown.extensions.extra", "markdown.extensions.codehilite"]
         ex_conf = {"markdown.extensions.codehilite": {'guess_lang': False}}
         article.XHtmlText = CleanUpXHtml(
+            article.RawTitle,
             markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml1"))
         article.HtmlText = markdown(article.ArticleText, extensions=extensions + ["markdown.extensions.smarty"],
                                     extension_configs=ex_conf, output_format="html5")

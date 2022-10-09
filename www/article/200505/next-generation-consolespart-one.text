@@ -24,7 +24,7 @@ the ground, so this compares the Xbox 360 and the PlayStation 3.
 <table border="1"> <tr><th>Feature</th><th>Xbox 360</th><th>PlayStation
 3</th></tr> <td>Core speed</td><td>3.2GHz</td><td>3.2GHz</td> <tr><td>Number of
 main processing cores</td> <td>3</td><td>1 PPC core + 7 SPEs</td></tr> <tr>
-<td>Hardware threads</td><td>6</td><td>8</td> </tr> <tr> </table>
+<td>Hardware threads</td><td>6</td><td>8</td> </tr> </table>
 
 So, what to make of this?  I've deliberately **not** quoted any of the
 meaningless 'dot products per second' or   'GFLOPS' that have been touted

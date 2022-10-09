@@ -32,9 +32,7 @@ properly, perhaps from an earlier crashed firefox process.  I grepped through
 the log, looking for file opens, and eventually found this:
 
 <i>open("/home/matthew/.mozilla/firefox/2z7l4uii.default/.parentlock",
-O\_WRONLY|O_CREAT|O_TRUNC, 0666) = 4
-
-</i>
+O\_WRONLY|O_CREAT|O_TRUNC, 0666) = 4</i>
 
 Bingo!  I checked; and even with no firefox process running, this file existed.
 It was an empty lock file, so I deleted it.  That did the trick --- now FireFox

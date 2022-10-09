@@ -6,21 +6,15 @@ A little birdie tells me that <a href="http://www.x-bam.com/">X-bam</a> had
 something to do with <a href="http://www.mrandmrswheatley.co.uk">Mr &amp; Mrs
 Wheatley's</a> latest viral marketing video...
 
-<a href="http://www.x-bam.com"><img align="right"
-src="/media/X-BAM01.gif" /></a><object
-classid="02BF25D5-8C17-4B23-BC80-D3488ABDDC6B"
-codebase="http://www.apple.com/qtactivex/qtplugin.cab#version=6,0,2,0">
-<param name="controller" value="TRUE">       <param name="type"
-value="video/quicktime">        <param name="autoplay" value="false">
-<param name="target" value="myself">       <param name="src"
-value="http://homepage.ntlworld.com/mr.wheatley/whoscounting_wheatley.mov">
-<embed width="300" height="250"
-src="http://homepage.ntlworld.com/mr.wheatley/whoscounting_wheatley.mov"
-type="video/quicktime"></embed>
-
-
-
-</object>
+<a href="http://www.x-bam.com"><img align="right" src="/media/X-BAM01.gif" /></a>
+<object classid="02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab#version=6,0,2,0">
+<param name="controller" value="TRUE"/>
+<param name="type" value="video/quicktime"/>
+<param name="autoplay" value="false"/>
+<param name="target" value="myself"/>
+<param name="src" value="http://homepage.ntlworld.com/mr.wheatley/whoscounting_wheatley.mov"/>
+<embed width="300" height="250" src="http://homepage.ntlworld.com/mr.wheatley/whoscounting_wheatley.mov" type="video/quicktime">
+</embed></object>
 
 Looks like viral marketing's all the rage now.  First off it was the branding of
 clothing, and the fact that certain brand names became cool --- then people
