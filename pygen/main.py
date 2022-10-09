@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import io
 import os, sys, re, time, datetime
 from warnings import warn
 from markdown import markdown
@@ -327,12 +327,17 @@ def XHtmlToHtml(xhtml):
 
 
 def CleanUpXHtml(title, xhtml):
-    full = f'<html><body>\n{xhtml}\n</body></html>'
+    full = f'<fakeroot>\n{xhtml}\n</fakeroot>'
     try:
-        ElementTree.fromstring(full)
+        tree = ElementTree.fromstring(full)
+        parent_map = {c: p for p in tree.iter() for c in p}
+        for banned_elem_type in ('script', 'iframe'):
+            for elem in tree.findall(f'.//{banned_elem_type}'):
+                parent_map[elem].remove(elem)
+        xhtml = ElementTree.tostring(list(tree)[0], 'utf-8').decode("utf-8")
     except Exception as e:
         for line, s in enumerate(full.splitlines(keepends=False)):
-            print(f'{line+1: 10}: {s}')
+            print(f'{line + 1: 10}: {s}')
         raise RuntimeError(f"Bad XHTML in {title}") from e
     xhtml = xhtml.replace('&nbsp;', '&#160;')
     xhtml = re.sub('&(?!(#|amp|gt|lt|quot))', '&amp;', xhtml)
@@ -341,7 +346,7 @@ def CleanUpXHtml(title, xhtml):
 
 def CacheArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (25, article.ArticleText)
+    cacheObj = (27, article.ArticleText)
     resultObj = globalData.cache.Find(cacheObj)
     if resultObj:
         print("Read cached article", article.RawTitle)
@@ -352,12 +357,12 @@ def CacheArticle(globalData, article):
         ex_conf = {"markdown.extensions.codehilite": {'guess_lang': False}}
         article.XHtmlText = CleanUpXHtml(
             article.RawTitle,
-            markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml1"))
+            markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml"))
         article.HtmlText = markdown(article.ArticleText, extensions=extensions + ["markdown.extensions.smarty"],
-                                    extension_configs=ex_conf, output_format="html5")
+                                    extension_configs=ex_conf, output_format="html")
         article.HtmlIntro = markdown(article.ArticleText,
                                      extensions=extensions + ["markdown.extensions.smarty", PrecisExtension()],
-                                     extension_configs=ex_conf, output_format="html5")
+                                     extension_configs=ex_conf, output_format="html")
         globalData.cache.Add(cacheObj, (article.XHtmlText, article.HtmlText, article.HtmlIntro))
 
 
