@@ -25,6 +25,5 @@ class PrecisProcessor(Treeprocessor):
 
 
 class PrecisExtension(Extension):
-    def extendMarkdown(self, md, md_globals):
-        md.treeprocessors.add("precis", PrecisProcessor(md), "<inline")
-        md.registerExtension(self)
+    def extendMarkdown(self, md):
+        md.treeprocessors.register(PrecisProcessor(md), "<inline", 5)

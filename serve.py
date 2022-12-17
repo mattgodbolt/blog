@@ -15,5 +15,5 @@ class MbsHandler(http.server.SimpleHTTPRequestHandler):
         return p
 
 if __name__ == '__main__':
-    os.chdir("htdocs")
+    os.chdir("www")
     http.server.test(MbsHandler, http.server.HTTPServer)
