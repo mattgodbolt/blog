@@ -1,0 +1,77 @@
+Compiler Explorer and Microsoft Visual Studio Compilers
+Date: 2023-08-17 22:00:00
+Status: Draft
+Summary: Explaining why Compiler Explorer is not supporting MSVC
+Label: Personal, Coding, Blog
+
+This post explains a change that will take place on Compiler Explorer on August 31st: I will be removing support
+for the Microsoft Compilers.
+
+**Firstly**: I'm really sorry if this affects you. I appreciate many of you use these compilers and there isn't a
+good free online alternative.
+
+This was not an easy decision to make, but I will explain it here. As you may may not know, Microsoft run and
+host the MSVC compilers for us. They have a forked version of the Compiler Explorer code, with custom configuration
+and their own Kubernetes-based infrastructure for it to run upon, independent of the main CE site. This is currently
+not open sourced, and relies on internal Microsoft infrastructure, including custom compilers internal
+to the MSVC compiler team.
+
+When you select a MSVC compiler on CE we are actually transparently proxying your request to this Microsoft instance
+of CE. This is why -- occasionally -- you might see the MSVC compiler disappear, or stop functioning, independently of
+your ability to access the rest of CE.
+
+This has been a good partnership: initially we lacked the skill and desire to run Windows instances ourselves. However,
+in January we had to abruptly disable execution on MSVC compilers. This was in response to a
+minor security issue discovered in the Windows sandbox. Once the MS security team had realised what was happening --
+running an external codebase internally, and one that lets users execute the compiler and
+arbitrary code -- things took a turn. Although we had permission, with this kind of
+attention bearing down, the only option was to [turn off execution](https://developercommunity.visualstudio.com/t/Allow-Code-Execution-on-godboltorg-for-/663829)
+as a quick placation, while working on a more
+permanent solution.
+
+Independently of the execution issue, we have for a while bumped up against issues with the integration: as the
+configuration and particular code running on Microsoft were not visible nor editable by us, we on the CE team can't help
+or fix issues that crop up. Additionally, doing site updates are complicated by this external service, which may be
+running a much older version of the code. While we had great support from our friends on the team within MS, there's
+only so much they could do in the limited time they had available.
+
+This, coupled with the execution problem, led us to decide -- along with our friends at MS, that the best course of
+action would be for the CE team to spin up and administrate our own Windows instances, and then migrate the MSVC
+compilers to our site. This means we could deploy updates, make fixes ourselves and generally be responsible for the
+uptime and security of the execution environment ourselves. It also means the team at MS helping us could start
+contributing in the "open" by working on the public Github project.
+
+The CE team has done some work on our side: we now host our own Window instances and have come up with an execution
+sandbox we're comfortable with. You can see the fruits of this labour when you pick a non-MS Windows-based compiler like
+the MinGW `clang`s and `gcc`s: they run on Windows on our infrastructure and support execution.
+
+We've been working with MS on getting access to the MSVC compilers to run in our own environment. Unfortunately, despite
+pulling in all the favours I could, I've been unable to get any forward progress.
+Microsoft's [EULA](https://visualstudio.microsoft.com/license-terms/vs2022-ga-diagnosticbuildtools/) forbids
+the kind of usage Compiler Explorer needs, and changing the EULA is not an easy thing for Microsoft. Additionally, as CE
+is just "me" and not a legal entity, I can't take the risk of "just" installing anyway and hoping -- too much is on the
+line for me.
+
+Behind all this, MS's security team requiring an audit for the service we rely on is coming up soon:
+I don't know that we could pass this without a huge effort on our side, if at all. Continuing on this path
+would put a lot of pressure on our MS team too, and I don't want that for them. Even if we were able to pass
+the audit, the fact that MS could pull the plug again on this service, and ultimately controls the user experience
+for the MSVC compilers on a site _I_ am responsible for, is not something I want to continue.
+
+Therefore I've decided the only way to have a hope at forward progress, is to force the issue by disabling MSVC,
+ahead of the inevitable removal of the MS service. This will save our friends at MS and us a lot of effort,
+and will hopefully
+bring a little more urgency to our conversations with Microsoft about the EULA. With our other
+proprietary compilers, I've had an email from a product manager or similar confirming they are OK with CE's usage of
+their project and won't enforce any EULA clauses. And that's been all I needed to feel comfortable moving forward. I
+don't know if that's naïve on my part, though.
+
+Of course all this doesn't come without a price: we lose the Microsoft compilers; though I believe we'd lose them anyway soon enough.
+
+I'd like it to be clear that this is *not the fault of any individual at Microsoft*: everyone I've spoken to and interact
+with on a regular basis has tried their honest best to do what's right for the project, and I'm incredibly thankful for
+their time and commitment over the years. Sometimes, it's just hard to effect this kind of change in a large
+organisation, and I understand that. It doesn't make it any less frustrating though.
+
+If you have questions or want to express your feelings to the CE team about this decision, you can find us on the
+[Compiler Explorer Discord](https://discord.gg/B5WacA7).
