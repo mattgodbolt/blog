@@ -3,8 +3,7 @@
 set -euo pipefail
 
 rm -rf out
-mkdir out/htdocs
-mkdir out/htdocs_fixup
+mkdir out out/htdocs out/htdocs_fixup
 
 rsync -rlp --exclude=/article www/ out/htdocs
 rsync -rlp --include='*.html' --include='*.png' --include='*.jpeg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ out/htdocs
