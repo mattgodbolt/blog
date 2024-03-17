@@ -1,0 +1,40 @@
+Compiler Explorer, LLC
+Date: 2024-03-18 00:00:00
+Status: Public
+Summary: A small update on the status of CE
+Label: Personal, Coding, Blog
+
+It's been over a year since I updated my blog; and I've been making some pretty
+fundamental changes to the infrastructure I host it all on. So this is more of a test
+post than a hugely informative one.
+
+That said; the reason I'be been making those changes is because, a couple of weeks
+ago I formed "Compiler Explorer LLC" as an Illinois-based corporation.
+
+Does this mean Compiler Explorer is going to be a business now?!
+
+**No.**
+
+Compiler Explorer is a community service, and I am committed to keeping it that way. It
+should be open source, free and available to as many folks as possible.
+
+So, why did I form an LLC? Well, for the longest time I've been making informal agreements
+with various third parties: commercial sponsors, proprietary tool providers, and compiler
+vendors. As time is going on, and the "informal-ness" is becoming more, well, formal... I
+owe it to myself and my family to put in a little legal protection between me the person, and
+Compiler Explorer the entity.
+
+The LLC gives me that protection. It also gives me a place to hang all the assets (we have
+some contingency savings), and put things like the AWS account under. And that then leads the
+way to -- eventually -- making a non-profit or other appropriate organisation to own and
+operate CE. If done right -- and I'll be taking a lot of advice on this -- that should safeguard
+CE for the community, even without me. Not being morbid, but the bus risk factor preys on my
+mind a little.
+
+So; the blog changes and many other upheavals in my use of AWS are all in service of this:
+moving out all the non-CE things from "my" AWS account before I consider it "Compiler Explorer LLC"'s
+account. That seems safer and easier than trying to move CE's stuff into a new account, even
+though that would be a lot more "clean". As Amazon don't make it easy to transfer assets between
+accounts this seems the best way.
+
+Right, back to copying all my personal backups from one S3 bucket to another...

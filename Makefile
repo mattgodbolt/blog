@@ -1,4 +1,4 @@
-default: dist
+default: serve
 
 PYTHON=$(CURDIR)/.venv/bin/python
 
