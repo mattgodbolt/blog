@@ -5,7 +5,7 @@ Summary: Slides on how to emulate a BBC Microcomputer in Javascript
 Label: Emulation
 
 Last year I gave a presentation at work on my favourite open source project,
-[jsbeeb](https://bbc.godbolt.org/) -- "Emulating a BBC Micro in Javascript".
+[jsbeeb](https://bbc.xania.org/) -- "Emulating a BBC Micro in Javascript".
 
 The slides are [now available online][slides]. Hopefully they
 make enough sense by themselves to be interesting. Please note that you can go

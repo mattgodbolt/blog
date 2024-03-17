@@ -95,7 +95,7 @@ node.js listens). This allows all my sites to live on the same box(es). nginx
 also serves up my static content, like this blog and the [jsbeeb][] website.
 
 [nginx]: https://www.nginx.com/
-[jsbeeb]: https://bbc.godbolt.org/
+[jsbeeb]: https://bbc.xania.org/
 
 To build the AMI I use [packer][], which remote-controls an EC2 instance, running
 all the commands I need to set it up, then does a snapshot to build an AMI.

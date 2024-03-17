@@ -65,7 +65,7 @@ Some of the relationships between register values, courtesy of the
 Advanced User Guide</a>
 </p>
 
-[jsbeeb]: http://bbc.godbolt.org) "Lovely, isn't it?"
+[jsbeeb]: http://bbc.xania.org) "Lovely, isn't it?"
 
 Every clock cycle (of the 2MHz clock), then 6845 processes one byte of screen
 memory, generating anywhere from two to eight logical pixels, depending on the number

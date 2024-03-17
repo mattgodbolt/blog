@@ -16,5 +16,5 @@ It requires an up-to-date browser (bleeding edge Chrome, for example), and proba
 
 Take it for a spin [here][miracle], or check the code out on [Github][].
 
-[miracle]: /miracle/miracle.html "Miracle, a Javascript Sega Master System emulator."
+[miracle]: https://miracle.xania.org/l "Miracle, a Javascript Sega Master System emulator."
 [github]: https://github.com/mattgodbolt/Miracle) "Source code to Miracle"

@@ -119,7 +119,7 @@ timer going. If the emulation wasn't spot on, then over time the place where
 the video settings change would slowly creep up the screen.
 
 [PAL]: http://en.wikipedia.org/wiki/PAL "Phase Alternating Line"
-[revs]: http://bbc.godbolt.org/?disc=%7CAcornsoft%2FRevs.zip&autoboot
+[revs]: http://bbc.xania.org/?disc=%7CAcornsoft%2FRevs.zip&autoboot
 
 Acknowledging the timer
 -----------------------

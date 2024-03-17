@@ -16,4 +16,4 @@ the emulator on the [jsbeeb][] site.
 
 
 [slides]: https://mattgodbolt.github.io/bbc-micro-emulation/goto/ "Emulating a BBC Micro in Javascript"
-[jsbeeb]: https://bbc.godbolt.org/ "My favourite hobby project"
+[jsbeeb]: https://bbc.xania.org/ "My favourite hobby project"

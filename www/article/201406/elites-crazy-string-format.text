@@ -15,7 +15,7 @@ I naively thought this would be easy to achieve: I added a quick routine in
 I tried a case-insensitive version. Likewise, no luck. This wasn't going to be
 as simple as I thought.
 
-[jsbeeb]: http://bbc.godbolt.org/ "Yes, it's that emulator again"
+[jsbeeb]: http://bbc.xania.org/ "Yes, it's that emulator again"
 
 I next put a conditional breakpoint on the OS write character routine
 `OSWRCH`, conditional on the character being the `H` of the `Harmless` I was
@@ -79,7 +79,7 @@ are left unchanged, so to replace the string with, say, "Monkey" we can patch th
 achieved with a URL parameter in jsbeeb, adding `&patch=@31ac,0769:6e6c6d68667a` 
 to the autoboot URL to yield a [handy bootable patched URL][patch].
 
-[patch]: http://bbc.godbolt.org/?disc=elite.ssd&autoboot&patch=@31ac,0769:6e6c6d68667a "Patching has never been so easy"
+[patch]: http://bbc.xania.org/?disc=elite.ssd&autoboot&patch=@31ac,0769:6e6c6d68667a "Patching has never been so easy"
 
 The "@" sign in the patch URL sets a breakpoint at that location, and then applies
 the patch (in `addr:bytestopatch`) when the breakpoint is hit. 

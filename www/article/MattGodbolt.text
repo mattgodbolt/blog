@@ -26,7 +26,7 @@ the publication ceased covering the BBC computer.
 
 [plus3]: http://en.wikipedia.org/wiki/ZX_Spectrum#ZX_Spectrum_.2B3_.281987.29 "The Spectrum +3"
 [frogman]: http://www.stairwaytohell.com/bbc/archive/diskimages/Unreleased/Frogman-demo.zip "ZIP archive of unreleased BBC game Frogman"
-[onslaught]: http://bbc.godbolt.org/?disc=%7CUnreleased%2FOnslaught-demo.zip&autoboot  "ZIP archive of unreleased BBC type-in game Onslaught"
+[onslaught]: http://bbc.xania.org/?disc=%7CUnreleased%2FOnslaught-demo.zip&autoboot  "ZIP archive of unreleased BBC type-in game Onslaught"
 [au]: https://en.wikipedia.org/wiki/Acorn_User "Acorn User magazine"
 
 At school I was always into science, in particular physics.  During secondary school I used to write
@@ -138,8 +138,8 @@ Some of my other open source projects include:
 * A way of indexing and searching large gzipped archives, [zindex][zindex].
 
 [gccex]: https://godbolt.org/ "Compiler Explorer. A fine way to waste some time tinkering with C++, Go, D Rust, or other compiled code"
-[smse]: https://xania.org/miracle/miracle.html "A SMS emulator, but in your browser"
-[jsb]: https://bbc.godbolt.org/ "A Javascript BBC Micro emulator"
+[smse]: https://miracle.xania.org/ "A SMS emulator, but in your browser"
+[jsb]: https://bbc.xania.org/ "A Javascript BBC Micro emulator"
 [seasocks]: https://github.com/mattgodbolt/seasocks "Seasocks, an embeddable C++ websocket server"
 [xmud2]: https://github.com/mattgodbolt/xania "Xania, a multi-user dungeon"
 [zindex]: https://github.com/mattgodbolt/zindex "Index and search your gzipped files"

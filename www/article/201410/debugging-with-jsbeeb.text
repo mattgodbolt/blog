@@ -5,7 +5,7 @@ Summary: Digging into apparent emulation issues can lead you down a rabbit-hole
 Label: Emulation
 
 Over the last few weeks I've really been concentrating on shoring up the
-emulation quality of [jsbeeb](http://bbc.godbolt.org/), mainly by adding test
+emulation quality of [jsbeeb](http://bbc.xania.org/), mainly by adding test
 cases for all the [undefined opcodes](http://www.pagetable.com/?p=39).
 Thankfully, there are some processor test suites out there and I've been able
 to get them running in jsbeeb as part of the [continuous
@@ -46,7 +46,7 @@ A bit of experimentation and it seemed about 30% of the time the sound would
 go nuts about a minute into the demo, squeaking and missing half the notes.
 
 At first I suspected the sound chip emulation. The emulation was taken from my
-earlier [Sega Master System emulator](/miracle/miracle.html)
+earlier [Sega Master System emulator](https://miracle.xania.org/)
 which happened to use the same chip, and I had recently updated the emulation
 there to fix up some other problems that Rich had noticed. I'd taken the
 information from the [SMS Power](http://www.smspower.org/Development/SN76489)

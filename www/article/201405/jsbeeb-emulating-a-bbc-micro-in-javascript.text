@@ -22,7 +22,7 @@ and data types helps, inasmuch as Javascript has types that is.
 a Sega Master System emulator. I'm going to talk through some of the more
 interesting parts of the code. Of course, the code itself is on [github][].
 
-[jsbeeb]: http://bbc.godbolt.org/ "BBC Micro emulator"
+[jsbeeb]: http://bbc.xania.org/ "BBC Micro emulator"
 [github]: https://github.com/mattgodbolt/jsbeeb
 
 CPU emulation
@@ -35,7 +35,7 @@ the 256 possible opcodes is not the best way to optimize.  Chrome's v8 at
 least bails out its JIT process if a function is either too big, or if it has
 too many entries in the switch statement.
 
-[Miracle]: /miracle/miracle.html "A Sega Master System emulator, also in Javascript"
+[Miracle]: https://miracle.xania.org/ "A Sega Master System emulator, also in Javascript"
 
 Instead, I use a 256-entry array of function pointers, each to its own
 instruction handling routine.  The main despatch then becomes something like:

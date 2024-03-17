@@ -9,12 +9,12 @@ Those not following me on [twitter](https://twitter.com/mattgodbolt) or
 I've been working feverishly on my latest Javascript emulator.
 
 <p class="picture">
-<a href="http://bbc.godbolt.org/?disc=%7CSuperior%2FExile.zip&amp;autoboot">
+<a href="http://bbc.xania.org/?disc=%7CSuperior%2FExile.zip&amp;autoboot">
 <img src="/20140325/exile.png" width="500" height="362" alt="jsbeeb demonstrating Exile"/></a>
 <br/>At last I can play my favourite game ever in my browser
 </p>
 
-So I'd like to announce [jsbeeb](http://bbc.godbolt.org) -- a Javascript BBC Micro emulator, currently targetting only
+So I'd like to announce [jsbeeb](http://bbc.xania.org) -- a Javascript BBC Micro emulator, currently targetting only
 the BBC Model B (with sideways RAM).  It runs well in Chrome, fairly well in Firefox, and almost certainly
 won't work on any other browser.
 
@@ -24,10 +24,10 @@ support for loading games directly -- click the "Load from STH" button.
 My pal Rich Talbot-Watkins is helping me get the instruction timings perfect so we can load some of the more gnarly
 protection systems of old, but for now you can enjoy playing classics like:
 
-  * [Repton](http://bbc.godbolt.org/?disc=%7CSuperior%2FRepton.zip&autoboot)
-  * [Elite](http://bbc.godbolt.org/?disc=elite.ssd&autoboot)
-  * [Exile](http://bbc.godbolt.org/?disc=%7CSuperior%2FExile.zip&autoboot)
-  * [Thrust](http://bbc.godbolt.org/?disc=%7CSuperior%2FThrust.zip&autoboot)
+  * [Repton](http://bbc.xania.org/?disc=%7CSuperior%2FRepton.zip&autoboot)
+  * [Elite](http://bbc.xania.org/?disc=elite.ssd&autoboot)
+  * [Exile](http://bbc.xania.org/?disc=%7CSuperior%2FExile.zip&autoboot)
+  * [Thrust](http://bbc.xania.org/?disc=%7CSuperior%2FThrust.zip&autoboot)
 
 ...and many many more!
 
