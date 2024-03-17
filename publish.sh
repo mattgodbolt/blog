@@ -24,3 +24,4 @@ fixup() {
 fixup html text/html .
 fixup atom application/rss+xml feed
 aws s3 cp out/htdocs/feed.atom s3://web.xania.org/feed --content-type application/rss+xml --cache-control max-age=30 --metadata-directive REPLACE
+aws cloudfront create-invalidation --distribution-id E2QLYX3P4WX0GV --paths '/*'
