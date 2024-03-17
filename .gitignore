@@ -1,7 +1,5 @@
-venv/
-htdocs/
-htdocs2/
-miracle/
+.venv/
+out/
 *.swp
 *.pyc
 conf/pycache.db
@@ -9,4 +7,3 @@ www/feed*
 www/article/*.html
 www/article/*/*.html
 www/*.html
-.env

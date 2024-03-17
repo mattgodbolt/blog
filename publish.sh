@@ -1,54 +1,27 @@
 #!/bin/bash
 
-set -e
-PATH=$PWD/venv/bin:$PATH
-mkdir -p www/feed
+set -euo pipefail
 
-(cd pygen && python ./main.py)
+rm -rf out
+mkdir out/htdocs
+mkdir out/htdocs_fixup
 
-# Publish the generated and static content from www/ into htdocs/.
-#
-# Note that we merge the HTML contents below 'article' straight into the
-# htdocs directory.  We therefore can't delete anything automatically.
-#
-# Note also that we use checksums (-c) rather than time to determine when
-# a file has changed, because we don't update the time of the file in htdocs/
-# to match the file in www/.  The reason we don't do that is because we want
-# the file time updated when the contents change (so that Last-Modified is
-# correct).  Using the Subversion 'use-commit-times' option might also be
-# an option, but this is easier.
-rsync -vc -rlp --exclude=.svn/ --exclude=/article www/ htdocs
-rsync -vc -rlp --exclude=.svn/ --include='*.html' --include='*.png' --include='*.jpeg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ htdocs
+rsync -rlp --exclude=/article www/ out/htdocs
+rsync -rlp --include='*.html' --include='*.png' --include='*.jpeg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ out/htdocs
 
-aws s3 sync htdocs/ s3://www.xania.org/
+aws s3 sync --size-only out/htdocs/ s3://web.xania.org/
 
 fixup() {
     EXT=$1
     CT=$2
     DIR=$3
-    rm -rf htdocs2
-    mkdir -p htdocs2
-    for file in $(cd htdocs && find ${DIR} -name "*.${EXT}"); do
-        mkdir -p htdocs2/$(dirname ${file})
-        cp -a htdocs/${file} htdocs2/${file%.${EXT}}
+    for file in $(cd out/htdocs && find ${DIR} -name "*.${EXT}"); do
+        mkdir -p out/htdocs_fixup/$(dirname ${file})
+        cp -a out/htdocs/${file} out/htdocs_fixup/${file%.${EXT}}
     done
-    aws s3 sync htdocs2/ s3://www.xania.org/ --content-type ${CT} --cache-control max-age=30 --metadata-directive REPLACE
-    rm -rf htdocs2
+    aws s3 sync --size-only out/htdocs_fixup/ s3://web.xania.org/ --content-type ${CT} --cache-control max-age=30 --metadata-directive REPLACE
 }
 
 fixup html text/html .
 fixup atom application/rss+xml feed
-aws s3 cp htdocs/feed.atom s3://www.xania.org/feed --content-type application/rss+xml --cache-control max-age=30 --metadata-directive REPLACE
-
-if [ ! -d miracle ]; then
-    git clone git@github.com:mattgodbolt/Miracle.git miracle
-fi
-if [ ! -d miracle/roms ]; then
-    aws s3 cp s3://xania.org/miracle-roms.tar.gz /tmp/
-    pushd miracle
-    tar zxf /tmp/miracle-roms.tar.gz
-    popd
-fi
-
-(cd miracle && git pull && make dist)
-aws s3 sync miracle/ s3://www.xania.org/miracle/ --exclude=".git/*" --cache-control max-age=30 --metadata-directive REPLACE
+aws s3 cp out/htdocs/feed.atom s3://web.xania.org/feed --content-type application/rss+xml --cache-control max-age=30 --metadata-directive REPLACE

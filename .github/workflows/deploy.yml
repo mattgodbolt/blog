@@ -1,0 +1,21 @@
+name: Blog deploy
+
+on: [push]
+
+jobs:
+  update-web:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' 
+      - uses: aws-actions/configure-aws-credentials@v4.0.2
+        with: 
+          aws-region: us-east-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Build distribution
+        run: |
+          make publish
