@@ -1,15 +1,18 @@
 MSVC and CE
 Date: 2024-07-11 20:00:00
-Status: Draft
+Status: Public
 Summary: Microsoft Compilers on Compiler Explorer
 Label: Coding
 
 The eagle-eyed among you may have noticed a change in the way
 compiling using Microsoft Visual Studio compilers works on
-Compiler Explorer. Short version: we have gained execution support
+[Compiler Explorer](https://compiler-explorer/com).
+Short version: we have gained execution support
 (yay), but lost library support (boo). We're working on the latter.
 
-So, what happened? In order to explain, a little history.
+So, what happened? In order to explain, here's some background:
+
+### Background
 
 Compiler Explorer runs on Linux infrastructure. My day job for the last
 two decades has meant developing on, and for, Linux or Linux-based systems.
@@ -26,6 +29,8 @@ transparently proxy to MS's infrastructure and so users mostly wouldn't know
 this was going on. That worked a treat and got us the latest Windows 
 compilers, supported by professionals who had intimate understanding and
 knowledge of Windows and how to secure it.
+
+### What happened?
 
 Over the years, priorities and teams changed, and issues and concerns about
 security grew. Code execution had to be disabled, and the site became a
@@ -44,6 +49,8 @@ up our own Windows-based infrastructure (mostly by our star developer
 us host the compilers ourselves. I can't go into more specifics due to the
 nature of the legal agreement between us.
 
+### And now?
+
 So: now we get to install, maintain, host and secure the Windows Microsoft
 Visual Studio C and C++ compilers on Compiler Explorer. That is great for our
 users: we can be more responsive to issues and bug reports; we have been 
@@ -58,6 +65,8 @@ to try and reproduce that setup. We are currently brainstorming
 how best to deal with libraries for Windows: our Linux-based solution has
 some novel Linux-only tricks to make it performant enough for interactivity
 that we haven't yet worked out Windows equivalents for.
+
+### Conclusion
 
 Hopefully this explains the change in MSVC on Compiler Explorer. If you're
 interested in learning more, or following further development, then check out:
