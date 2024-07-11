@@ -1,0 +1,69 @@
+MSVC and CE
+Date: 2024-07-11 20:00:00
+Status: Draft
+Summary: Microsoft Compilers on Compiler Explorer
+Label: Coding
+
+The eagle-eyed among you may have noticed a change in the way
+compiling using Microsoft Visual Studio compilers works on
+Compiler Explorer. Short version: we have gained execution support
+(yay), but lost library support (boo). We're working on the latter.
+
+So, what happened? In order to explain, a little history.
+
+Compiler Explorer runs on Linux infrastructure. My day job for the last
+two decades has meant developing on, and for, Linux or Linux-based systems.
+As a result, CE itself uses Linux. When folks originally asked for Windows
+compiler support, I put it off for a while. A few years after, a friend
+helped me just about coerce and fudge a few versions of MSVC to run under
+WINE, but it's not perfect and to this day causes us issues.
+
+Microsoft reached out and offered to help. Through a number of conversations
+with the fine folks who work there, we negotiated an informal deal where
+they would run and administrate an instance of Compiler Explorer on Windows 
+with access to their compilers. The main Compiler Explorer would 
+transparently proxy to MS's infrastructure and so users mostly wouldn't know
+this was going on. That worked a treat and got us the latest Windows 
+compilers, supported by professionals who had intimate understanding and
+knowledge of Windows and how to secure it.
+
+Over the years, priorities and teams changed, and issues and concerns about
+security grew. Code execution had to be disabled, and the site became a
+little less reliable, with periods of downtime for the MSVC compilers
+ranging from hours to days.  As most people didn't know it was MS who were 
+responsible for these compilers, and that the main CE team didn't have
+any control or access to the MS side of things or its configuration, it
+was a little frustrating being "front line support" with no ability to
+fix things. Our friends at Microsoft were _very_ helpful but also had
+many other priorities and considerations other than CE, so this is
+completely understandable.
+
+Ultimately after a lot of discussion and hard work proving out and setting
+up our own Windows-based infrastructure (mostly by our star developer
+[Patrick Quist](https://twitter.com/partouf)), Microsoft agreed to help
+us host the compilers ourselves. I can't go into more specifics due to the
+nature of the legal agreement between us.
+
+So: now we get to install, maintain, host and secure the Windows Microsoft
+Visual Studio C and C++ compilers on Compiler Explorer. That is great for our
+users: we can be more responsive to issues and bug reports; we have been 
+able to re-enable execution on Windows; and we can steer the direction as
+we see fit amongst the community.
+
+However, we lost library support along the way: Microsoft chose to use their
+own `vcpkg`-based solution for implementing libraries somewhat separately 
+from the way the rest of CE does libraries. That definitely made sense when
+they had a free choice and separate infrastructure, but we have chosen not
+to try and reproduce that setup. We are currently brainstorming
+how best to deal with libraries for Windows: our Linux-based solution has
+some novel Linux-only tricks to make it performant enough for interactivity
+that we haven't yet worked out Windows equivalents for.
+
+Hopefully this explains the change in MSVC on Compiler Explorer. If you're
+interested in learning more, or following further development, then check out:
+
+- [Compiler Explorer on Github](https://github.com/compiler-explorer)
+- [Patreon](https://patreon.com/mattgodbolt) where I write weekly updates
+  for patrons.
+- The [Compiler Explorer Discord](https://discord.gg/B5WacA7) where a
+  friendly bunch of folks are always around to chat.
