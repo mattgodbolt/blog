@@ -6,7 +6,7 @@ Label: Coding
 
 The eagle-eyed among you may have noticed a change in the way
 compiling using Microsoft Visual Studio compilers works on
-[Compiler Explorer](https://compiler-explorer/com).
+[Compiler Explorer](https://compiler-explorer.com).
 Short version: we have gained execution support
 (yay), but lost library support (boo). We're working on the latter.
 
