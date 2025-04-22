@@ -79,11 +79,12 @@ if __name__ == "__main__":
             self.permalink = "https://xania.org"
 
     code, deps = compile(r"../conf/frontpage-template.html", r"../conf")
-    globalDict = dict()
-    globalDict["label"] = {"name": "bob", "filename": "denzel"}
-    globalDict["latestUpdateISO"] = "hello"
-    globalDict["year"] = "2007"
-    globalDict["articles"] = [article("one"), article("two")]
+    globalDict = {
+        "label": {"name": "bob", "filename": "denzel"},
+        "latestUpdateISO": "hello",
+        "year": "2007",
+        "articles": [article("one"), article("two")],
+    }
     exec(code, globalDict)
     print(globalDict["output"])
     print(deps)

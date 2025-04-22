@@ -19,6 +19,8 @@ black = "^24.2.0"
 isort = "^5.13.2"
 ruff = "^0.2.1"
 mypy = "^1.8.0"
+types-pytz = "^2024.1.0.20240416"
+types-markdown = "^3.5.0.20240505"
 
 [build-system]
 requires = ["poetry-core"]
@@ -35,6 +37,8 @@ line_length = 120
 [tool.ruff]
 line-length = 120
 target-version = "py310"
+
+[tool.ruff.lint]
 select = [
     "E",    # pycodestyle errors
     "F",    # pyflakes
@@ -60,10 +64,10 @@ unfixable = [
     "F401",
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["pygen"]
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
 [tool.mypy]

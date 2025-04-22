@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 import codecs
 import datetime
-import io
 import os
 import re
-import sys
-import time
 from warnings import warn
 from xml.etree import ElementTree
 
@@ -61,11 +58,17 @@ class GlobalData:
         return int(self.GetInheritedValue(value, label))
 
     def GetPublicArticles(self, label):
+        def is_public_with_label(article):
+            return article.Status == "public" and label in article.Labels
+
+        def is_public(article):
+            return article.Status == "public"
+
         if label:
-            func = lambda a: a.Status == "public" and label in a.Labels
+            filter_func = is_public_with_label
         else:
-            func = lambda a: a.Status == "public"
-        return list(filter(func, list(self.articles.values())))
+            filter_func = is_public
+        return list(filter(filter_func, list(self.articles.values())))
 
     def SetCache(self, cache):
         self.cache = cache
@@ -165,26 +168,26 @@ def ReadGeneratorConfig(filename, globalData):
             key = key.strip()
             value = value.strip()
             if key in globalData.config:
-                warn("%s:%d : Duplicate key '%s'" % (filename, lineNumber, key))
+                warn(f"{filename}:{lineNumber} : Duplicate key '{key}'", stacklevel=2)
             globalData.config[key] = value
         except ValueError:
-            warn("%s:%d : Missing ':'" % (filename, lineNumber))
+            warn(f"{filename}:{lineNumber} : Missing ':'", stacklevel=2)
 
 
 def CheckConfig(globalData):
     def IsPresent(key):
         if key not in globalData.config:
-            raise Exception("Missing required configuration option '%s'" % key)
+            raise Exception(f"Missing required configuration option '{key}'")
 
     def IsDir(key):
         IsPresent(key)
         if not os.path.isdir(globalData.config[key]):
-            raise Exception("Missing directory '%s' for configuration option '%s'" % (globalData.config[key], key))
+            raise Exception(f"Missing directory '{globalData.config[key]}' for configuration option '{key}'")
 
     def IsFile(key):
         IsPresent(key)
         if not os.path.isfile(globalData.config[key]):
-            raise Exception("Missing file '%s' for configuration option '%s'" % (globalData.config[key], key))
+            raise Exception(f"Missing file '{globalData.config[key]}' for configuration option '{key}'")
 
     def CreateDummy(key, value=""):
         if key not in globalData.config:
@@ -195,9 +198,10 @@ def CheckConfig(globalData):
         try:
             value = int(globalData.config[key])
             if value <= 1:
-                raise Exception("Invalid numeric value %d (< 1) for configuration option '%s'" % (value, key))
-        except ValueError:
-            raise Exception("Invalid numeric value '%s' for configuration option '%s'" % (globalData.config[key], key))
+                raise Exception(f"Invalid numeric value {value} (< 1) for configuration option '{key}'")
+        except ValueError as err:
+            val = globalData.config[key]
+            raise Exception(f"Invalid numeric value '{val}' for configuration option '{key}'") from err
 
     IsDir("ArticleDirectory")
     IsPresent("ArticleURLPrefix")
@@ -262,8 +266,8 @@ def ReadArticle(globalData, article):
     filename = os.path.join(globalData.config["ArticleDirectory"], article.BaseName + ".text")
     try:
         fileHandle = codecs.open(filename, "r", "utf8")
-    except OSError:
-        print("Ignoring article '%s' as cannot open" % filename)
+    except OSError as err:
+        print(f"Ignoring article '{filename}' as cannot open: {err}")
         return
     article.RawTitle = fileHandle.readline().strip()
     # Strip the BOM, if needed.
@@ -284,10 +288,10 @@ def ReadArticle(globalData, article):
                 key = key.strip().lower()
                 value = value.strip()
                 if key in headers:
-                    warn("%s:%d : Duplicate key '%s'" % (filename, lineNumber, key))
+                    warn(f"{filename}:{lineNumber} : Duplicate key '{key}'", stacklevel=2)
                 headers[key] = value
-            except ValueError:
-                raise Exception("%s:%d : Missing ':''" % (filename, lineNumber))
+            except ValueError as value_err:
+                raise Exception(f"{filename}:{lineNumber} : Missing ':''") from value_err
         else:
             article.ArticleText += line
     for key, value in list(headers.items()):
@@ -410,28 +414,27 @@ def FormatAtomDates(dates):
 
 
 def GetArticleDict(globalData, article):
-    d = dict()
-    d["basename"] = article.BaseName
-    d["basenameNAME"] = article.BaseNameNAME
-    d["title"] = article.Title
-    d["status"] = article.Status
-    d["summary"] = article.Summary
-    d["via"] = article.Via
-    d["author"] = article.Author
-    d["permalink"] = article.Permalink
-    d["contentHTML"] = article.HtmlText
-    d["contentXHTML"] = article.XHtmlText
-    d["licenseURL"] = article.LicenseURL
-    d["dateHTML"] = article.DateHTML
-    d["dateISO"] = article.DateISO
-    d["dateMonth"] = article.DateMonth
-    # TODO: dateMonthPrev
-    d["datesAtom"] = article.DatesAtom
-    d["year"] = str(datetime.datetime.now().year)
-    d["labels"] = article.Labels
-    d["allLabels"] = globalData.labels
-
-    return d
+    return {
+        "basename": article.BaseName,
+        "basenameNAME": article.BaseNameNAME,
+        "title": article.Title,
+        "status": article.Status,
+        "summary": article.Summary,
+        "via": article.Via,
+        "author": article.Author,
+        "permalink": article.Permalink,
+        "contentHTML": article.HtmlText,
+        "contentXHTML": article.XHtmlText,
+        "licenseURL": article.LicenseURL,
+        "dateHTML": article.DateHTML,
+        "dateISO": article.DateISO,
+        "dateMonth": article.DateMonth,
+        # TODO: dateMonthPrev
+        "datesAtom": article.DatesAtom,
+        "year": str(datetime.datetime.now().year),
+        "labels": article.Labels,
+        "allLabels": globalData.labels,
+    }
 
 
 def GetTemplateDependencies(globalData, template, includePath):

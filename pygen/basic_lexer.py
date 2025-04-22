@@ -1,5 +1,5 @@
 from pygments.lexer import RegexLexer
-from pygments.token import *
+from pygments.token import Comment, Literal, Name, Punctuation, Text, Token
 
 __all__ = ["BasicLexer"]
 
