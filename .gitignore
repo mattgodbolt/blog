@@ -28,7 +28,6 @@ htmlcov/
 
 # Poetry
 dist/
-poetry.toml
 
 # Misc
 .DS_Store
