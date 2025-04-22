@@ -52,24 +52,28 @@ After the header fields and a blank line, the article content follows in Markdow
 
 ## Build & Run Commands
 
-- **Setup**: `make deps` - Creates venv and installs requirements
+- **Setup**: `make deps` - Installs Poetry locally and sets up dependencies
 - **Generate site**: `make update` - Rebuilds blog content
 - **Preview locally**: `make serve` - Builds and serves site at localhost:8000
 - **Publish to S3**: `make publish` - Builds and deploys to production
 
+The project uses Poetry for dependency management. The Makefile automatically installs Poetry locally in the `.poetry` directory and manages the virtual environment for you.
+
 ## Project Structure
 
-- `pygen/`: Main Python generation code
+- `pygen/`: Main Python generation code (Python package)
 - `conf/`: Templates and configuration
 - `www/`: Website content and generated files
 - `publish.sh`: Deployment script for AWS S3
+- `pyproject.toml`: Poetry configuration and dependencies
+- `poetry.lock`: Locked dependency versions for reproducible builds
 
 ## Potential Improvements
 
 ### High Priority
-1. **Move to Poetry for dependency management**
-   - Replace `requirements.txt` with `pyproject.toml`
-   - Add proper dependency versioning and lock file
+1. ✅ **Move to Poetry for dependency management** (Completed)
+   - ✅ Replace `requirements.txt` with `pyproject.toml`
+   - ✅ Add proper dependency versioning and lock file
 
 2. **Modernize Python code**
    - Add type hints
@@ -112,7 +116,7 @@ After the header fields and a blank line, the article content follows in Markdow
 A suggested sequence for implementing the improvements:
 
 1. **Initial modernization**
-   - Set up Poetry for dependency management
+   - ✅ Set up Poetry for dependency management
    - Add basic linting and formatting
    - Document existing code before changing it
 
