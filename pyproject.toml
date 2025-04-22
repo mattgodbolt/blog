@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Matt Godbolt's personal blog generator"
 authors = ["Matt Godbolt <matt@godbolt.org>"]
 readme = "README.md"
+packages = [{include = "pygen"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
