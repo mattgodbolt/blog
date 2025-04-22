@@ -3,9 +3,9 @@
 import datetime
 
 import pytest
-from pytz import timezone
+from pytz import timezone, utc
 
-from pygen.main import ParseDate, defaultTimeZone
+from pygen.main import FormatAtomDates, FormatHtmlDate, FormatISODate, ParseDate, defaultTimeZone
 
 
 def test_parse_basic_date():
@@ -198,3 +198,72 @@ def test_invalid_offset_timezone():
     with pytest.raises(ValueError) as excinfo:
         ParseDate("2020-01-01 12:34:56 -5")  # Not enough digits
     assert "Invalid timezone name" in str(excinfo.value)
+
+
+def test_format_iso_date():
+    """Test ISO date formatting converts to UTC."""
+    # Create a date in US/Pacific timezone
+    pacific_tz = timezone("US/Pacific")
+    local_date = pacific_tz.localize(datetime.datetime(2023, 1, 15, 14, 30, 0))
+
+    # Format as ISO date (should convert to UTC)
+    iso_date = FormatISODate(local_date)
+
+    # US/Pacific is UTC-8 in January, so 14:30 should become 22:30 UTC
+    assert "2023-01-15T22:30:00Z" in iso_date
+
+
+def test_format_html_date():
+    """Test HTML date formatting preserves timezone."""
+    # Create a date in Europe/Paris timezone
+    paris_tz = timezone("Europe/Paris")
+    local_date = paris_tz.localize(datetime.datetime(2023, 6, 1, 14, 30, 0))
+
+    # Format as HTML date
+    html_date = FormatHtmlDate(local_date)
+
+    # Check time and timezone are in the output
+    assert "14:30:00" in html_date
+    assert "CEST" in html_date or "CET" in html_date
+    # Check date formatting
+    assert "1<sup>st</sup> June 2023" in html_date
+
+
+def test_format_atom_dates_single_date():
+    """Test that FormatAtomDates properly formats a single date."""
+    date = utc.localize(datetime.datetime(2023, 1, 15, 14, 30, 0))
+    atom_date = FormatAtomDates([date])
+    expected = "<updated>2023-01-15T14:30:00Z</updated>"
+    assert atom_date == expected
+
+
+def test_format_atom_dates_multiple_dates():
+    """Test that FormatAtomDates properly formats multiple dates."""
+    date1 = utc.localize(datetime.datetime(2023, 1, 15, 14, 30, 0))
+    date2 = utc.localize(datetime.datetime(2023, 1, 16, 10, 0, 0))
+
+    atom_date = FormatAtomDates([date1, date2])
+    expected1 = "<published>2023-01-15T14:30:00Z</published>"
+    expected2 = "<updated>2023-01-16T10:00:00Z</updated>"
+
+    assert expected1 in atom_date
+    assert expected2 in atom_date
+
+
+def test_parse_date_leap_year():
+    """Test parsing dates in leap years."""
+    # February 29 in a leap year
+    date = ParseDate("2020-02-29")
+    assert date.year == 2020
+    assert date.month == 2
+    assert date.day == 29
+
+    # February 29 in a leap year with timezone
+    date = ParseDate("2020-02-29 12:00:00 US/Pacific")
+    assert date.year == 2020
+    assert date.month == 2
+    assert date.day == 29
+    assert date.hour == 12
+    assert date.minute == 0
+    pacific_tz = timezone("US/Pacific")
+    assert str(date.tzinfo) == str(pacific_tz)

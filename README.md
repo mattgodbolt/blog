@@ -43,7 +43,14 @@ def hello_world():
 ### Header Fields
 
 - **Title**: The first line of the file (no explicit key)
-- **Date**: Publication date and time in `YYYY-MM-DD HH:MM:SS` format
+- **Date**: Publication date and time in one of these formats:
+  - `YYYY-MM-DD` - Uses default timezone (Europe/London)
+  - `YYYY-MM-DD HH` - Only hour specified, uses default timezone
+  - `YYYY-MM-DD HH:MM` - Hour and minute, uses default timezone
+  - `YYYY-MM-DD HH:MM:SS` - Full timestamp, uses default timezone
+  - `YYYY-MM-DD HH:MM:SS TZNAME` - With named timezone (e.g., America/Chicago, US/Central)
+  - `YYYY-MM-DD HH:MM:SS ±HHMM` - With timezone offset (e.g., -0500, +0100)
+  - `YYYY-MM-DD HH:MM:SS ±HH:MM` - With timezone offset with colon (e.g., -05:00, +01:00)
 - **Label**: Category tags for the article (comma-separated)
 - **Status** (optional): Typically "Public"
 - **Summary** (optional): Brief description for previews/metadata
@@ -101,7 +108,11 @@ The project uses Poetry for dependency management. The Makefile automatically in
    - ✅ Simplified article processing workflow
 
 6. **Add tests**
-   - Unit tests for core functionality
+   - ✅ Unit tests for date parsing functionality
+   - ✅ Unit tests for date formatting
+   - ✅ Unit tests for string processing
+   - ✅ Unit tests for ETL template system
+   - ✅ Unit tests for article summarization (precis)
    - Integration tests for site generation
 
 7. **Configuration management**
