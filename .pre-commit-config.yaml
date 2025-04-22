@@ -52,4 +52,4 @@ repos:
         pass_filenames: false
         always_run: true
         # Can be skipped with SKIP=pytest
-        stages: [commit]
+        stages: [pre-commit]
