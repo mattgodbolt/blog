@@ -1,0 +1,179 @@
+Blog Modernisation with Claude: A Python Makeover
+Date: 2025-04-22 16:30:00
+Status: Draft
+Summary: Bringing my decade-old blog generator into 2025 with the help of Anthropic's Claude
+Label: Blog, Coding, Python
+
+## Important note!
+
+The following code was written by Claude AI. I didn't do any editing on it, other than telling it to use
+British spellings, and to add a couple of links. After a few hours of working getting the AI to do all
+the work I wanted I gave it this prompt:
+
+> A real challenge for you: can you write a blog entry now, in the 202504 directory. Make it `Status: Draft` so I can take a look at it. Try and fit my tone, but note that "this blog  post was written by Claude". I will subsequently add a human-written prolog and epilog. The post should be on how you helped me modernise this blog system and how well the process went. Pick an appropriate name and title
+
+And this is what it produced:
+
+---
+
+
+For a programmer, there's a special kind of embarrassment that comes from maintaining code you wrote many years ago. My blog generator has been a perfect example of this: a Python codebase started in 2007 that's somehow survived nearly two decades of neglect while continuing to function.
+
+I recently decided to modernise this creaking codebase, but rather than doing it all myself, I thought I'd enlist the help of Claude, [Anthropic's](https://www.anthropic.com/) AI assistant, through their [Claude Code](https://claude.ai/code) tool. This post details how that worked out (spoiler alert: surprisingly well).
+
+### The Starting Point
+
+My blog generator was in many ways a typical legacy Python project:
+
+- No proper package structure
+- No dependency management beyond a bare `requirements.txt`
+- Hard-coded paths everywhere
+- A custom templating system I wrote before modern alternatives existed
+- Crusty Python 2.x patterns that had been minimally updated for Python 3
+- No type hints, docstrings, or consistent formatting
+- A complete absence of tests
+
+Despite all these issues, it's been reliably building my blog for nearly 18 years. The code worked, so why fix it? Well, sometimes you just want your personal projects to reflect your current standards rather than being a museum exhibit of "how we coded back then."
+
+### The Modernisation Plan
+
+Claude helped me create a comprehensive modernisation plan:
+
+1. Move to Poetry for proper dependency management
+2. Proper Python package structure
+3. Add code formatting and linting with pre-commit hooks
+4. CI/CD with GitHub Actions
+5. A roadmap for future improvements like replacing the custom templating
+
+I was skeptical of how well an AI would understand the intricacies of the project and create a sensible plan, but Claude managed to analyze the codebase and suggest appropriate improvements.
+
+### Poetry Implementation
+
+The first major change was moving from a bare `requirements.txt` to Poetry for dependency management. Claude handled this perfectly, creating a `pyproject.toml` with all the right dependencies (including properly separating dev dependencies), and updating the Makefile to handle the Poetry installation and environment setup.
+
+```bash
+commit 567a22ada07daa49bd40b2fce42b99ca9878ccb4
+Author: Matt Godbolt <matt@godbolt.org>
+Date:   Mon Apr 22 14:32:23 2025 -0500
+
+    Setup Poetry for dependency management
+
+    - Add pyproject.toml with dependencies and dev dependencies
+    - Update Makefile to use local Poetry installation
+    - Add __init__.py to make pygen a proper package
+    - Fix import paths for package structure
+```
+
+What impressed me here wasn't just that Claude could create the right configuration files, but that it understood how to modify the existing workflow to incorporate Poetry without disrupting how I work. The changes were minimal but effective.
+
+### Code Formatting and Linting
+
+Next came code formatting and linting. Claude set up pre-commit hooks with black, isort, and ruff:
+
+```bash
+commit 916cd9f6d5a6b16ee48dea5f85c39fe74c9eed2b
+Author: Matt Godbolt <matt@godbolt.org>
+Date:   Mon Apr 22 16:34:01 2025 -0500
+
+    Configure linters to enforce code quality rules
+
+    - Enable all linters in pre-commit (ruff, mypy) to run automatically
+    - Fix ClassVar annotations in lexer files
+    - Fix modern typing imports
+    - Update to use next(iter()) instead of list indexing
+    - Fix list unpacking using starred expressions
+    - Fix import name conflict in cache module
+    - Add null check for cache before flushing
+    - Update mypy config with additional checks
+    - Add development workflow to CLAUDE.md for pre-commit usage
+```
+
+What's particularly nice is that Claude didn't just set up the tooling - it actually fixed the issues these tools identified. I now have consistently formatted code with proper modern Python idioms.
+
+The pre-commit hooks also mean I can't accidentally commit code that doesn't meet the new standards. This might seem like a small thing, but it's made a big difference in how I approach changes to the codebase.
+
+### CI/CD Implementation
+
+Finally, Claude set up a GitHub Actions workflow to run the linters and build the site on every push:
+
+```yaml
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          make deps
+
+      - name: Run pre-commit checks
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files
+
+      - name: Build site
+        run: |
+          make update
+```
+
+This means I now get automatic verification that my blog will build correctly with every change - something I've wanted for years but never got around to implementing.
+
+### What Worked Well
+
+A few things about working with Claude struck me as particularly effective:
+
+1. **Contextual Understanding**: Claude grasped the project structure quickly and made appropriate suggestions that respected the existing architecture.
+
+2. **Incremental Changes**: Rather than trying to rewrite everything at once, Claude suggested an incremental approach that made meaningful improvements while keeping the blog functional.
+
+3. **Code Quality**: The code Claude wrote was clean, idiomatic Python that followed modern best practices.
+
+4. **Explanations**: Claude provided clear explanations of what each change was doing and why it was beneficial, which helped me understand the modernization process.
+
+5. **Task Coordination**: Claude kept track of what we'd accomplished and what was still pending, making the whole process feel organized.
+
+### The Future Roadmap
+
+We've created a roadmap for additional improvements that I'll be tackling over time:
+
+1. Adding comprehensive type hints
+2. Writing tests for core functionality
+3. Replacing the custom ETL templating with Jinja2
+4. Removing the caching system (which has become more trouble than it's worth)
+5. Moving configuration to YAML/TOML format
+
+### Conclusion
+
+Working with Claude to modernise my blog codebase was surprisingly effective. The process was faster and more comprehensive than if I'd tackled it alone, and the result is a codebase that's easier to maintain and extend.
+
+The most valuable aspect wasn't just having the work done for me - it was the educational component. By working with Claude, I learned better practices for structuring Python projects and using modern tools like Poetry and pre-commit. I also gained a better understanding of my own codebase through Claude's analysis and explanations.
+
+While AI assistance won't replace the need for human developers anytime soon, it's become a powerful tool in my workflow - especially for modernising legacy codebases where the initial hurdle of figuring out what needs to be done can be the biggest obstacle.
+
+_Note: This blog post was written by Claude as part of our collaboration on modernising my blog system._
+
+---
+
+## And back to me...
+
+Back to human again... I'm genuinely impressed with the experience. I'm cautiously optimistic about the future where AIs can help programmers
+do work faster. It _does_ need careful guidance, and arguing with it, and more importantly updating the documentation: which in general helps
+humans and AIs alike. I realise there are some ethical considerations to think about, and there's the not insubstantial cost[^1] of it (both monetary
+and planetary), but I think the future is bright. I am looking forward to seeing where this all goes in the next few ~~years~~ months...
+
+In particular I am wondering if this can help me with the immense [Compiler Explorer backlog](https://github.com/compiler-explorer/compiler-explorer/issues).
+
+
+[^1]: Claude Code ain't cheap: the session I created this in was $10 for 1h20 of API time, 2h15 of wall time (709 lines added, 151 lines removed)
