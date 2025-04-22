@@ -41,3 +41,13 @@ repos:
         additional_dependencies: [types-pytz, types-markdown]
         args: [--ignore-missing-imports, --warn-unused-ignores, --warn-redundant-casts, --warn-unreachable]
         files: ^pygen/
+
+  # Run pytest to ensure all tests pass
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: poetry run pytest
+        language: system
+        pass_filenames: false
+        always_run: true

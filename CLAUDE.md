@@ -22,7 +22,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Always run `pre-commit run --all-files` before running `git add` to ensure code formatting
 - Use `make lint` to check for linting issues
 - Use `make format` to fix formatting issues
+- Use `make test` to run the test suite
 - Let the formatter make its changes before committing code
+- All tests must pass before creating a PR
 
 ## Project Structure
 - pygen/: Main Python generation code
