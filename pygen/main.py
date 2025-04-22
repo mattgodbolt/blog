@@ -12,7 +12,6 @@ from markdown import markdown
 from pytz import timezone, utc
 
 from pygen import ETL
-from pygen.cache import Cache, SqlBackend
 from pygen.precis import PrecisExtension
 
 pygments.lexers.LEXERS["AsmLexer"] = ("pygen.asm_lexer", "AsmLexer", ("asm",), ("*.asm",), ("text/asm"))
@@ -28,7 +27,6 @@ class GlobalData:
     def __init__(self):
         self.config = {}
         self.articles = {}
-        self.cache = None
         self.labels = set()
 
     def GetValue(self, value, label):
@@ -69,9 +67,6 @@ class GlobalData:
         else:
             filter_func = is_public
         return list(filter(filter_func, list(self.articles.values())))
-
-    def SetCache(self, cache):
-        self.cache = cache
 
 
 class Article:
@@ -356,34 +351,27 @@ def CleanUpXHtml(title, xhtml):
     return xhtml
 
 
-def CacheArticle(globalData, article):
+def ProcessArticle(globalData, article):
     article.Title = ProcessTitle(article.RawTitle)
-    cacheObj = (28, article.ArticleText)
-    resultObj = globalData.cache.Find(cacheObj)
-    if resultObj:
-        print("Read cached article", article.RawTitle)
-        article.XHtmlText, article.HtmlText, article.HtmlIntro = resultObj
-    else:
-        print("Caching article", article.RawTitle)
-        extensions = ["markdown.extensions.extra", "markdown.extensions.codehilite"]
-        ex_conf = {"markdown.extensions.codehilite": {"guess_lang": False}}
-        article.XHtmlText = CleanUpXHtml(
-            article.RawTitle,
-            markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml"),
-        )
-        article.HtmlText = markdown(
-            article.ArticleText,
-            extensions=[*extensions, "markdown.extensions.smarty"],
-            extension_configs=ex_conf,
-            output_format="html",
-        )
-        article.HtmlIntro = markdown(
-            article.ArticleText,
-            extensions=[*extensions, "markdown.extensions.smarty", PrecisExtension()],
-            extension_configs=ex_conf,
-            output_format="html",
-        )
-        globalData.cache.Add(cacheObj, (article.XHtmlText, article.HtmlText, article.HtmlIntro))
+    print("Processing article", article.RawTitle)
+    extensions = ["markdown.extensions.extra", "markdown.extensions.codehilite"]
+    ex_conf = {"markdown.extensions.codehilite": {"guess_lang": False}}
+    article.XHtmlText = CleanUpXHtml(
+        article.RawTitle,
+        markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml"),
+    )
+    article.HtmlText = markdown(
+        article.ArticleText,
+        extensions=[*extensions, "markdown.extensions.smarty"],
+        extension_configs=ex_conf,
+        output_format="html",
+    )
+    article.HtmlIntro = markdown(
+        article.ArticleText,
+        extensions=[*extensions, "markdown.extensions.smarty", PrecisExtension()],
+        extension_configs=ex_conf,
+        output_format="html",
+    )
 
 
 def FormatHtmlDate(date):
@@ -438,22 +426,10 @@ def GetArticleDict(globalData, article):
 
 
 def GetTemplateDependencies(globalData, template, includePath):
-    # See if we have this cached - using the name of the template and its modification time.
-    cacheObj = (template, os.path.getmtime(template))
-    fileList = globalData.cache.Find(cacheObj)
-    if fileList:
-        try:
-            # Try finding all the mtimes of all the dependencies
-            fileList = [os.path.getmtime(file) for file in fileList]
-        except OSError:
-            fileList = None
-    if fileList:
-        return fileList
-    # If we failed then reconstruct the include, and cache them.
+    # Process template includes
     ignored, fileList = ETL.process_includes(template, includePath)
     fileList.add(template)
-    globalData.cache.Add(cacheObj, fileList)
-    # Remember to look up the file times and return those.
+    # Get modification times for all dependencies
     fileList = [os.path.getmtime(file) for file in fileList]
     return fileList
 
@@ -463,29 +439,13 @@ def OutputArticleHtml(globalData, article):
     articleDirectory = globalData.config["ArticleDirectory"]
     articleHtml = os.path.join(articleDirectory, article.BaseName + ".html")
     dictionary = GetArticleDict(globalData, article)
-    dependencyTimes = GetTemplateDependencies(globalData, template, ".")
-    cacheObj = (dictionary, dependencyTimes)
-    result = globalData.cache.Find(cacheObj)
-    if result:
-        print("Found cached article", article.RawTitle)
-        html = result
-    else:
-        print("Processing article", article.RawTitle)
-        html, deps = ETL.process(template, ".", dictionary)
-        globalData.cache.Add(cacheObj, html)
 
-    # See if the existing version we've found is the most up-to-date anyway.
-    cacheObj = html
-    if os.path.exists(articleHtml):
-        expectedModTime = os.path.getmtime(articleHtml)
-        if expectedModTime == globalData.cache.Find(cacheObj):
-            print("  article is already up to date.")
-            return
+    print("Processing article", article.RawTitle)
+    html, deps = ETL.process(template, ".", dictionary)
 
     output = codecs.open(articleHtml, "w", "utf-8")
     output.write(html)
     output.close()
-    globalData.cache.Add(cacheObj, os.path.getmtime(articleHtml))
 
 
 def MyMax(objects, key):
@@ -562,9 +522,6 @@ def Generate(forceGenerate):
     if forceGenerate:
         globalData.config["ForceRefresh"] = True
 
-    # TODO: configurable cache file
-    globalData.SetCache(Cache(SqlBackend("pycache.db")))
-
     ScanArticleDirectory(globalData)
 
     for article in globalData.articles.values():
@@ -581,7 +538,7 @@ def Generate(forceGenerate):
             del globalData.articles[articleName]
 
     for article in list(globalData.articles.values()):
-        CacheArticle(globalData, article)
+        ProcessArticle(globalData, article)
 
     for article in list(globalData.articles.values()):
         OutputArticleHtml(globalData, article)
@@ -593,9 +550,6 @@ def Generate(forceGenerate):
         print("Generating indices:", label.name)
         GenerateArticleIndices(globalData, label)
 
-    print("Flushing cache")
-    if globalData.cache:
-        globalData.cache.Flush()
     print("Done")
 
 
