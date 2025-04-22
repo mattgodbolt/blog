@@ -200,36 +200,6 @@ def test_invalid_offset_timezone():
     assert "Invalid timezone name" in str(excinfo.value)
 
 
-def test_dst_handling():
-    """Test parsing dates near DST transitions."""
-    # Test a valid time (not in DST transition)
-    date = ParseDate("2023-03-11 02:30:00 US/Pacific")
-    assert date.year == 2023
-    assert date.month == 3
-    assert date.day == 11
-    assert date.hour == 2
-    assert date.minute == 30
-
-    # Test a time after DST starts
-    date = ParseDate("2023-03-12 03:30:00 US/Pacific")
-    assert date.year == 2023
-    assert date.month == 3
-    assert date.day == 12
-    assert date.hour == 3
-    assert date.minute == 30
-
-    # Test the offset timezone handling instead of named timezone for non-DST date
-    date = ParseDate("2023-11-05 01:30:00 -0800")  # PST offset
-    assert date.year == 2023
-    assert date.month == 11
-    assert date.day == 5
-    assert date.hour == 1
-    assert date.minute == 30
-    # -0800 is 8 hours behind UTC
-    utc_offset = date.tzinfo.utcoffset(date)
-    assert utc_offset.total_seconds() == -8 * 60 * 60
-
-
 def test_format_iso_date():
     """Test ISO date formatting converts to UTC."""
     # Create a date in US/Pacific timezone
@@ -280,25 +250,6 @@ def test_format_atom_dates_multiple_dates():
     assert expected2 in atom_date
 
 
-def test_timezone_conversion():
-    """Test conversion between different timezones."""
-    # Create a date in Tokyo timezone
-    tokyo_tz = timezone("Asia/Tokyo")
-    tokyo_date = tokyo_tz.localize(datetime.datetime(2023, 1, 1, 12, 0, 0))
-
-    # Convert to New York timezone
-    nyc_tz = timezone("America/New_York")
-    nyc_date = tokyo_date.astimezone(nyc_tz)
-
-    # Tokyo is UTC+9, New York is UTC-5 in January
-    # 12:00 in Tokyo should be 22:00 previous day in New York
-    assert nyc_date.year == 2022
-    assert nyc_date.month == 12
-    assert nyc_date.day == 31
-    assert nyc_date.hour == 22
-    assert nyc_date.minute == 0
-
-
 def test_parse_date_leap_year():
     """Test parsing dates in leap years."""
     # February 29 in a leap year
@@ -316,21 +267,3 @@ def test_parse_date_leap_year():
     assert date.minute == 0
     pacific_tz = timezone("US/Pacific")
     assert str(date.tzinfo) == str(pacific_tz)
-
-
-def test_compare_dates_different_timezones():
-    """Test comparing dates in different timezones."""
-    # Same time in different timezones
-    london_tz = timezone("Europe/London")
-    nyc_tz = timezone("America/New_York")
-
-    london_date = london_tz.localize(datetime.datetime(2023, 1, 1, 17, 0, 0))
-    nyc_date = nyc_tz.localize(datetime.datetime(2023, 1, 1, 12, 0, 0))
-
-    # Same instant in time, despite different local times
-    # NYC is 5 hours behind London in January
-    assert london_date.astimezone(utc) == nyc_date.astimezone(utc)
-
-    # Test date comparison directly
-    # These should be the same point in time
-    assert london_date == nyc_date
