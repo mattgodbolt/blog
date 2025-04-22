@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from pygments.lexer import RegexLexer
 from pygments.token import Comment, Literal, Name, Punctuation, Text, Token
 
@@ -6,10 +8,10 @@ __all__ = ["AsmLexer"]
 
 class AsmLexer(RegexLexer):
     name = "AsmLexer"
-    aliases = ["asm"]
-    filenames = ["*.asm"]
+    aliases: ClassVar[list[str]] = ["asm"]
+    filenames: ClassVar[list[str]] = ["*.asm"]
 
-    tokens = {
+    tokens: ClassVar[dict[str, list[tuple[str, Token | str]]]] = {
         "root": [
             (r"\.[a-zA-Z_][a-zA-Z_0-9]*", Name.Label),
             (r";.*\n", Comment),

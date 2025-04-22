@@ -18,6 +18,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Variable names: Descriptive, avoid abbreviations
 - For ETL templates: Use consistent spacing for template variables
 
+## Development Workflow
+- Always run `pre-commit run --all-files` before running `git add` to ensure code formatting
+- Use `make lint` to check for linting issues
+- Use `make format` to fix formatting issues
+- Let the formatter make its changes before committing code
+
 ## Project Structure
 - pygen/: Main Python generation code
 - conf/: Templates and configuration

@@ -74,5 +74,12 @@ ban-relative-imports = "all"
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
+# Type checking settings will be gradually enforced as types are added
+# For now, warn about issues but don't fail
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true

@@ -346,7 +346,7 @@ def CleanUpXHtml(title, xhtml):
         for banned_elem_type in ("script", "iframe"):
             for elem in tree.findall(f".//{banned_elem_type}"):
                 parent_map[elem].remove(elem)
-        xhtml = ElementTree.tostring(list(tree)[0], "utf-8").decode("utf-8")
+        xhtml = ElementTree.tostring(next(iter(tree)), "utf-8").decode("utf-8")
     except Exception as e:
         for line, s in enumerate(full.splitlines(keepends=False)):
             print(f"{line + 1: 10}: {s}")
@@ -373,13 +373,13 @@ def CacheArticle(globalData, article):
         )
         article.HtmlText = markdown(
             article.ArticleText,
-            extensions=extensions + ["markdown.extensions.smarty"],
+            extensions=[*extensions, "markdown.extensions.smarty"],
             extension_configs=ex_conf,
             output_format="html",
         )
         article.HtmlIntro = markdown(
             article.ArticleText,
-            extensions=extensions + ["markdown.extensions.smarty", PrecisExtension()],
+            extensions=[*extensions, "markdown.extensions.smarty", PrecisExtension()],
             extension_configs=ex_conf,
             output_format="html",
         )
@@ -594,7 +594,8 @@ def Generate(forceGenerate):
         GenerateArticleIndices(globalData, label)
 
     print("Flushing cache")
-    globalData.cache.Flush()
+    if globalData.cache:
+        globalData.cache.Flush()
     print("Done")
 
 

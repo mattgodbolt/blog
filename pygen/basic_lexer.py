@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from pygments.lexer import RegexLexer
 from pygments.token import Comment, Literal, Name, Punctuation, Text, Token
 
@@ -184,10 +186,10 @@ tokenRe = "|".join(escape(token) for token in tokens)
 
 class BasicLexer(RegexLexer):
     name = "BasicLexer"
-    aliases = ["basic"]
-    filenames = ["*.basic"]
+    aliases: ClassVar[list[str]] = ["basic"]
+    filenames: ClassVar[list[str]] = ["*.basic"]
 
-    tokens = {
+    tokens: ClassVar[dict[str, list[tuple[str, Token | str]]]] = {
         "root": [
             (r"\.[a-zA-Z_][a-zA-Z_0-9]*", Name.Label),
             (r"REM;.*\n", Comment),

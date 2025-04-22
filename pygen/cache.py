@@ -13,9 +13,13 @@ class SqlBackend:
     def __init__(self, filename):
         try:
             import sqlite3
+
+            db_module = sqlite3
         except ImportError:
-            from pysqlite2 import dbapi2 as sqlite3
-        self.db = sqlite3.connect(filename)
+            from pysqlite2 import dbapi2
+
+            db_module = dbapi2
+        self.db = db_module.connect(filename)
         self.db.text_factory = str
         version = self.db.execute("PRAGMA user_version").fetchall()[0][0]
         if version > self.currentVersion:
