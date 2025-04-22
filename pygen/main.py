@@ -3,6 +3,8 @@ import codecs
 import datetime
 import os
 import re
+from datetime import timedelta
+from datetime import timezone as dt_timezone
 from warnings import warn
 from xml.etree import ElementTree
 
@@ -256,6 +258,7 @@ def ParseDate(date):
     - YYYY-MM-DD HH:MM:SS
     - YYYY-MM-DD HH:MM:SS TZNAME (e.g., America/Chicago)
     - YYYY-MM-DD HH:MM:SS ±HHMM (e.g., -0500, +0100)
+    - YYYY-MM-DD HH:MM:SS ±HH:MM (e.g., -05:00, +01:00)
 
     If no timezone is specified, the default timezone (Europe/London) is used.
     """
@@ -277,18 +280,15 @@ def ParseDate(date):
 
     # Process timezone if provided
     if tz_part:
-        # Try to match offset timezone format (e.g., -0500, +0100)
-        tz_offset_match = re.match(r"([+-])(\d\d)(\d\d)", tz_part)
+        # Try to match offset timezone format with or without colon (e.g., -0500, +0100, -05:00, +01:00)
+        # Format: +/-HH:MM or +/-HHMM
+        tz_offset_match = re.match(r"([+-])(\d\d)(?::)?(\d\d)", tz_part)
         if tz_offset_match:
             sign, offset_hours, offset_minutes = tz_offset_match.groups()
             offset_hours, offset_minutes = int(offset_hours), int(offset_minutes)
             total_offset = offset_hours * 60 + offset_minutes
             if sign == "-":
                 total_offset = -total_offset
-
-            # Create a timezone with the specified offset
-            from datetime import timedelta
-            from datetime import timezone as dt_timezone
 
             # Convert offset to seconds
             offset_seconds = total_offset * 60
@@ -297,19 +297,15 @@ def ParseDate(date):
 
         # Try to use it as a named timezone
         try:
-            from pytz import timezone as pytz_timezone
-
+            named_tz = timezone(tz_part)
             try:
-                named_tz = pytz_timezone(tz_part)
                 return named_tz.localize(local_dt, is_dst=None)
-            except Exception:
-                # If timezone name is invalid, fall back to default
-                pass
-        except ImportError:
-            # pytz not available, ignore timezone
-            pass
+            except Exception as e:
+                raise ValueError(f'Error localizing date with timezone "{tz_part}": {e!s}') from e
+        except Exception as e:
+            raise ValueError(f'Invalid timezone name "{tz_part}": {e!s}') from e
 
-    # If no timezone was specified or couldn't be processed, use default
+    # If no timezone was specified, use default
     return defaultTimeZone.localize(local_dt, is_dst=None)
 
 

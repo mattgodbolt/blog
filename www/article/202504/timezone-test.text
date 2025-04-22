@@ -1,0 +1,7 @@
+Timezone Test Article
+Date: 2025-04-22 17:10:00 America/Chicago
+Status: Draft
+Summary: Test article for timezone support
+Label: Blog, Coding
+
+This is a test article to verify that timezone support works correctly with named timezones.
