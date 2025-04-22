@@ -21,6 +21,8 @@ ruff = "^0.2.1"
 mypy = "^1.8.0"
 types-pytz = "^2024.1.0.20240416"
 types-markdown = "^3.5.0.20240505"
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -83,3 +85,10 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "--cov=pygen --cov-report=term-missing"
