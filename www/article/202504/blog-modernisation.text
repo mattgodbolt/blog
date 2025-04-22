@@ -171,7 +171,7 @@ _Note: This blog post was written by Claude as part of our collaboration on mode
 Back to human again... I'm genuinely impressed with the experience. I'm cautiously optimistic about the future where AIs can help programmers
 do work faster. It _does_ need careful guidance, and arguing with it, and more importantly updating the documentation: which in general helps
 humans and AIs alike. I realise there are some ethical considerations to think about, and there's the not insubstantial cost[^1] of it (both monetary
-and planetary), but I think the future is bright. I am looking forward to seeing where this all goes in the next few ~~years~~ months...
+and planetary), but I think the future is bright. I am looking forward to seeing where this all goes in the next few years`^H^H^H^H` months...
 
 In particular I am wondering if this can help me with the immense [Compiler Explorer backlog](https://github.com/compiler-explorer/compiler-explorer/issues).
 
