@@ -31,6 +31,33 @@ $(DEPS): pyproject.toml poetry.lock | $(VENV)
 .PHONY: deps
 deps: $(DEPS) ## Install dependencies
 
+.PHONY: pre-commit-install
+pre-commit-install: deps ## Install pre-commit hooks
+	pre-commit install
+
+.PHONY: lint
+lint: deps ## Run all linters (warnings only)
+	pre-commit run --all-files
+
+.PHONY: lint-staged
+lint-staged: deps ## Run linters on staged files
+	pre-commit run
+
+.PHONY: format-black
+format-black: deps ## Format Python files with black
+	$(POETRY) run black pygen serve.py
+
+.PHONY: format-isort
+format-isort: deps ## Sort imports with isort
+	$(POETRY) run isort pygen serve.py
+
+.PHONY: lint-fix
+lint-fix: format-black format-isort ## Fix formatting and imports
+	$(POETRY) run ruff check --fix pygen serve.py
+
+.PHONY: format
+format: lint-fix ## Alias for lint-fix
+
 .PHONY: update
 update: deps ## Generate site content
 	mkdir -p www/feed
