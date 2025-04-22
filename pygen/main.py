@@ -4,15 +4,15 @@ import os, sys, re, time, datetime
 from warnings import warn
 from markdown import markdown
 import pygments, pygments.lexers
-from cache import Cache, SqlBackend
+from pygen.cache import Cache, SqlBackend
 from pytz import timezone, utc
 import codecs
-import ETL
-from precis import PrecisExtension
+from pygen import ETL
+from pygen.precis import PrecisExtension
 from xml.etree import ElementTree
 
-pygments.lexers.LEXERS['AsmLexer'] = ('asm_lexer', 'AsmLexer', ('asm',), ('*.asm',), ('text/asm'))
-pygments.lexers.LEXERS['BasicLexer'] = ('basic_lexer', 'BasicLexer', ('basic',), ('*.basic',), ('text/basic'))
+pygments.lexers.LEXERS['AsmLexer'] = ('pygen.asm_lexer', 'AsmLexer', ('asm',), ('*.asm',), ('text/asm'))
+pygments.lexers.LEXERS['BasicLexer'] = ('pygen.basic_lexer', 'BasicLexer', ('basic',), ('*.basic',), ('text/basic'))
 
 # TODO: make this a per-article and config thing
 defaultTimeZone = timezone('Europe/London')

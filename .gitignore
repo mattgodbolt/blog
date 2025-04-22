@@ -1,9 +1,30 @@
+# Virtual environment
 .venv/
+.poetry/
+
+# Generated content
 out/
-*.swp
-*.pyc
-conf/pycache.db
 www/feed*
 www/article/*.html
 www/article/*/*.html
 www/*.html
+
+# Cache files
+conf/pycache.db
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Editor files
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Poetry
+dist/
+poetry.toml
+
+# Misc
+.DS_Store
