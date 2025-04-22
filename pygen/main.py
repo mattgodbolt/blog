@@ -17,7 +17,7 @@ from pygen.precis import PrecisExtension
 pygments.lexers.LEXERS["AsmLexer"] = ("pygen.asm_lexer", "AsmLexer", ("asm",), ("*.asm",), ("text/asm"))
 pygments.lexers.LEXERS["BasicLexer"] = ("pygen.basic_lexer", "BasicLexer", ("basic",), ("*.basic",), ("text/basic"))
 
-# TODO: make this a per-article and config thing
+# Default timezone for articles that don't specify one
 defaultTimeZone = timezone("Europe/London")
 
 
@@ -247,13 +247,70 @@ def ScanArticleDirectory(globalData):
 
 
 def ParseDate(date):
-    """Parse date (a string in the format "YYYY-MM-DD[ HH[:MM[:SS]]]"""
-    match = re.match(r"\s*(\d\d\d\d)-(\d\d)-(\d\d)(?:\s+(\d\d)(?::(\d\d)(?::(\d\d))?)?)?\s*", date)
-    if match:
-        year, month, day, hour, minute, second = (int(i or 0) for i in match.groups())
-        local_dt = datetime.datetime(year, month, day, hour, minute, second, 0)
-        return defaultTimeZone.localize(local_dt, is_dst=None)
-    raise ValueError('Invalid date string "' + date + '"')
+    """Parse date with optional timezone information.
+
+    Formats supported:
+    - YYYY-MM-DD
+    - YYYY-MM-DD HH
+    - YYYY-MM-DD HH:MM
+    - YYYY-MM-DD HH:MM:SS
+    - YYYY-MM-DD HH:MM:SS TZNAME (e.g., America/Chicago)
+    - YYYY-MM-DD HH:MM:SS ±HHMM (e.g., -0500, +0100)
+
+    If no timezone is specified, the default timezone (Europe/London) is used.
+    """
+    # First, try to match the date and time part
+    match = re.match(r"\s*(\d\d\d\d)-(\d\d)-(\d\d)(?:\s+(\d\d)(?::(\d\d)(?::(\d\d))?)?)?(.*)", date)
+
+    if not match:
+        raise ValueError(f'Invalid date string "{date}"')
+
+    year, month, day, hour, minute, second, tz_part = match.groups()
+    year, month, day = int(year), int(month), int(day)
+    hour = int(hour or 0)
+    minute = int(minute or 0)
+    second = int(second or 0)
+    tz_part = tz_part.strip() if tz_part else ""
+
+    # Create a naive datetime
+    local_dt = datetime.datetime(year, month, day, hour, minute, second, 0)
+
+    # Process timezone if provided
+    if tz_part:
+        # Try to match offset timezone format (e.g., -0500, +0100)
+        tz_offset_match = re.match(r"([+-])(\d\d)(\d\d)", tz_part)
+        if tz_offset_match:
+            sign, offset_hours, offset_minutes = tz_offset_match.groups()
+            offset_hours, offset_minutes = int(offset_hours), int(offset_minutes)
+            total_offset = offset_hours * 60 + offset_minutes
+            if sign == "-":
+                total_offset = -total_offset
+
+            # Create a timezone with the specified offset
+            from datetime import timedelta
+            from datetime import timezone as dt_timezone
+
+            # Convert offset to seconds
+            offset_seconds = total_offset * 60
+            custom_tz = dt_timezone(timedelta(seconds=offset_seconds))
+            return local_dt.replace(tzinfo=custom_tz)
+
+        # Try to use it as a named timezone
+        try:
+            from pytz import timezone as pytz_timezone
+
+            try:
+                named_tz = pytz_timezone(tz_part)
+                return named_tz.localize(local_dt, is_dst=None)
+            except Exception:
+                # If timezone name is invalid, fall back to default
+                pass
+        except ImportError:
+            # pytz not available, ignore timezone
+            pass
+
+    # If no timezone was specified or couldn't be processed, use default
+    return defaultTimeZone.localize(local_dt, is_dst=None)
 
 
 def ReadArticle(globalData, article):

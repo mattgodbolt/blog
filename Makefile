@@ -71,4 +71,8 @@ publish: update ## Build and publish to S3
 serve: update ## Run development server
 	$(POETRY) run python ./serve.py
 
+.PHONY: test
+test: deps ## Run tests
+	$(POETRY) run pytest
+
 default: serve
