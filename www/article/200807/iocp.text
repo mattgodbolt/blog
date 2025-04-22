@@ -18,7 +18,7 @@ to better distribute work amongst threads.
 One of the issues with using thread pools is the [thundering herd][th] problem --- lots of threads
 in a pool all waiting for some work, and then when that work turns up, they all jump on it.  Only
 one can win, but in the mean time you have a great big fightas they all try to acquire
-the exclusive lock.  Eventually it all settles down, but you've probably thrown away any performance 
+the exclusive lock.  Eventually it all settles down, but you've probably thrown away any performance
 gained from pooling right there in the dusty cloud of context switching.
 
 [th]: http://en.wikipedia.org/wiki/Thundering_herd_problem "Moooo"
@@ -64,18 +64,18 @@ Usually seen when the other end of a network connection has been forcibly closed
 </tr>
 <tr>
     <td>non-zero</td><td><code>NULL</code></td><td>n/a</td>
-    <td>This condition doesn't happen due to IO requests, but is useful to use in combination with 
+    <td>This condition doesn't happen due to IO requests, but is useful to use in combination with
 <a href="http://msdn.microsoft.com/en-us/library/aa365458(VS.85).aspx">PostQueuedCompletionStatus</a> as
 a way of indicating to threads that they should terminate.</td>
 </tr>
 <tr>
     <td>non-zero</td><td>non-<code>NULL</code></td><td>zero</td>
-    <td>End of file for a file <code>HANDLE</code>, or the connection has been gracefully closed (for network connections). 
+    <td>End of file for a file <code>HANDLE</code>, or the connection has been gracefully closed (for network connections).
 The <code>OVERLAPPED</code> buffer has still been used; and must be deallocated if necessary.</td>
 </tr>
 <tr>
     <td>non-zero</td><td>non-<code>NULL</code></td><td>non-zero</td>
-    <td>"num bytes" of data have been transferred into the block pointed by the <code>OVERLAPPED</code> structure. 
+    <td>"num bytes" of data have been transferred into the block pointed by the <code>OVERLAPPED</code> structure.
 The direction of the transfer is dependant on the call made to the IO port,
 it's up to the user to remember if it was a read or a write (usually by stashing extra data in the <code>OVERLAPPED</code> structure).
 The thread must deallocate the structure as necessary.</td>

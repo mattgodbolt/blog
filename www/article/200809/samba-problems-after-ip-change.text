@@ -35,7 +35,7 @@ And you see errors in `log.nmbd` of the form:
 a number of places where the old IP will still be lurking, possibly causing the issues above.
 
 `nmbd` caches browse master information in `/var/cache/samba/browse.dat` --- your PDC's old IP
-address will be listed here, and when `nmbd` starts up, it sees it as an existing, distinct 
+address will be listed here, and when `nmbd` starts up, it sees it as an existing, distinct
 domain master browser that then doesn't respond to it any more.   Stop `nmbd` and then delete the
 file.
 

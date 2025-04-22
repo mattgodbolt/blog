@@ -44,14 +44,14 @@ several pieces of work to do.  And those pieces of   work need to be able to run
 concurrently, that is they need to be independent pieces of work which don't
 interfere with each   other and don't rely on each others' results.  Typically,
 good <a href="http://en.wikipedia.org/wiki/Parallel_computing">parallelism</a>
-is achieved by one of three ways: 
+is achieved by one of three ways:
 
 1 You have a lot of data which needs to be processed in the same way (<a
   href="http://arstechnica.com/articles/paedia/cpu/simd.ars">SIMD</a>).  Examples
   of this are large maths   problems like <a href="http://www.seti.org/">SETI</a>,
   or indeed some vector operations like transforming triangles and
   suchlike.
-2 You have totally independent 'processes' of execution like in Windows where each 
+2 You have totally independent 'processes' of execution like in Windows where each
   running program is separate.
 3 You can pipeline up the work, just like in a real life production line.  Each core would perform a piece
   of work on the whole   product before passing it to the next core, which
@@ -85,7 +85,7 @@ one-way traffic.
 
 Pipelining looks a good bet to start with; and indeed you could do wonders if
 you could find a way of separating the   processing of the game into pipelinable
-tasks.  The general process of a game loop goes something like: 
+tasks.  The general process of a game loop goes something like:
 1 Read input
 2 Update player position
 3 Run AI on current positions

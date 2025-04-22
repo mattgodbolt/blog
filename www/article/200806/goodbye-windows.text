@@ -23,7 +23,7 @@ what with the cockup of the Vista launch.
 
 For some time I've been humming and harring about installing
  [Ubuntu GNU/Linux][ubuntu].  It's been around for ages, I know, and has been
-pretty well received by everyone.  My existing Linux boxes (relegated to the 
+pretty well received by everyone.  My existing Linux boxes (relegated to the
 loft) have always run [Debian][deb] --- and I've been very happy with their
 distribution ---
 but I thought I'd see what all the buzz was about and install a more
@@ -31,10 +31,10 @@ contemporary system.
 [ubuntu]: http://www.ubuntu.com "Ooh, bunt who?"
 [deb]: http://www.debian.org "Previous favourite"
 
-Although I had ensured my [BackupPC][bpc] backups of all my data were up to 
+Although I had ensured my [BackupPC][bpc] backups of all my data were up to
 date, just to be paranoid I also took a [VMWare][] snapshot of my XP machine before I hosed it completely.  That took a few hours, as I was storing the data on my relatively slow file server.  It was a surreal experience to power it down,
 and then as a test bring up a virtual equivalent on my laptop.  I wouldn't
-recommend running a virtual OS's disks over Samba on a wireless network 
+recommend running a virtual OS's disks over Samba on a wireless network
 though --- it took about 15 minutes to boot, and about the same to shut down,
 all I/O bound.
 

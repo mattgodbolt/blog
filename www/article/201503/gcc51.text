@@ -4,7 +4,7 @@ Status: Public
 Summary: More compilers!
 Label: Coding
 
-Bit late to mention it here, but [GCC Explorer](http://gcc.godbolt.org) 
+Bit late to mention it here, but [GCC Explorer](http://gcc.godbolt.org)
 now supports GCC 5.1, and in fact has done since the day it was released!
 
 GCC 5.1 has a bunch of link-time optimizations that aren't

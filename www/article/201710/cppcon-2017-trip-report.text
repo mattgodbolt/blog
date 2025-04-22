@@ -25,15 +25,15 @@ taste of some of the talks that left an impression with me:
 
 ## Keynotes
 
-The keynotes were by and large great. Bjarne gave a talk on 
-[Learning and Teaching Modern C++](https://www.youtube.com/watch?v=fX2W3nNjJIo) which 
+The keynotes were by and large great. Bjarne gave a talk on
+[Learning and Teaching Modern C++](https://www.youtube.com/watch?v=fX2W3nNjJIo) which
 was a great call to action for us folks trying to make C++ more accessible to
 newcomers (we are all teachers!), as well as a reminder to old fuddy-duddies like me that Modern C++
 is approachable, especially with things like the C++ Core Guidelines to, well,
 guide us.
 
-Titus Winters from Google expoused the idea of 
-[C++ as a "Live At Head" language](https://www.youtube.com/watch?v=tISy7EJQPzI) 
+Titus Winters from Google expoused the idea of
+[C++ as a "Live At Head" language](https://www.youtube.com/watch?v=tISy7EJQPzI)
 -- an idea I particularly like, although my time at Google might be the reason
 for that! He argued convincingly for building our code against the head
 revision of all dependencies, and for library vendors to provide tooling

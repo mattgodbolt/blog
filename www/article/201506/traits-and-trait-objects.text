@@ -13,7 +13,7 @@ This weekend I was working on
 make shapes generic instead of always spheres, and adding explicit light
 sampling. While doing so I hit some unusual error messages, of the form:
 
-    the trait `renderable::Renderable` is not implemented 
+    the trait `renderable::Renderable` is not implemented
         for the type `renderable::Renderable`
 
 A somewhat confusing error message, I'm sure you'll agree. To understand what

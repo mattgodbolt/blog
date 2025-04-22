@@ -9,7 +9,7 @@ Yup, something which took me the best part of three days the first time to get
 working now has a fair set of useful links.
 
 * Visit Adam Hooper's [setup guide][adamhooper] to prepare a patched kernel (I used 2.6.10 with no ill effect).
-* The official pptpclient page also has [debian MPPE patch][pptpclient] instructions, 
+* The official pptpclient page also has [debian MPPE patch][pptpclient] instructions,
   though I found them a bit more wordy than I would have liked.
 * A godsend, the [fault tree][pptpdiagnosis] on the pptpclient page.
 

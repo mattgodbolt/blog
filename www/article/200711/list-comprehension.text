@@ -31,7 +31,7 @@ rewrite the code in my first example (printing a list of the squares of numbers 
     for item in [x*x for x in range(1, 5)]:
         print item
 
-Things get even more interesting when you use the `if` syntax.  This allows arbitrary elements 
+Things get even more interesting when you use the `if` syntax.  This allows arbitrary elements
 to be filtered from the source list.  Take my example from [HTML scraping][html].  I grab a list of all `<div>`
 DOM node elements, and filter them by their class name in a single line:
 

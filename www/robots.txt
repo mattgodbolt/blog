@@ -6,4 +6,3 @@ Disallow: /submit.php
 Disallow: /trackback.php
 Disallow: /calendar.php
 Disallow: /Notes
-

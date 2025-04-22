@@ -27,19 +27,19 @@ A [KD tree][kd] (a way of cutting up the world into manageable pieces) was then 
 Dynamic objects were modelled using a collection of spheres which were stored alongside the normal geometry. To account for their motion and to ensure fast moving objects can't "tunnel" out through walls, spheres were effectively swept along a line into "capsules" (the same shape as a pill or a sausage) before being intersected with the landscape. It turns out the maths behind intersecting a capsule against a triangle is really complex. We actually extruded each triangle by the sphere radius, turning it into two larger triangles and three capsules, one for each edge. We would then intersect the ray corresponding to the line segment in the centre of the original capsule  against this expanded world.
 
 <p class="picture">
-<img src="/201004/collision-1.png" width="300" height="112" 
+<img src="/201004/collision-1.png" width="300" height="112"
  alt="Line art picture of collision"/>
  <br/>An object (on the left), moves to a new position on the right. There is a solid object (the line) in between them, so we need to find the collision point (shown as a red circle).
 </p>
 
 <p class="picture">
-<img src="/201004/collision-2.png" width="300" height="112" 
+<img src="/201004/collision-2.png" width="300" height="112"
  alt="Line art of swept sphere"/>
  <br/>In order to find the collision point we sweep the object from the start to its end point and collide this swept sphere (shown here in 2D as a swept circle) with the solid object.
 </p>
 
 <p class="picture">
-<img src="/201004/collision-3.png" width="216" height="194" 
+<img src="/201004/collision-3.png" width="216" height="194"
  alt="Transformed collision"/>
  <br/>For simplicity, the motion of the object is considered to be a line, and the solid object is expanded out by the radius of the moving object. The line is then intersected with this expanded object to find the centre point of the collision.
 </p>

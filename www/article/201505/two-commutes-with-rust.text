@@ -32,7 +32,7 @@ that run when a variable binding goes out of scope. I miss this a lot in those
 times where I'm programming in a language other than C++.
 
 So I loved the sound of all this, but in order to see how it all fitted
-together in practice, I decided to port a C++ 
+together in practice, I decided to port a C++
 [path tracer](http://en.wikipedia.org/wiki/Path_tracing) to Rust, and see how
 I'd get on. I'm fond of [smallpt](http://www.kevinbeason.com/smallpt/), a
 99-line C++ program that generates lovely images. While I was still at Google,
@@ -58,21 +58,21 @@ operations I needed. As a bonus, by `impl`-ing the relevant `Add`, `Sub` etc
     }
     impl Vec3d {
         pub fn dot(self, other: Vec3d) -> f64 {
-            self.x * other.x + 
-                self.y * other.y + 
+            self.x * other.x +
+                self.y * other.y +
                 self.z * other.z
         }
         ...
     }
-    
+
     impl Add for Vec3d {
         type Output = Vec3d;
-    
+
         fn add(self, other: Vec3d) -> Vec3d {
-            Vec3d { 
+            Vec3d {
                 x: self.x + other.x,
                 y: self.y + other.y,
-                z: self.z + other.z 
+                z: self.z + other.z
             }
         }
     }
@@ -87,7 +87,7 @@ Immediate things I found:
   value of a function. Accidentally putting a semicolon after the return value
   will cause you a moment of confusion.
 * There's no ternary operators, but instead *everything* is an expression, so
-  you just put an `if` statement in the middle of your expression like : 
+  you just put an `if` statement in the middle of your expression like :
   `a = if b > 1 { 1 } else { 2 }`.
 * Math functions are brought in by importing extra traits onto the
   floating-point types. Thus you don't say `sqrt(x)` you say `x.sqrt()`. Which
@@ -128,7 +128,7 @@ Things I learned getting the first image rendered:
 * Rust is also opinionated on naming constants. You have to SHOUT them, lest
   you get ticked off by the compiler.
 * Array syntax is odd: `let a = [Vec3d; 1024];` and they're always allocated on
-  the stack, which is fixed to be 2MB for the main thread. That made my 
+  the stack, which is fixed to be 2MB for the main thread. That made my
   1024x768x`Vec3d` array to store the results of the render dump core as the
   stack overflowed. The solution is to use a `Vec` (the `std::vector` of Rust)
   which puts its memory on the heap.
@@ -148,8 +148,8 @@ This leads to nice code like:
             // update 'result' with this hit.
             if match result { None => true,
                               Some(ref x) => dist < x.dist) } {
-                result = Some(HitRecord { 
-                    sphere: &sphere, dist: dist 
+                result = Some(HitRecord {
+                    sphere: &sphere, dist: dist
                 });
             }
         }
@@ -176,7 +176,7 @@ An example:
         dist: f64
     }
 
-    fn intersect<'a>(scene: &'a [Sphere], ray: &Ray) 
+    fn intersect<'a>(scene: &'a [Sphere], ray: &Ray)
         -> Option<HitRecord<'a>> {...}
 
 

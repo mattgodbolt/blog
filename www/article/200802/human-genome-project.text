@@ -19,7 +19,7 @@ and maintenance specifications.
 
 > Reverse engineering the sequence is complicated by the fact that the resulting image of the
 mass-storage device will not be a file-by-file copy, but rather a streaming dump of the bytes
-in the order they occupied on the device and the files are known to be fragmented. 
+in the order they occupied on the device and the files are known to be fragmented.
 In addition, some of the device is known to contain erased files or other garbage. Once the garbage
 has been recognized and discarded and the fragmented files reassembled, the reverse engineering of
 the codes must be undertaken with only a partial, and sometimes incorrect understanding of the CPU
@@ -29,7 +29,7 @@ computer-assisted-manufacturing process that fabricates the CPU. In addition, on
 consider that the huge database also contains code generated from the result of literally
 millions of maintenance revisions performed by the worst possible set of kludge-using,
 spaghetti-coding, opportunistic hackers who delight in clever tricks like writing self-modifying
-code and relying upon undocumented system quirks. 
+code and relying upon undocumented system quirks.
 
 Absolutely spot on.
 

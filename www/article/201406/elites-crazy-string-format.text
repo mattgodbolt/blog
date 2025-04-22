@@ -28,8 +28,8 @@ the program, or `false` to carry on. `OSWRCH` is at `$ffee` so bringing up the
 Javascript console and typing:
 
     :::javascript
-    processor.debugInstruction.addr(function(pc) { 
-        return pc === 0xffee && processor.a === 72; 
+    processor.debugInstruction.addr(function(pc) {
+        return pc === 0xffee && processor.a === 72;
     });
 
 A quick run and...no joy. Of course, Elite doesn't use the OS routines to
@@ -75,14 +75,14 @@ shorter. The string "Harmless" is actually all caps (the title casing is done
 by the code) and is encoded as 6 bytes: `H [AR] M [LE] S S` where the `AR` and `LE` are
 two-letter expansions. The string itself is stored at `$0769`. Capital letters
 are left unchanged, so to replace the string with, say, "Monkey" we can patch the code to put
-`6e6c6d68667a` ("MONKEY" `EOR`ed with 35) in the relevant place. This can be 
-achieved with a URL parameter in jsbeeb, adding `&patch=@31ac,0769:6e6c6d68667a` 
+`6e6c6d68667a` ("MONKEY" `EOR`ed with 35) in the relevant place. This can be
+achieved with a URL parameter in jsbeeb, adding `&patch=@31ac,0769:6e6c6d68667a`
 to the autoboot URL to yield a [handy bootable patched URL][patch].
 
 [patch]: http://bbc.xania.org/?disc=elite.ssd&autoboot&patch=@31ac,0769:6e6c6d68667a "Patching has never been so easy"
 
 The "@" sign in the patch URL sets a breakpoint at that location, and then applies
-the patch (in `addr:bytestopatch`) when the breakpoint is hit. 
+the patch (in `addr:bytestopatch`) when the breakpoint is hit.
 That way, Elite loads up first, then the first time the print routine is called
 the patch is made.
 
@@ -92,7 +92,7 @@ The long version
 Let's dig into that print routine a bit and see what it's doing. Here I'm
 going to use the label names from the source. To follow along at home, fire up
 Elite in jsbeeb, hit the Home key and then go to `$31ac` by typing into the
-disassembly address box, or open up `ELITEB.TXT` from the source ZIP. 
+disassembly address box, or open up `ELITEB.TXT` from the source ZIP.
 
 The "print message" routine directly follows the
 print character routine, and I've annotated the whole lot. Some of the
@@ -111,30 +111,30 @@ routine).
     DEX         ; decrement and set flags...
     BEQ tal     ; if zero, A was 1; go to tal
                 ; which prints "tally" (a number)
-    DEX     
+    DEX
     BEQ ypl     ; if A was 2; go to to ypl
                 ; which prints the current planet name
-    DEX 
+    DEX
     BNE P%+5
     JMP cpl     ; if A was 3; go to cpl
                 ; which prints the selected planet name
-    DEX 
+    DEX
     BEQ cmn     ; if A was 4; go to cmn
                 ; which prints the player name (commander?)
-    DEX 
+    DEX
     BEQ fwl     ; if A was 5; go to fwl
                 ; which just prints the player's cash
-    DEX 
+    DEX
     BNE P%+7
     LDA #128    ; if A was 6, store 128 in QQ17
     STA QQ17    ; which is a case-switch flag
     RTS         ; and return
     DEX         ; (this comes from P%+7 above)
-    DEX 
+    DEX
     BNE P%+5
     STX QQ17    ; if A was 8, store zero ...
     RTS         ; in case-switch flag and return
-    DEX 
+    DEX
     BEQ crlf    ; if A was 9, tab over and put a colon
                 ; (maybe)
     CMP #&60    ; NB we are comparing with the original 'A' again
@@ -192,7 +192,7 @@ routine).
     PHA         ; save character to print
     TXA
     AND #191    ; clear bit 6 of case-switch
-    STA QQ17    
+    STA QQ17
     PLA         ; restore character
     .TT74
     JMP TT26    ; and print as-is
@@ -240,7 +240,7 @@ routine).
     .TT49
     INY             ; skip the zero-terminator
     BNE TT59        ; handle overflow
-    INC V+1         
+    INC V+1
     .TT59
     DEX             ; decrement the message index
     BNE TT51        ; and reloop if we haven't skipped to target
@@ -248,7 +248,7 @@ routine).
     ; Now we're at the main loop where (V),Y point at the message
     ; to print.
     .TT50
-    ; Printing a char can recursively call us, so stack (V+1) 
+    ; Printing a char can recursively call us, so stack (V+1)
     ; and Y (which is enough to preserve our state).
     TYA
     PHA             ; preserve "Y"
@@ -337,7 +337,7 @@ by `addr:bytes,addr:bytes,addr:bytes...'.  The breakpoint is a one-time
 breakpoint at the specified address, upon which any patches specified will be
 applied.
 
-In the case of this patch, only a single breakpoint 
+In the case of this patch, only a single breakpoint
 and patch address is needed. Once the processor hits the breakpoint address
 `31ac` we know it's about to run Elite's string routine for the first time, so
 now's a good time to patch the data. We then patch `0769` with `6e6c6d68667a`

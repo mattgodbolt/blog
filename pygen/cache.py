@@ -1,30 +1,39 @@
 import hashlib
-import pickle, time
+import pickle
+import time
 
 
 class SqlBackend:
     """A sqlite3/pysqlite2 database backend for the cache.
     Attempts to use sqlite3 first, and if that fails, tries
     pysqlite2."""
+
     currentVersion = 16
 
     def __init__(self, filename):
         try:
             import sqlite3
+
+            db_module = sqlite3
         except ImportError:
-            from pysqlite2 import dbapi2 as sqlite3
-        self.db = sqlite3.connect(filename)
+            from pysqlite2 import dbapi2
+
+            db_module = dbapi2
+        self.db = db_module.connect(filename)
         self.db.text_factory = str
         version = self.db.execute("PRAGMA user_version").fetchall()[0][0]
         if version > self.currentVersion:
             raise Exception(
-                "Cache database newer than expected (expected %d, found %d)" % (self.currentVersion, version))
+                "Cache database newer than expected (expected %d, found %d)" % (self.currentVersion, version)
+            )
         if version != self.currentVersion:
             self.db.execute("DROP TABLE IF EXISTS cache")
-            self.db.execute("""CREATE TABLE cache(
+            self.db.execute(
+                """CREATE TABLE cache(
                 md5 TEXT(32) NOT NULL PRIMARY KEY,
                 lastAccessedDay INT NOT NULL,
-                data TEXT NOT NULL)""")
+                data TEXT NOT NULL)"""
+            )
             self.db.execute("PRAGMA user_version=%d" % self.currentVersion)
 
     def NowDayNumber(self):
@@ -57,9 +66,12 @@ class SqlBackend:
         return data
 
     def Write(self, md5, data):
-        self.db.execute("""INSERT OR REPLACE 
+        self.db.execute(
+            """INSERT OR REPLACE
             INTO cache (md5, lastAccessedDay, data)
-            VALUES(?, ?, ?)""", [md5, self.NowDayNumber(), data])
+            VALUES(?, ?, ?)""",
+            [md5, self.NowDayNumber(), data],
+        )
 
     def Flush(self):
         self.db.commit()
@@ -89,7 +101,7 @@ class Cache:
         if self.lastObject is object:
             return self.lastMD5
         self.lastObject = object
-        self.lastMD5 = hashlib.new('md5', pickle.dumps(object)).hexdigest()
+        self.lastMD5 = hashlib.new("md5", pickle.dumps(object)).hexdigest()
         return self.lastMD5
 
     def Find(self, object):
@@ -114,7 +126,7 @@ class Cache:
 
 
 if __name__ == "__main__":
-    cache = Cache(SqlBackend('temptest.db'))
+    cache = Cache(SqlBackend("temptest.db"))
     print(cache.Find("monkey"))
     cache.Add("monkey", "spaz")
     print(cache.Find("monkey"))

@@ -14,7 +14,7 @@ distributed rendering).
 I guess the honeymoon is over. I tried a bit of "simple" file
 manipulation, and I'm finding all sorts of trickinesses. In this post I
 am referring to [this version][tv] of path-tracer on GitHub. I'm sure by the time
-anyone reads this I'll have found workarounds, so check the 
+anyone reads this I'll have found workarounds, so check the
 [most recent version](https://github.com/mattgodbolt/path-tracer) to
 see how I'm getting on.
 
@@ -32,7 +32,7 @@ output my own simple text-based format of the form:
     R G B R G B ... etc
 
 Generating the file is pretty simple, but loading it back again to merge it has
-been a major source of frustation. 
+been a major source of frustation.
 
 My best effort is [here][be]. I welcome suggestions to improve it, notably:
 

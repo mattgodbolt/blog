@@ -89,7 +89,7 @@ I ran the same test on an Ivy Bridge (E5-2667 v2) and a Haswell (E5-1650 v3):
 | Test |   Instructions |   Mispredictions |
 |------|:--------------:|:----------------:|
 | Ahead NT  |  1501707 | 133 |
-| Behind NT |  1501707 | 119 | 
+| Behind NT |  1501707 | 119 |
 | Ahead Taken | 1301707 | 1123 |
 | Behind Taken  |  900507 | 1086 |
 

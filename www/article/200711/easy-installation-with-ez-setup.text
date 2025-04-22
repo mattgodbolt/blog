@@ -30,9 +30,9 @@ for example, to install the [Python Time Zone (pytz)][pytz] package, run:
 
 Within a very short amount of time you'll have pytz ready and available to import and use.
 
-Incidentally, pytz is a pretty damn cool little timezone library --- if you've ever had to do any 
-manipulation of dates and times across daylight saving times or time zone boundaries in Python, I 
-recommend you take a look.  
+Incidentally, pytz is a pretty damn cool little timezone library --- if you've ever had to do any
+manipulation of dates and times across daylight saving times or time zone boundaries in Python, I
+recommend you take a look.
 
 Quick caveat on using it though --- to create a local time from a "non-localised"
 time, don't be tempted to just construct a default `datetime(blahblah, tzinfo=myTimeZone)`.  Instead

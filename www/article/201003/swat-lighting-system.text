@@ -18,12 +18,12 @@ With that in mind, we considered generating the static scenery shadows geometric
 [next]: /201003/swat-xbox-renderer
 
 <p class="picture">
-<img src="/201003/polygon-shadow-1.png" width="200" height="256" 
+<img src="/201003/polygon-shadow-1.png" width="200" height="256"
  alt="A light casting a shadow"/>
  <br/>A triangle casts a shadow onto two other triangles.
 </p>
 <p class="picture">
-<img src="/201003/polygon-shadow-2.png" width="200" height="256" 
+<img src="/201003/polygon-shadow-2.png" width="200" height="256"
  alt="Shadow cut-out"/>
  <br/>The shadow region is cut out, leaving only the areas in light.
 </p>
@@ -54,7 +54,7 @@ I'll go into how the light polygons and stencils were actually drawn in the [nex
 Another cool feature of the lighting system was its simulation of a real film camera. After rendering, the entire screen was post-processed to simulate film's non-linear response to light and the "aperture" of our virtual camera. A further post-process would bleed out very bright areas. We sampled back a set of pixels near the centre of the screen every frame, and used this to adjust the aperture for the next frame, simulating auto-exposure.
 
 <p class="picture">
-<img src="/201003/outdoor-lighting-scene.jpeg" width="400" height="300" 
+<img src="/201003/outdoor-lighting-scene.jpeg" width="400" height="300"
  alt="Demonstration of aperture effect"/>
  <br/>Looking out from a relatively dark area into the bright outdoors.
 </p>

@@ -6,7 +6,7 @@ Hi there, I'm Matt Godbolt --- pleased to meet you.  Please, come in, sit down, 
 
 <p class="picture"><img width="512" height="512" alt="[Piccie of me]" src="/media/MattGodbolt2019.jpg" /></p>
 
-Let me tell you a bit about myself.  I was born on August 16<sup>th</sup> 1976 to 
+Let me tell you a bit about myself.  I was born on August 16<sup>th</sup> 1976 to
 Richard and Christine Godbolt.
 My first computer came at age 8, a [48k Sinclair Spectrum][speccie],
 you know the ones with rubber keys.  I was captivated, and remember fondly one Christmas getting
@@ -20,7 +20,7 @@ what I saw in it all --- but for me it was just the beginning!
 During my school years I met like-minded [Richard Talbot-Watkins](https://twitter.com/richtw1), and we started making little programs
 for our computers.  By now I'd upgraded to a BBC Master computer (via a [Spectrum +3][plus3]), and Rich
 and I had a fairly lucrative (for 15 year olds!) side-job doing little snippets of code for UK magazine
-[Acorn User][au].  We even wrote a few games (you'll need a good BBC emulator for this) --- [Frogman][frogman], 
+[Acorn User][au].  We even wrote a few games (you'll need a good BBC emulator for this) --- [Frogman][frogman],
 and were in negotiations for a 4-part series in Acorn User on our game [Onslaught][onslaught] when sadly
 the publication ceased covering the BBC computer.
 
@@ -118,7 +118,7 @@ Coinbase, then five happy years at quantative hedge fund, [Aquatic](https://aqua
 I'm currently on a break between jobs, working on [Compiler Explorer][gccex] and spending time
 with my family.
 
-You can learn more about my working life at [my LinkedIn profile][linkedin]. 
+You can learn more about my working life at [my LinkedIn profile][linkedin].
 
 [linkedin]: http://www.linkedin.com/in/godbolt "Matt Godbolt's LinkedIn Profile"
 

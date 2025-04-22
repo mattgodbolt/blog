@@ -17,7 +17,7 @@ class PrecisProcessor(Treeprocessor):
         if len(kids) < 5:
             limit = 5
         for thing in kids:
-            if thing.tag == 'p':
+            if thing.tag == "p":
                 count += 1
             if count > limit:
                 tree.remove(thing)

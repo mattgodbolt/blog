@@ -4,7 +4,7 @@ Status: Public
 Summary: Debugging GCC Explorer's javascript memory leaks
 Label: Coding
 
-Regular users of [GCC Explorer](https://gcc.godbolt.org) may have noticed its 
+Regular users of [GCC Explorer](https://gcc.godbolt.org) may have noticed its
 uptime was getting a little choppy. Having moved to using
 [docker](https://www.docker.com) and no longer running the site under an
 auto-restarting supervisor script, the occasional shutdowns I had been
@@ -13,7 +13,7 @@ intermittantly seeing became longer outages instead of a quick restart.
 Rather than resurrect the seemingly unnecessary supervisor, I decided to fix the
 underlying problem. The main issue was that the [node.js](https://nodejs.org/)
 process that runs the webserver was slowly "leaking" memory and eventually my
-[Amazon S3](http://aws.amazon.com/s3/) instance would run out of memory. The 
+[Amazon S3](http://aws.amazon.com/s3/) instance would run out of memory. The
 [OOM killer](http://linux-mm.org/OOM_Killer) would then come along and whack
 the process -- and I'd get another SMS alert telling me the site was down.
 

@@ -6,7 +6,7 @@ Date: 2007-12-10 21:45
 
 Keeping header file dependencies to a minimum in C++ is always a good idea.  There's
 a great book on the subject --- John Lakos's [Large Scale C++ Design][lakos] --- but
-there's plenty of little tricks that aren't mentioned.  In this article I'm going to 
+there's plenty of little tricks that aren't mentioned.  In this article I'm going to
 discuss a handy trick I've discovered in reducing dependencies, particularly useful for
  [STL][] headers.
 
@@ -51,7 +51,7 @@ Well, let's look at the include graph (courtesy of [IncludeManager][]):
   alt="[A saved graph from IncludeManager showing the inclusion graph on the code in this article]"/>
 </a>
 <br/>Good grief, all this for one include?
-<br/>The top box is the original header, the rest is what 
+<br/>The top box is the original header, the rest is what
 <code>&lt;list&gt;</code> brings in.
 </p>
 
@@ -109,7 +109,7 @@ And then:
     // NewAverager.h
     // Forward declare a template list.
     template<class T> class MyList;
-    
+
     class Averager
     {
     public:
@@ -142,12 +142,12 @@ dependencies.  Using [IncludeManager][]'s project view you can see the cost of t
 
 <p class="picture">
 <a href="/200712/project-details.png">
-<img src="/200712/project-details-thumb.png" width="440" height="401" 
+<img src="/200712/project-details-thumb.png" width="440" height="401"
   title="some include file costs thanks to IncludeManager"
   alt="[An IncludeManager screenshot showing the relative compilation costs of the files in this article]"/>
 </a>
 <br/>Project details for my example project.
-<br/><code>listclient.cpp</code> uses the <code>std::list</code> 
+<br/><code>listclient.cpp</code> uses the <code>std::list</code>
 functionality,
 <code>simpleclient.cpp</code> just uses <code>Add(int)</code>.
 </p>

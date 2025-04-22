@@ -13,7 +13,7 @@ impressed; the Rust version really is as good as the C++ version! I tested on
 my home server, a [4-core 2.5GHz X3323](http://ark.intel.com/products/35336/Intel-Xeon-Processor-X3323-6M-Cache-2_50-GHz-1333-MHz-FSB),
 which was otherwise idle.
 
-Due to some stack limitations in Rust, the [Rust code](https://github.com/mattgodbolt/path-tracer/tree/b74e4c6d37ced6b865f85393dc2ff1d330f7c5c5) 
+Due to some stack limitations in Rust, the [Rust code](https://github.com/mattgodbolt/path-tracer/tree/b74e4c6d37ced6b865f85393dc2ff1d330f7c5c5)
 bails out after 500 levels of recursion; so I modified smallpt to do the same.
 
 I ran smallpt like this:

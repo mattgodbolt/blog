@@ -40,10 +40,9 @@ the installation it first disables and removes any pre-existing SPTD filter,
 before asking you to reboot and retry installation.  I simply let it disable
 and remove and then rebooted. I didn't go on to reinstall as I don't need it.
 
-[fix]: http://www.duplexsecure.com/en/downloads 
+[fix]: http://www.duplexsecure.com/en/downloads
 
 So now I can plug in my USB drives again and access the data on them! The reason
 this had become so important is I've finally caved in and bought a digital
 picture frame and I wanted to mount its internal drive to copy my pictures onto
 it.
-

@@ -13,7 +13,7 @@ spotted an exciting thing coming up in Subversion --- [changelists][cl].
 [cl]: http://blogs.open.collab.net/svn/2007/07/one-quality-of-.html "Changelists in Subversion"
 
 When I'm coding I tend to end up working on multiple bugs and features at once, and it becomes a pain to work out which
-edited files correspond to which bug when I then come to check stuff in.  
+edited files correspond to which bug when I then come to check stuff in.
 
 [pf]: http://www.perforce.com/ "A pretty good non-free source control package"
 

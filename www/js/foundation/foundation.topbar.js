@@ -65,7 +65,7 @@
       var smallMatch = matchMedia(Foundation.media_queries.small).matches;
       var medMatch   = matchMedia(Foundation.media_queries.medium).matches;
       var lrgMatch   = matchMedia(Foundation.media_queries.large).matches;
-      
+
        if (sticky && settings.sticky_on === 'all') {
           return true;
        }

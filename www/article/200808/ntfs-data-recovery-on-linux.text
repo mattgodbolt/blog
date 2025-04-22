@@ -13,7 +13,7 @@ Certainly the NTFS file system drivers for Linux have as much trouble as Windows
 recognising the data.
 
 After an awful lot of playing with `dd` and Googling about, I found that the boot sector
-of the partition had been hosed.  Luckily, there's a backup copy of the boot sector. 
+of the partition had been hosed.  Luckily, there's a backup copy of the boot sector.
 Some [documentation][backup] says it's at the end of the partition, but I found it at
 the centre.  A bit of [bash shell maths][malc] later and I had the bootsector `dd`ed
 out.

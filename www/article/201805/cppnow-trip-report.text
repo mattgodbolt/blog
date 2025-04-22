@@ -101,7 +101,7 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
   on this, and will post his source code on [his website](https://probablydance.com/) soon. I can't wait to see how it looks. Great talk, fantastic data-driven research
   and the kind of thing that gets me really excited about programming in C++!
 * Jason Turner's presentation was a great explanation of all the things wrong (and right) with initializer lists.
-* Phil Nash's talk on "Option(al) is Not a Failure" discussed many different strategies for error handling in programs. It introduced Herb Sutter's 
+* Phil Nash's talk on "Option(al) is Not a Failure" discussed many different strategies for error handling in programs. It introduced Herb Sutter's
   [early ideas](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0709r0.pdf) on how static `throw` might be part of the solution.
 * The second evening of lightning talks was an absolute blast too. Despite my giving a full-length talk, I still did my lightning talk too.
   Slides are on [GitHub](https://github.com/mattgodbolt/cppnow-lightning).
@@ -112,7 +112,7 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
   putting more logic into declarations, using I+FE (Immediately Invoked Inline Function Expressions) to push setup code into discrete
   scopes, making more things const, and just generally making code even easier to reason about. This was a fantastic talk, and I believe it
   won the "talk of the conference" award. Well done, Ben!
-* Peter Bindels gave a great overview of views, and how they can be implemented in a fairly straightforward way. Ranges is coming down the 
+* Peter Bindels gave a great overview of views, and how they can be implemented in a fairly straightforward way. Ranges is coming down the
   pipeline (it seems!) but Peter's talk gave practical insight into how one can implement and benefit from views and lazy evaluation with
   existing codebases.
 * Anastasiia Kazakova showed some of the cool things IDEs (not just her own, CLion, but others too!) can do to make our lives better.
@@ -133,7 +133,7 @@ so they'll be available on the [C++Now YouTube channel](https://www.youtube.com/
 ## Conclusion
 
 The notes above don't do the conference justice. So much of the cool stuff happens during the breaks, or at dinners or lunches. I met some
-amazing people, and was inspired to read up on about 12 new papers, and to investigate more libraries. A special thanks to 
+amazing people, and was inspired to read up on about 12 new papers, and to investigate more libraries. A special thanks to
 [Michael Caisse](https://ciere.com/) for inviting me to dinner and giving me a great opportunity to speak with many of the boost
 developers. And again, huge thanks to Jason Turner for the pre- and post-conference accomodation and airport taxi service, Jon Kalb
 for giving me the opportunity to talk, and of course Charley Bay for letting me car-share and room-share with him.

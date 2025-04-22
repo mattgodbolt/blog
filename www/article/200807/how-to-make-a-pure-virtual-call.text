@@ -14,39 +14,39 @@ code[^yeah]:
     public:
       AllocBase() : allocated_(false) {}
       virtual ~AllocBase() { Shutdown(); }
-    
+
       void Initialise() {
         if (!allocated_) {
           Alloc();
           allocated_ = true;
         }
       }
-    
+
       void Shutdown() {
         if (allocated_)
           Dealloc();
         allocated_ = false;
       }
-    
+
       // Overridden by subclasses:
       virtual void Alloc() = 0;
       virtual void Dealloc() = 0;
-    
+
     private:
       bool allocated_;
     };
-    
+
     class AllocClient : public AllocBase
     {
     public:
       AllocClient() : data_(0) {}
       virtual void Alloc() { data_ = new char[10]; }
       virtual void Dealloc() { delete[] data_; }
-    
+
     private:
       char* data_;
     };
-    
+
     int main(int, char**)
     {
       AllocClient alloc_client;

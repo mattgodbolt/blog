@@ -31,17 +31,17 @@ covered some of this in the [first post][fp], but so many tricks on the BBC
 required intimate knowledge of the instruction and hardware timings that if an
 emulator didn't account for them properly, some things wouldn't work right.
 
-The most challenging example of timings were games protection systems. 
+The most challenging example of timings were games protection systems.
 These would be used to prevent disassembly, copying and cheats.
 The game code would be encrypted first and would be decrypted at runtime by
 code. The code would often use XORs with hardware timers (amongst other things) to make it
-difficult to decrypt manually. In order to decrypt correctly the relative timing 
+difficult to decrypt manually. In order to decrypt correctly the relative timing
 of the decryption code and the hardware timers has to be emulated absolutely
 perfectly.
 
 Worse still, it's not just how many CPU cycles each instruction takes that
 needs to be correct, but the fact that the memory reads and writes happen on
-particular cycles within an instruction that need to be correct. 
+particular cycles within an instruction that need to be correct.
 
 Let's delve a little into that:
 
@@ -50,21 +50,21 @@ Life of an instruction
 
 The 6502 at the heart of the Beeb is simple but powerful. Like most other
 processors, instructions are fetched from RAM and executed in turn. The 6502
-has a very simple pipeline --- the fetch for the next instruction happens 
+has a very simple pipeline --- the fetch for the next instruction happens
 during the execution of the previous instruction. This has important
 consequences that we'll talk about later.
 
-Most CPUs have a physical pin dedicated to indicate "I need to access memory", but 
+Most CPUs have a physical pin dedicated to indicate "I need to access memory", but
 to save costs this was left off of the 6502. Instead the memory system is
-permanently engaged. As almost every clock cycle needs 
+permanently engaged. As almost every clock cycle needs
 access to memory (to read instructions or data) this is generally a win.
 Again, this is an important fact which leads to some unusual behaviour we must
 account for.
 
 The 6502 treats the 256 bytes at the bottom of RAM (the "zero
 page") specially. Instructions accessing the zero page are encoded differently
-and run a little faster (as they don't need to encode two address bytes). 
-The zero page can also be treated as an array of 16-bit index pointers. 
+and run a little faster (as they don't need to encode two address bytes).
+The zero page can also be treated as an array of 16-bit index pointers.
 
 Let's go through a quick example, calculating a very simple checksum over ten
 bytes:
@@ -103,9 +103,9 @@ Using [Visual 6502][v6502-1], we can see what memory accesses happen on each clo
       9 $0071  $00   1  addrHi
      10 $0000  $a9   1  val at (addr)
      11 $0006  $c8   1  INY
-     12 $0007  $c0   1  (CPY) 
+     12 $0007  $c0   1  (CPY)
      13 $0007  $c0   1  CPY #
-     14 $0008  $0a   1  #10 
+     14 $0008  $0a   1  #10
      15 $0009  $d0   1  BNE
      16 $000a  $f8   1  lp
      17 $000b  $60   1  (RTS)
@@ -123,7 +123,7 @@ to note:
 On cycles 3, 12 and 17 the opcode following the current instruction is
 fetched prematurely. In the case of cycles 3 and 12, the instruction is a
 single byte instruction. Each instruction takes a minimum of two clock cycles,
-and in this case the following instruction is fetched twice. In the case of 
+and in this case the following instruction is fetched twice. In the case of
 cycle 17, the next instruction is fetched even though the branch isn't taken.
 
 The sequence of fetches for the `ADC ($70), Y` instruction is `opcode`, `zero page
@@ -153,7 +153,7 @@ Nothing shocking there. Now take a look at the next iteration where `Y=1`:
     :::asm
       #  addr  data rw Comment
      20 $0004  $71  1  ADC (zp),Y
-     21 $0005  $70  1  $70 
+     21 $0005  $70  1  $70
      22 $0070  $ff  1  addrLo=$ff
      23 $0071  $0e  1  addrHi=$0e
      24 $0e00  $00  1  val at $0e00 ?!
@@ -210,7 +210,7 @@ consider. Inside the Beeb there are two buses. Fast peripherals and RAM
 can run at the same speed as the CPU itself and are clocked at 2MHz. Some of
 the peripherals can't work at this blazing speed, and instead need to be
 communicated with at the slothly 1MHz. These peripherals are memory mapped and
-the Beeb supports this variable speed memory access with a bit of help of some 
+the Beeb supports this variable speed memory access with a bit of help of some
 external circuitry which looks at the memory addresses on the bus and slows
 the CPU clock down when accessing areas of memory where slow peripherals are
 mapped. The gory details are mostly covered in the [BBC Micro hardware guide][hwg],
@@ -313,7 +313,7 @@ Let's look at `INC Abs,X` from earlier. The compilation starts at
 `getInstruction` which is given the text of opcode and its arguments. It calls
 `getOp` with the opcode part (`INC`) and that returns a struct describing what
 the instruction does (its `op`) and what bus cycles are needed (`read` and/or
-`write`). In this case the operation needs both a read and write bus cycle, 
+`write`). In this case the operation needs both a read and write bus cycle,
  and the op is the javascript snippet:
 
     :::javascript
@@ -340,12 +340,12 @@ the two bytes of the address):
     ig = new InstructionGen();
     ig.append("addr = cpu.getw();");
     ig.append("addrWithCarry = addr + cpu.x;");
-    ig.append("addrNonCarry = (addr&0xff00) 
+    ig.append("addrNonCarry = (addr&0xff00)
                 | (addrWithCarry&0xff);");
     ig.tick(3);
 
 Next we perform the operation's required bus accesses. In our case we need a
-read and a write. Here we account for the spurious read and write. 
+read and a write. Here we account for the spurious read and write.
 The `readOp` and `writeOp` methods of the `InstructionGen` are
 responsible for ticking the CPU the appropriate amount of time depending on
 cycle stretching.
@@ -375,25 +375,25 @@ The final compiled code for `INC Abs,X` comes out as something like:[^3]
     :::javascript
     addr = cpu.getw();
     addrWithCarry = (addr + cpu.x) & 0xffff;
-    addrNonCarry = (addr&0xff00) 
+    addrNonCarry = (addr&0xff00)
         | (addrWithCarry&0xff);
-    cpu.polltime(4+cpu.is1MHzAccess(addrNonCarry) 
+    cpu.polltime(4+cpu.is1MHzAccess(addrNonCarry)
         * ((cpu.cycles & 1) + 1));
     cpu.readmem(addrNonCarry);
-    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry) 
+    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry)
         * (!(cpu.cycles & 1) + 1));
     REG = cpu.readmem(addrWithCarry);
-    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry) 
+    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry)
         * (!(cpu.cycles & 1) + 1));
     cpu.checkInt();
     cpu.writemem(addrWithCarry, REG);
     REG = (REG + 1) & 0xff;
     cpu.setzn(REG);
-    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry) 
+    cpu.polltime(1+cpu.is1MHzAccess(addrWithCarry)
         * (!(cpu.cycles & 1) + 1));
     cpu.writemem(addrWithCarry, REG);
- 
-To get the actual version, fire up [jsbeeb][] and type `instructions6502[0xfe]` into the 
+
+To get the actual version, fire up [jsbeeb][] and type `instructions6502[0xfe]` into the
 Javascript console.
 
 [opcodes]: https://github.com/mattgodbolt/jsbeeb/blob/master/6502.opcodes.js

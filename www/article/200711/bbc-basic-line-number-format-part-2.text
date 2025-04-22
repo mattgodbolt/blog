@@ -4,7 +4,7 @@ Label: Coding
 Status: Public
 Summary: More on the BBC BASIC binary line number encoding.
 
-With regards to the BBC BASIC [line number encoding][prev], [Malcolm][] asked the very sensible 
+With regards to the BBC BASIC [line number encoding][prev], [Malcolm][] asked the very sensible
 question "Why the exclusive `OR` with `0x54` for the third byte?  Why not `OR` with `0x40`
 like the other two?"
 
@@ -15,7 +15,7 @@ The answer emerges when you look at how the values are decoded at run
 time[^license]:
 
 [^license]: The BASIC code, as part of RISC OS, is licensed under a
-[proprietary license][c], 
+[proprietary license][c],
 which allows me to reproduce this here.
 
 [c]: http://www.castle-technology.co.uk/riscosbaselicence.htm "Castle Technology's RISC OS license"

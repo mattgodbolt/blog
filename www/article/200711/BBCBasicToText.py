@@ -1,12 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # (c) 2007 Matt Godbolt.
 # Use however you like, as long as you put credit where credit's due.
 # Some information obtained from source code from RISC OS Open.
 # v0.01 - first release.  Doesn't deal with GOTO line numbers.
 
-import struct, re, getopt, sys
+import getopt
+import re
+import struct
+import sys
 
+# fmt: off
 # The list of BBC BASIC V tokens:
 # Base tokens, starting at 0x7f
 tokens = [
@@ -51,24 +55,27 @@ stmtTokens= [
     'CASE', 'CIRCLE', 'FILL', 'ORIGIN', 'PSET', 'RECT', 'SWAP', 'WHILE',
     'WAIT', 'MOUSE', 'QUIT', 'SYS', 'INSTALL', 'LIBRARY', 'TINT', 'ELLIPSE',
     'BEATS', 'TEMPO', 'VOICES', 'VOICE', 'STEREO', 'OVERLAY']
+# fmt: on
+
 
 def Detokenise(line):
     """Replace all tokens in the line 'line' with their ASCII equivalent."""
+
     # Internal function used as a callback to the regular expression
     # to replace tokens with their ASCII equivalents.
     def ReplaceFunc(match):
         ext, token = match.groups()
         tokenOrd = ord(token[0])
-        if ext: # An extended opcode, CASE/WHILE/SYS etc
-            if ext == '\xc6':
-                return cfnTokens[tokenOrd-0x8e]
-            if ext == '\xc7':
-                return comTokens[tokenOrd-0x8e]
-            if ext == '\xc8':
-                return stmtTokens[tokenOrd-0x8e]
-            raise Exception, "Bad token"
-        else: # Normal token, plus any extra characters
-            return tokens[tokenOrd-127] + token[1:]
+        if ext:  # An extended opcode, CASE/WHILE/SYS etc
+            if ext == "\xc6":
+                return cfnTokens[tokenOrd - 0x8E]
+            if ext == "\xc7":
+                return comTokens[tokenOrd - 0x8E]
+            if ext == "\xc8":
+                return stmtTokens[tokenOrd - 0x8E]
+            raise RuntimeError("Bad token")
+        else:  # Normal token, plus any extra characters
+            return tokens[tokenOrd - 127] + token[1:]
 
     # This regular expression is essentially:
     # (Optional extension token) followed by
@@ -76,39 +83,42 @@ def Detokenise(line):
     #     -- this ensures we don't detokenise the REM statement itself
     # OR
     # (any token)
-    return re.sub(r'([\xc6-\xc8])?(\xf4.*|[\x7f-\xff])', ReplaceFunc, line)
+    return re.sub(r"([\xc6-\xc8])?(\xf4.*|[\x7f-\xff])", ReplaceFunc, line)
+
 
 def ReadLines(data):
     """Returns a list of [line number, tokenised line] from a binary
-       BBC BASIC V format file."""
+    BBC BASIC V format file."""
     lines = []
     while True:
         if len(data) < 2:
-            raise Exception, "Bad program"
-        if data[0] != '\r':
-            print `data`
-            raise Exception, "Bad program"
-        if data[1] == '\xff':
+            raise RuntimeError("Bad program")
+        if data[0] != "\r":
+            print(data)
+            raise RuntimeError("Bad program")
+        if data[1] == "\xff":
             break
-        lineNumber, length = struct.unpack('>hB', data[1:4])
+        lineNumber, length = struct.unpack(">hB", data[1:4])
         lineData = data[4:length]
         lines.append([lineNumber, lineData])
         data = data[length:]
     return lines
+
 
 def Decode(data, output):
     """Decode binary data 'data' and write the result to 'output'."""
     lines = ReadLines(data)
     for lineNumber, line in lines:
         lineData = Detokenise(line)
-        output.write(lineData + '\n')
+        output.write(lineData + "\n")
+
 
 if __name__ == "__main__":
-    optlist, args = getopt.getopt(sys.argv[1:], '')
+    optlist, args = getopt.getopt(sys.argv[1:], "")
     if len(args) != 2:
-        print "Usage: %s INPUT OUTPUT" % sys.argv[0]
+        print("Usage: %s INPUT OUTPUT" % sys.argv[0])
         sys.exit(1)
-    entireFile = open(args[0], 'rb').read()
-    output = open(args[1], 'w')
+    entireFile = open(args[0], "rb").read()
+    output = open(args[1], "w")
     Decode(entireFile, output)
     output.close()

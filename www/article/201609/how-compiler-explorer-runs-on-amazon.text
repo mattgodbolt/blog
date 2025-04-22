@@ -128,7 +128,7 @@ through there may give some further clues as to what's going on.
 [rp]: https://github.com/mattgodbolt/gcc-explorer-image/ "Scripts and configuration for building Compiler Explorer"
 
 Compiler Explorer started out as me manually running a single instance
-with no load balancer: I'd just `ssh` on and `git pull` to upgrade. 
+with no load balancer: I'd just `ssh` on and `git pull` to upgrade.
 As things grew and I wanted to be be less susceptible to accidentally breaking
 it I automated more and more.
 

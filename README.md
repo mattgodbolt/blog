@@ -57,6 +57,12 @@ After the header fields and a blank line, the article content follows in Markdow
 - **Preview locally**: `make serve` - Builds and serves site at localhost:8000
 - **Publish to S3**: `make publish` - Builds and deploys to production
 
+### Development Commands
+
+- **Install pre-commit hooks**: `make pre-commit-install` - Sets up git hooks
+- **Run linters**: `make lint` - Runs pre-commit hooks on all files
+- **Fix formatting**: `make format` - Formats Python files and fixes issues
+
 The project uses Poetry for dependency management. The Makefile automatically installs Poetry locally in the `.poetry` directory and manages the virtual environment for you.
 
 ## Project Structure
@@ -85,9 +91,9 @@ The project uses Poetry for dependency management. The Makefile automatically in
    - Better error reporting and debugging
 
 ### Medium Priority
-4. **Development workflow improvements**
-   - Add linting and formatting tools
-   - Create pre-commit hooks
+4. ✅ **Development workflow improvements** (Partially completed)
+   - ✅ Add linting and formatting tools
+   - ✅ Create pre-commit hooks
    - Add GitHub Actions for CI/CD
 
 5. **Remove caching system**
@@ -117,7 +123,7 @@ A suggested sequence for implementing the improvements:
 
 1. **Initial modernization**
    - ✅ Set up Poetry for dependency management
-   - Add basic linting and formatting
+   - ✅ Add basic linting and formatting
    - Document existing code before changing it
 
 2. **Core improvements**

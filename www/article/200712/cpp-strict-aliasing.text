@@ -16,7 +16,7 @@ data that it in fact doesn't.  A quick example:
     :::cpp
     inline bool IsNegative(float f)
     {
-        return *reinterpret_cast<int*>(&f) 
+        return *reinterpret_cast<int*>(&f)
             & 0x80000000;
     }
 

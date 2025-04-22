@@ -4,7 +4,7 @@ Status: Public
 Summary: Emulating a 6502's interrupt behaviour
 Label: Coding, Emulation
 
-This is the fourth post in my series on emulating a BBC Micro in Javascript. 
+This is the fourth post in my series on emulating a BBC Micro in Javascript.
 I'd recommend reading the [previous part][pp] on 6502 internal timings before
 reading this post. It's also handy to have read read the [first part][fp] which covers general
 stuff, and the [second part][sp] which focuses on the video hardware.
@@ -19,16 +19,16 @@ what goes on in the Beeb.
 May I interrupt you a moment?
 -----------------------------
 
-Like most CPUs, the 6502 has a physical pin (the IRQ line) which causes an 
-interrupt when brought low: the current instruction is completed and then 
+Like most CPUs, the 6502 has a physical pin (the IRQ line) which causes an
+interrupt when brought low: the current instruction is completed and then
 instead of proceeding to the next
 instruction, the CPU enters interrupt mode (which disables further interrupts)
-and jumps to an operating system handler. This handler then deals with the 
-interrupt --- a timer firing, a keyboard event, disc activity and so on. 
+and jumps to an operating system handler. This handler then deals with the
+interrupt --- a timer firing, a keyboard event, disc activity and so on.
 The handler is responsible for:
 
-   * Polling all the potential interrupt sources to determine why the 
-   interrupt occurred and dealing with it appropriately, 
+   * Polling all the potential interrupt sources to determine why the
+   interrupt occurred and dealing with it appropriately,
    * Acknowledging the interrupt with the hardware to bring the CPU's IRQ line
    back high.
    * Leaving interrupt mode and returning to whatever it was doing before.
@@ -50,9 +50,9 @@ evidence left for the interrupt handler to determine why it was called.
 
 Not emulating these strange quirks leads to subtle differences in when
 interrupts are taken, which causes the legendary Kevin Edwards'
-protection systems to fail to decode. 
+protection systems to fail to decode.
 
-Given all this complexity, it's interesting to think how experiment to try 
+Given all this complexity, it's interesting to think how experiment to try
 and work out how Kevin sussed all this out. Rich had a guess
 and in [this fascinating thread][kevin] Kevin confirms how it was done.
 
@@ -62,8 +62,8 @@ Running out of time(rs)
 -----------------------
 
 While we're talking cycle correctness we should mention the hardware timers.
-There are two timers in each of two [6522 Versatile Interface Adapters][viads] (VIA). 
-Each timer can generate an interrupt when it overruns, and automatically 
+There are two timers in each of two [6522 Versatile Interface Adapters][viads] (VIA).
+Each timer can generate an interrupt when it overruns, and automatically
 reloads from a programmable start value.
 
 [viads]: http://archive.6502.org/datasheets/mos_6522.pdf
@@ -72,11 +72,11 @@ From our cycle correctness point of view the interesting thing about the
 timers is the exact time that the timer fires. They tick at 1MHz, and generate
 their interrupt a half-cycle after they underflow below `$0000` (back to
 `$ffff`). At this point they either stop (a "one-shot" timer), or reload their
-initial value and start again (a "free-running" timer). 
+initial value and start again (a "free-running" timer).
 
 When used in the latter mode the reload happens on the half-cycle after the interrupt:
-When a value `N` is written to the timer's latched start value, the 
-first interrupt will happen `N + 1.5` 1MHz cycles later (i.e. `2N + 3` 
+When a value `N` is written to the timer's latched start value, the
+first interrupt will happen `N + 1.5` 1MHz cycles later (i.e. `2N + 3`
 CPU cycles); and subsequent interrupts happen at `N + 2` 1MHz cycle
 (`2N + 4` CPU cycle) intervals. (Recall that the CPU clock runs at 2MHz.)
 
@@ -126,14 +126,14 @@ Acknowledging the timer
 
 Reading the low 8 bits of a timer has an extra meaning: it acknowledges any
 interrupts from that timer. This is what an interrupt handler would do:
-once it had ascertained that it was a timer that caused the IRQ 
-(by checking the VIA status register) it would read from that timer 
+once it had ascertained that it was a timer that caused the IRQ
+(by checking the VIA status register) it would read from that timer
 to stop it holding the CPU IRQ pin low.
 
 By now you'll realise there's going to be a catch: if the CPU tries to
 acknowledge the timer firing on the same cycle that it
 fired, then the acknowledgement gets lost[^2]. An interrupt will still be
-generated on the next cycle. Again, Kevin Edwards' protection systems take 
+generated on the next cycle. Again, Kevin Edwards' protection systems take
 advantage of this unusual behaviour.
 
 [^2]: This seems to be a 6522 glitch, though it's not documented anywhere.
@@ -151,7 +151,7 @@ from or written to account for the actual point within a cycle the CPU would
 actually read or write the timer.
 
 Most of the relevant code for the interrupts in in the [via.js][via] source file.
-The interrupt generation and counter handling is in the `polltime` function and 
+The interrupt generation and counter handling is in the `polltime` function and
 it looks a little like:
 
     :::javascript
@@ -170,7 +170,7 @@ it looks a little like:
     }
     // Reload the timer, accounting for the
     // extra 4 2MHz ticks of a reload.
-    while (count < -3) 
+    while (count < -3)
       count += reload + 4;
 
 [via]: https://github.com/mattgodbolt/jsbeeb/blob/master/via.js
