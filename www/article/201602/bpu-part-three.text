@@ -23,7 +23,7 @@ organized.
 
 [ml]: http://www.realworldtech.com/nehalem/4/
 
-For this test I broadly used the same approach as [Vladimir Uzelac's thesis][vl], 
+For this test I broadly used the same approach as [Vladimir Uzelac's thesis][vl],
 wihch is to create a sequence of N branches, each aligned to a particular
 boundary D. By varying N and D and looking at some of the microarchitectural
 counters, it should be possible to work out the BTB arrangement.
@@ -56,7 +56,7 @@ be as diagnostic and I don't show the results below except in the detailed
 view (click the images below for that).
 
 For each experiment, I ran 100 times and took the run that had the minimum
-number of front-end resteers. 
+number of front-end resteers.
 
 ### Total size of the BTB
 
@@ -66,7 +66,7 @@ are as follows:
 
 <p class="picture">
 <a href="/201602/btb_arrendale_total_size.png">
-<img src="/201602/btb_arrendale_total_size_resteers.png" width="300" height="262" 
+<img src="/201602/btb_arrendale_total_size_resteers.png" width="300" height="262"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Resteers by branch count and alignment. Click for full details.
  Alignment is log scale.
@@ -85,7 +85,7 @@ including 2048 branches, then 37% misses at N=2560, rising to 90% at N=4096. The
 are similar for D=8. At D=16 there's around 27% at 1536, 60% at 2048.
 
 At D=32 and D=64 we're starting to see significant resteering at the 512
-and 1024 mark, respectively. 
+and 1024 mark, respectively.
 
 My interpretation is that there are 2048 entries in the BTB: 2048 is the
 greatest number of branches we were able to have with no significant resteers
@@ -94,7 +94,7 @@ greatest number of branches we were able to have with no significant resteers
 For the D=4 case, at N=2560 we'd expect 2560-2048=512 of the BTB entries to
 overspill. If we assume a simple least-recently-used replacement strategy we'd
 expect the overspill to be pathological: each overspilling branch kicks out
-the next branch due to execute...which kicks out the next and so on. 
+the next branch due to execute...which kicks out the next and so on.
 
 This would lead us to expect (ways+1) * 512 evictions. We see 37% evictions --
 which implies only 1 way ((1 + 1) * 512 / 2560 = 40%). At 3072 we see 59% --
@@ -117,7 +117,7 @@ addresses map to sets.
 
 <p class="picture">
 <a href="/201602/btb_arrendale_number_of_ways.png">
-<img src="/201602/btb_arrendale_number_of_ways_resteers.png" width="300" height="255" 
+<img src="/201602/btb_arrendale_number_of_ways_resteers.png" width="300" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Resteers by branch count and alignment. Click for full details.
  Alignment is log scale.
@@ -162,6 +162,6 @@ As before the code is on [GitHub][gh], and the code was at revision
 [gh]: https://github.com/mattgodbolt/agner
 [this]: https://github.com/mattgodbolt/agner/tree/203499a84f58bdf021cad0c506f6f89b0227692a
 
-In [another post][next] I'll look at how many tag bits are used. 
+In [another post][next] I'll look at how many tag bits are used.
 
 [next]: /201602/bpu-part-four

@@ -24,7 +24,7 @@ Things I had to note:
 * alsa needed a quick patch --- it uses a header file not in the uclib.  Luckily the header
   isn't actually used, so I could safely comment out the include for it. The files
   `src/alisp/alisp.c` and `src/names.c` can safely have the include for  removed.
-* when configuring MFD, I used `--with-tremor` so it uses the integer OGG library instead 
+* when configuring MFD, I used `--with-tremor` so it uses the integer OGG library instead
   of the float one (which requires cosf and sinf; neither of which are in the uclib).
 * `tag.c` in MFD needed a patch, again it was using a header which isn't in my micro distribution;
   again it wasn't actually needed and could be safely commented out.

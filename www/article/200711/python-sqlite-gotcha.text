@@ -29,11 +29,11 @@ But it's not so cool when you do something like:
     print db.execute("SELECT * FROM test").fetchall()
     db.close()
 
-Doing this will have you scratching your head going, "Why is my database empty?  I'm sure I 
+Doing this will have you scratching your head going, "Why is my database empty?  I'm sure I
 put something in it!"  Indeed you did, but because you didn't commit the data (or have Python
 automatically do it for you), the data is rolled back and lost.
 
-So the lesson here is either `db.commit()` manually at the relevant points (before closing the database in this case), 
+So the lesson here is either `db.commit()` manually at the relevant points (before closing the database in this case),
 or create the connection with a `None` isolation_level:
 
     :::python

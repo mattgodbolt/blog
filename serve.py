@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import http.server
-import http.server
 import os
+
 
 class MbsHandler(http.server.SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -14,6 +14,7 @@ class MbsHandler(http.server.SimpleHTTPRequestHandler):
                     return maybe_name
         return p
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     os.chdir("www")
     http.server.test(MbsHandler, http.server.HTTPServer)

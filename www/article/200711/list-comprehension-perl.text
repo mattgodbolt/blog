@@ -43,5 +43,5 @@ The Python equivalent I'd write would be:
                          in params.items()])
     out.close()
 
-Which I think is pretty similar.  As Justin says, "I like comparing how you do things in different languages. It gives you a 
+Which I think is pretty similar.  As Justin says, "I like comparing how you do things in different languages. It gives you a
 feel for strengths and weaknesses."

@@ -12,7 +12,7 @@ As you've probably noticed over the last few days, I like [Python][] [a][py1] [l
 
 Last night I found a new (to me) thing.  It's a new to Python 2.5, which might preclude
 it from being useful in older projects.  In C and C++, one of the more useful constructs in expressions
-is the ternary operator: 
+is the ternary operator:
 
     :::python
     minimumOfXandY = (x < y) ? x : y;
@@ -23,10 +23,10 @@ but return the actual objects involved --- a little counterintuitively you would
     :::python
     minimumOfXandY = (x < y) and x or y
 
-In Python 2.5 there's a slightly more readable syntax: 
+In Python 2.5 there's a slightly more readable syntax:
 
     :::python
     minimumOfXandY = x if (x < y) else y
 
-I don't think it's quite as nice as the C style way of doing things, as the values and the conditional are in a non-intuitive order 
+I don't think it's quite as nice as the C style way of doing things, as the values and the conditional are in a non-intuitive order
 for imperative languages.  But arguably it's a little better than the `and`/`or` idiom.

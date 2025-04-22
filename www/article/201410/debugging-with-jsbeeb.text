@@ -78,7 +78,7 @@ Armed with this information I added a breakpoint on reading that frequency
 table location. That allowed me to see when it was being read, but there
 wasn't any obvious reason why: I needed to somehow track to the root cause.
 
-Writing an emulator gives you amazing flexibility in debugging --- 
+Writing an emulator gives you amazing flexibility in debugging ---
 I [added a circular buffer](https://github.com/mattgodbolt/jsbeeb/commit/5a760c1b8df15c79b201bbc8d6c2a387f206130d)
 of the last 256 values of all the registers after executing
 each instruction.  That meant when the breakpoint tripped I had a history of

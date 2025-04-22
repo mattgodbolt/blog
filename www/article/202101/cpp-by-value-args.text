@@ -26,8 +26,8 @@ Now consider what happens when we do something like `set_s("moo");`:
 
 * The `const char*` gets converted into a temporary `string` via the `string` constructor that takes a `const char*`.
   That does allocations[^sso] etc and copies the `"moo"` into the new temporary `string` object.
-* That temporary is used to construct the parameter value `s` in the `set_s`. 
-  The argument to the constructor of this `s` is a temporary -- so it's of type `string &&`. 
+* That temporary is used to construct the parameter value `s` in the `set_s`.
+  The argument to the constructor of this `s` is a temporary -- so it's of type `string &&`.
   The `string&&` constructor can "steal" the contents of the temporary string&& which makes it super cheap (no allocations, just swapping pointers).
 * The `s_ = std::move()` runs. The `s_`'s `operator=(string &&)` is called (as the move turns the `string` into an r-value). This also does the steal-the-innards trick.
 * All the destructors for the temporaries run -- the original `"moo"` temporary object and the pass-by-copy param `s`. They have no work to do as they've been "stolen" from.

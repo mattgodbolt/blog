@@ -4,7 +4,7 @@ Status: Public
 Label: Coding
 
 My favourite scripting language by far is [Python][].  I'm always finding cool things
-in the language that I didn't know were there.  Even though I've been writing scripts 
+in the language that I didn't know were there.  Even though I've been writing scripts
 in it for years, today I discovered that you can use maths-style ranges in comparisons.
 
 [python]: http://www.python.org "Python - my favourite scripting language"

@@ -17,7 +17,7 @@ Vim, then you can fix up the error parsing by putting this in your `.vimrc`:
 
 I'm also experimenting with some alternative bindings to replace me typing `:make`. So far I'm using control-F10 to build and show errors, and F3, F4 to navigate between errors with:
 
-    function Make() 
+    function Make()
         silent make
         redraw!
         cw 8
@@ -29,4 +29,3 @@ I'm also experimenting with some alternative bindings to replace me typing `:mak
     nnoremap <F3> :cprev<CR>
 
 It's by no means perfect as you get no feedback during the make process itself (which is rubbish), but it's a start.
-

@@ -3,7 +3,9 @@ repos:
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^\.idea/
       - id: end-of-file-fixer
+        exclude: ^\.idea/
       - id: check-yaml
       - id: check-added-large-files
       - id: check-toml
@@ -15,14 +17,12 @@ repos:
     hooks:
       - id: black
         language_version: python3
-        args: [--check]  # Initially, just check and don't modify
 
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
         name: isort (python)
-        args: [--check-only]  # Initially, just check and don't modify
 
   # Initially only run ruff on Python files in the 'pygen' directory with warnings only
   - repo: https://github.com/charliermarsh/ruff-pre-commit

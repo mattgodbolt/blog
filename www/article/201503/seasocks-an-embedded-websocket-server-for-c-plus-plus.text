@@ -32,11 +32,11 @@ all other connected parties.
     :::cpp
     struct ChatHandler : WebSocket::Handler {
         set<WebSocket *> connections;
-        void onConnect(WebSocket *socket) override 
+        void onConnect(WebSocket *socket) override
         { connections.insert(socket); }
-        void onData(WebSocket *, const char *data) override 
+        void onData(WebSocket *, const char *data) override
         { for (auto c : connections) c->send(data); }
-        void onDisconnect(WebSocket *socket) override 
+        void onDisconnect(WebSocket *socket) override
         { connections.erase(socket); }
     };
 

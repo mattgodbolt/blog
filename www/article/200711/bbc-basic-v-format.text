@@ -37,8 +37,8 @@ number is 65279 (`0xfeff`) as the special marker `0x0d 0xff` is used to signify 
 The line length includes the three preceding bytes, making the maximum length of a line 251 bytes.
 
 The line data itself is tokenised.  The original BBC BASIC treated any character with the top bit set as
-a token (with one exception), and a table of 128 tokens was used to determine this.  In BBC BASIC V, 
-any character value greater or equal to `0x7f` is interpreted as a token, and there are three 
+a token (with one exception), and a table of 128 tokens was used to determine this.  In BBC BASIC V,
+any character value greater or equal to `0x7f` is interpreted as a token, and there are three
 "extended" tokens (`0xc6`, `0xc7` and `0xc8`) which use the next byte to select further tokens.
 
 The exception mentioned above --- which applies to both original BBC BASIC and BBC BASIC V --- is that
@@ -51,10 +51,10 @@ This format is described in more detail in [another blog post][goto].
 
 The tokens are broken into four categories:
 
-1. The main token list, holding all the main keywords.  These values start at `0x7f` and are 
+1. The main token list, holding all the main keywords.  These values start at `0x7f` and are
    looked up for all values except `0xc6`, `0xc7`, `0xc8` and `0x8d`.  _(See the Python implementation
    below for the list of all tokens.)_
-2. Extended function tokens.  These follow a `0xc6` byte and start at value `0x8e`. There 
+2. Extended function tokens.  These follow a `0xc6` byte and start at value `0x8e`. There
    are only two tokens, `SUM` and `BEAT`.
 3. Extended command tokens.  These follow a `0xc7` and start at value `0x8e`, and include
    `RENUMBER`, `EDIT` and `HELP`.

@@ -45,7 +45,7 @@ re-initialise the decompressor to decompress from within the middle of the
 file. To read from a particular offset in the file, the nearest checkpoint
 before the required data is found, the decompressor initialized with its
 state, and then data decompressed and discarded until the required offset is
-found. This bounds the amount of time needed to read a file to be on average 
+found. This bounds the amount of time needed to read a file to be on average
 the time taken to decompress half the checkpoint size's amount of data.
 Without checkpoints the average time is half the time needed to decompress the
 entire file.

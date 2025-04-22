@@ -27,7 +27,7 @@ place!  Running in debug, `net groupmap list` will have a line like:
 
     ldapsam_setsamgrent: 0 entries in the base
 
---- that'll be a clear giveaway.  Especially if 
+--- that'll be a clear giveaway.  Especially if
 
     ldapsearch -x "(&(objectClass=sambaDomain)(sambaDomainName=*YOURDOMAIN*))"
 
@@ -35,5 +35,5 @@ and
 
     ldapsearch -x "(objectclass=sambaGroupMapping)"
 
-still yield results --- so you know you have some valid data, just it isn't 
+still yield results --- so you know you have some valid data, just it isn't
 appearing in Samba's group lists.

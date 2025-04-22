@@ -26,7 +26,7 @@ Take a look at this code snippet, designed to show up the problem:
         CloseRequest(handle);
         handle = -1;
     }
-    
+
     void ThreadB() {
       Sleep();  // Wait a bit (gives Thread A a chance to run)
       CloseRequest(handle);  // Cancel Thread A's request
@@ -101,7 +101,7 @@ Writing a couple of utility functions to hide this gives something like:
       }
       return new_handle;
     }
-    
+
     // Close the handle, then mark it as available to other
     // threads. Should only be called by the owner of the handle.
     void SafeCloseRequest(int handle) {
@@ -135,7 +135,7 @@ becomes:
         handle = -1;
       }
     }
-    
+
     void ThreadB() {
       Sleep();
       // Cancel thread A's request.

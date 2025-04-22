@@ -45,7 +45,7 @@ one would write the address number to `0xfe00` and then the value required to
 
 The registers control things like where the television sync pulse would be
 generated, when and where horizontal lines would start and end, and what
-memory address the bitmapped screen was stored at. By judicious programming 
+memory address the bitmapped screen was stored at. By judicious programming
 of the start of screen memory, games could perform
 hardware scrolling, albeit at a somewhat coarse level of 8 pixels in the X
 direction.
@@ -60,7 +60,7 @@ blur the pixels a little to simulate an authentic TV experience.
 <img src="/201405/screen-params.png" width="400" height="308"
      alt="Some of the screen timings and registers"/>
 <br/>
-Some of the relationships between register values, courtesy of the 
+Some of the relationships between register values, courtesy of the
 <a href="http://stardot.org.uk/mirrors/www.bbcdocs.com/filebase/essentials/BBC%20Microcomputer%20Advanced%20User%20Guide.pdf">
 Advanced User Guide</a>
 </p>
@@ -74,7 +74,7 @@ generates between eight and sixteen physical pixels in PAL space.
 
 On each clock cycle, jsbeeb looks at all the hardware registers,
 determines which settings are in effect, and renders either 8 or 16 32-bpp
-pixels into its buffer. The video code runs every time the CPU emulator calls 
+pixels into its buffer. The video code runs every time the CPU emulator calls
 its `polltime()`, making it a kind of co-routine with the CPU (along with the
 other peripheral emulators). (Code is in [video.js][vjs])
 
@@ -107,7 +107,7 @@ The code for a single screen byte `dat` looks something like:
     }
 
 The `table4bpp` is a table mapping the contributions of each display
-byte's bits to the 8 or 16 physical pixels of a character (created [here][tbl]). 
+byte's bits to the 8 or 16 physical pixels of a character (created [here][tbl]).
 It maps to a 4-bit
 value which indexes into the palette, `ulapal`.
 

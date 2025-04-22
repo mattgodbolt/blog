@@ -23,7 +23,7 @@ is caused.
 
 <p class="picture">
 <a href="/201602/btb_arrendale_set_bits.png">
-<img src="/201602/btb_arrendale_set_bits_resteers.png" width="300" height="259" 
+<img src="/201602/btb_arrendale_set_bits_resteers.png" width="300" height="259"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Resteers by branch count and alignment. Click for full details.
  Alignment is log scale.
@@ -42,7 +42,7 @@ high), we get:
 
 <p class="picture">
 <a href="/201602/btb_arrendale_bits_in_set.png">
-<img src="/201602/btb_arrendale_bits_in_set_resteers.png" width="300" height="255" 
+<img src="/201602/btb_arrendale_bits_in_set_resteers.png" width="300" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Resteers by branch count and alignment. Click for full details.
  Alignment is log scale.
@@ -59,7 +59,7 @@ logical addreeses though.
 
 [Next time][next] I'll run the tests on other CPUs and see what we get. I'd love to
 try and confirm the set address hashing too, and to fathom out the replacement
-algorithm.  Ideas welcomed! I've been somewhat distracted by further posts on 
+algorithm.  Ideas welcomed! I've been somewhat distracted by further posts on
 the [Mechanical Sympathy][ms] mailing list with extra pointers to follow up on modern branch prediction, so I'm a little
 behind on where I'd like to be!
 

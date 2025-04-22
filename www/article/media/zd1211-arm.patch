@@ -5,22 +5,22 @@ diff -x '*.o' -Nur zd1211-driver-r80/Makefile zd1211-driver-r80-arm/Makefile
      $(SRC_DIR)/zddebug.o \
      $(SRC_DIR)/zdtkipseed.o \
      $(SRC_DIR)/zdmic.o \
--    $(SRC_DIR)/zdusb.o 
+-    $(SRC_DIR)/zdusb.o
 +    $(SRC_DIR)/zdusb.o \
 +    $(SRC_DIR)/div64.o
      OBJECTS += $(SRC_DIR)/zd1211.o
- 
+
  CFLAGS=-O -Wall -Wstrict-prototypes -pipe # -Wa,-a,-ad -g
 @@ -202,8 +203,10 @@
  	chmod -x $(MODULE)
- 
+
  %.o: %.c
--	$(CC) -static $(CFLAGS) $(INCLUDES) $(DEFINES) $(DEBUG) -c $< -o $@                              
--    
-+	$(CC) -static $(CFLAGS) $(INCLUDES) $(DEFINES) $(DEBUG) -c $< -o $@     
+-	$(CC) -static $(CFLAGS) $(INCLUDES) $(DEFINES) $(DEBUG) -c $< -o $@
+-
++	$(CC) -static $(CFLAGS) $(INCLUDES) $(DEFINES) $(DEBUG) -c $< -o $@
 +%.o: %.S
 +	$(CC) -c $< -o $@ -D__ASSEMBLY__
-+	
++
  endif
  both:
  	make ZD1211REV_B=0

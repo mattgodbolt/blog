@@ -25,7 +25,7 @@ First up let's try and see how many branches we can fit in the BTB:
 <div class="small-6 columns">
 <p class="picture">
 <a href="/201602/ivy_btb_size_total_size.png">
-<img src="/201602/ivy_btb_size_total_size_resteers.png" width="350" height="255" 
+<img src="/201602/ivy_btb_size_total_size_resteers.png" width="350" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Ivy Bridge resteers by count and alignment
 </p>
@@ -33,7 +33,7 @@ First up let's try and see how many branches we can fit in the BTB:
 <div class="small-6 columns">
 <p class="picture">
 <a href="/201602/haswell_btb_size_total_size.png">
-<img src="/201602/haswell_btb_size_total_size_resteers.png" width="350" height="255" 
+<img src="/201602/haswell_btb_size_total_size_resteers.png" width="350" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Haswell resteers by count and alignment
 </p>
@@ -60,7 +60,7 @@ Let's try and work out the number of ways the sets have:
 <div class="small-6 columns">
 <p class="picture">
 <a href="/201602/ivy_btb_size_number_of_ways.png">
-<img src="/201602/ivy_btb_size_number_of_ways_resteers.png" width="350" height="255" 
+<img src="/201602/ivy_btb_size_number_of_ways_resteers.png" width="350" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Ivy Bridge resteers by count and alignment
 </p>
@@ -68,7 +68,7 @@ Let's try and work out the number of ways the sets have:
 <div class="small-6 columns">
 <p class="picture">
 <a href="/201602/haswell_btb_size_number_of_ways.png">
-<img src="/201602/haswell_btb_size_number_of_ways_resteers.png" width="350" height="255" 
+<img src="/201602/haswell_btb_size_number_of_ways_resteers.png" width="350" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Haswell resteers by count and alignment
 </p>
@@ -82,8 +82,8 @@ only 20% at 5-way. A 5-way set seems very unlikely: instead my guess
 is there's a smarter replacement policy than "LRU" and a 4-way set. One guess
 is that somehow when all four ways are filled with "hot" branches, the 5th branch is not
 allowed to evict the others and is just flatly mispredicted, yielding a 1 in
-5 (20%) misprediction rate. Or that a random entry is evicted giving a similar result. 
-Either way, the pathological case of N+1 branches landing in the same set seems to 
+5 (20%) misprediction rate. Or that a random entry is evicted giving a similar result.
+Either way, the pathological case of N+1 branches landing in the same set seems to
 no longer happen.
 
 *Verdict:* Both have 4 ways; Haswell is much smarter about replacing them.
@@ -98,7 +98,7 @@ big D, to see if we can draw any conclusions:
 <div class="small-6 columns">
 <p class="picture">
 <a href="/201602/ivy_btb_size_bits_in_set.png">
-<img src="/201602/ivy_btb_size_bits_in_set_resteers.png" width="350" height="255" 
+<img src="/201602/ivy_btb_size_bits_in_set_resteers.png" width="350" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Ivy Bridge resteers by count and alignment
 </p>
@@ -106,7 +106,7 @@ big D, to see if we can draw any conclusions:
 <div class="small-6 columns">
 <p class="picture">
 <a href="/201602/haswell_btb_size_bits_in_set.png">
-<img src="/201602/haswell_btb_size_bits_in_set_resteers.png" width="350" height="255" 
+<img src="/201602/haswell_btb_size_bits_in_set_resteers.png" width="350" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Haswell resteers by count and alignment
 </p>
@@ -139,7 +139,7 @@ two) of branches and space them out to see if we can get them to collide:
 <div class="small-6 columns">
 <p class="picture">
 <a href="/201602/ivy_btb_size_number_of_address_bits_for_set.png">
-<img src="/201602/ivy_btb_size_number_of_address_bits_for_set_resteers.png" width="350" height="255" 
+<img src="/201602/ivy_btb_size_number_of_address_bits_for_set_resteers.png" width="350" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Ivy Bridge resteers by count and alignment
 </p>
@@ -147,7 +147,7 @@ two) of branches and space them out to see if we can get them to collide:
 <div class="small-6 columns">
 <p class="picture">
 <a href="/201602/haswell_btb_size_number_of_address_bits_for_set.png">
-<img src="/201602/haswell_btb_size_number_of_address_bits_for_set_resteers.png" width="350" height="255" 
+<img src="/201602/haswell_btb_size_number_of_address_bits_for_set_resteers.png" width="350" height="255"
  alt="Resteers by branch count and alignment"/></a>
  <br/>Haswell resteers by count and alignment
 </p>

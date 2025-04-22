@@ -29,7 +29,7 @@ Art pipeline
 The source artwork was created in [Photoshop][] and [3D Studio Max][max]. The various textures created were saved as Targa image files (TGA), and 3D geometry was exported by our own custom plugin into a custom tagged data format called ACFF[^acff].
 
 <p class="picture">
-<img src="/201003/sef-bank-is-a-safe-bank.jpeg" width="400" height="300" 
+<img src="/201003/sef-bank-is-a-safe-bank.jpeg" width="400" height="300"
  alt="Image of SWAT: Global Strike Team - underground"/>
  <br/>The underground level. The guy in the poster is Sefton Hill, the game's producer, and the caption reads "A Sef bank is a safe bank".
 </p>

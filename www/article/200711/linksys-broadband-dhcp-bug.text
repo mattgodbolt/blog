@@ -4,7 +4,7 @@ Label: Blog
 Date: 2007-11-10 13:22:00
 Summary: In which I discover a fun bug in Linksys's DHCP implementation.
 
-After a bit of a  debugging session at home using [Wireshark][], 
+After a bit of a  debugging session at home using [Wireshark][],
 my interest in networking matters has been piqued again.   I couldn't get a decent
 connection to [PKR][] and was trying to work out why --- still no idea on that front.
 But it got me thinking that I really ought to find out more about how networks actually work.
@@ -52,7 +52,7 @@ Box 2's log is:
     DHCPDISCOVER from 00:13:10:4a:00:02 via eth0
     DHCPOFFER on 10.10.10.58 to 00:13:10:4a:00:02 via eth0
     DHCPREQUEST for 10.10.10.59 (10.10.10.200)
-        from 00:13:10:4a:00:02 via eth0: 
+        from 00:13:10:4a:00:02 via eth0:
         lease 10.10.10.59 unavailable.
     DHCPNAK on 10.10.10.59 to 00:13:10:4a:00:02 via eth0
 

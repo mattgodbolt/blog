@@ -12,7 +12,7 @@ have pre-canned binaries for 14.04, and rather than have to build my own, I'd
 prefer to use those binaries.
 
 That being said; the reverse is true for older compilers like [GCC
-4.4](http://gcc.gnu.org). 
+4.4](http://gcc.gnu.org).
 
 I wondered if I could drop support for GCC 4.4, and in short, I don't think I
 can!  I turned to the very minimal Google Analytics I have for GCC Explorer,

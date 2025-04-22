@@ -80,7 +80,7 @@ It turns out this `SWI` is only used in a couple of places in the ROM, so I was 
     ;  pointer in R10)
     LDR R0,[R10]:LDR R1,Wind:CMP R0,R1:BNE Normal
     LDR R0,[R10,#4]:CMN R0,#1:BEQ Normal
-    ; Read the opcode following the SWI, and 
+    ; Read the opcode following the SWI, and
     ; check it against that expected in the
     ; part of ROM we're trying to hook.
     ; 'Word' has the instruction:

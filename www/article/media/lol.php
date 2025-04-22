@@ -35,4 +35,3 @@ $title = $strings[array_rand($strings)];
 <b>Welcome</b> to <?=$title?>.
 </body>
 </html>
-

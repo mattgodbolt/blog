@@ -231,12 +231,12 @@
         this.locked = true;
         this.key_up_off(modal);   // PATCH #3: turning on key up capture only when a reveal window is open
         modal.trigger('close').trigger('close.fndtn.reveal');
-        
+
         if ((settings.multiple_opened && open_modals.length === 1) || !settings.multiple_opened || modal.length > 1) {
           this.toggle_bg(modal, false);
           this.to_front(modal);
         }
-        
+
         if (settings.multiple_opened) {
           this.hide(modal, settings.css.close, settings);
           this.to_front($($.makeArray(open_modals).reverse()[1]));
@@ -340,11 +340,11 @@
 
       return el.show();
     },
-    
+
     to_back : function(el) {
       el.addClass('toback');
     },
-    
+
     to_front : function(el) {
       el.removeClass('toback');
     },

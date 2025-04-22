@@ -7,7 +7,7 @@ Label: Coding, Microarchitecture
 Over the last week or so I've been investigating the static branch prediction
 on modern Intel processors. A [thread][mst] on the excellent [Mechnical Sympathy][ms]
 mailing list got me thinking about it: a claim was made that static prediction
-is still used on Intel processors; and my understanding from 
+is still used on Intel processors; and my understanding from
 [Agner Fog's excellent resources][agner] is that newer Intel processors no
 longer do so.
 
@@ -56,10 +56,10 @@ really been looked at[^hmm].
 
 [pm]: http://www.ece.uah.edu/~milenka/docs/VladimirUzelac.thesis.pdf
 
-Intel processors fetch instructions in blocks of 16 bytes every cycle and each block 
+Intel processors fetch instructions in blocks of 16 bytes every cycle and each block
 can contain several branches.
 As best is understood, a cache-like structure called the Branch Target Buffer
-(BTB) is used to look up previously-seen  branches. Just like a memory cache, 
+(BTB) is used to look up previously-seen  branches. Just like a memory cache,
 the BTB has a number of sets, and each set has a number of ways. Some number of bits of the
 current program counter are used to pick a set within the BTB, and then
 another subset of the bits is compared with the tags in each of the ways of

@@ -64,7 +64,7 @@ instructions take several CPU cycles to execute, and access memory multiple
 times during their execution. These accesses may touch memory-mapped hardware
 which may interpret the access as a command (for example, to schedule a timer
 interrupt). Sometimes accessing hardware would cause the processor to use a
-slower clock to handle differing bus speeds. 
+slower clock to handle differing bus speeds.
 
 The 6502 CPU in the BBC Micro had a number of "bugs" too -- for example, for
 read-modify-write instructions of a certain type, under some circumstances,
@@ -96,7 +96,7 @@ That's not quite true -- due to a small amount of pipelining inside the 6502
 the interrupt request lines are checked on the penultimate cycle of an
 instruction. If the IRQ happens on the last cycle of an instruction, it won't
 have a chance to take effect until the entirety of the next instruction has
-completed, by which time timers etc have all moved on. This is a trick used 
+completed, by which time timers etc have all moved on. This is a trick used
 by the Kevin Edwards protection.
 
 So in all instructions I spool time forward to the penultimate cycle before
@@ -150,15 +150,15 @@ This comes out as (brace yourself...) :
       var REG = 0|0;
       var addr = cpu.getw();
       var addrWithCarry = (addr + cpu.x) & 0xffff;
-      var addrNonCarry = (addr & 0xff00) | 
+      var addrNonCarry = (addr & 0xff00) |
             (addrWithCarry & 0xff);
-      cpu.polltime(4+ cpu.is1MHzAccess(addrNonCarry) * 
+      cpu.polltime(4+ cpu.is1MHzAccess(addrNonCarry) *
             ((cpu.cycles & 1) + 1));
       cpu.readmem(addrNonCarry);
-      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) * 
+      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) *
             (!(cpu.cycles & 1) + 1));
       REG = cpu.readmem(addrWithCarry);
-      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) * 
+      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) *
             (!(cpu.cycles & 1) + 1));
       cpu.checkInt();
       cpu.writemem(addrWithCarry, REG);
@@ -166,14 +166,14 @@ This comes out as (brace yourself...) :
       cpu.p.c = !!(REG & 0x80);
       REG = ((REG << 1) & 0xff) | newBotBit;
       cpu.setzn(REG);
-      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) * 
+      cpu.polltime(1+ cpu.is1MHzAccess(addrWithCarry) *
             (!(cpu.cycles & 1) + 1));
       cpu.writemem(addrWithCarry, REG);
     }
 
 All the complex code about `is1MHzAccess` is to synchronize the CPU clock with
 the slower, 1MHz peripheral bus. Also note the `cpu.readmem(addrNonCarry)`
-which is where a single read of the address before any carry in the 
+which is where a single read of the address before any carry in the
 `(addr + X)` calculation has been applied. This is what the real 6502 did!
 
 So far the emulation is _almost_ perfect. My own encryption system from days

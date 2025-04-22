@@ -30,7 +30,7 @@ right.  After a lot of debugging, we tracked it down to the some code similar to
                       const std::string &iValue)
     {
     	size_t valueLength = iValue.length();
-    	LONG res = RegSetValueEx(iKey, iKeyName, 0, REG_SZ, 
+    	LONG res = RegSetValueEx(iKey, iKeyName, 0, REG_SZ,
                        reinterpret_cast<const BYTE*>(iValue.c_str()),
                        valueLength);
     	return (res == ERROR_SUCCESS);
@@ -53,25 +53,25 @@ But the interesting part is that this is treated differently on Windows Vista th
 versions of Windows.  In the instance where we set an empty `""` string to the registry, the
 code succeeds on Windows XP, but fails on Vista with the error LOOK THIS UP.
 
-Obviously the code's wrong, but it's interesting to note that Vista considers an unterminated 
+Obviously the code's wrong, but it's interesting to note that Vista considers an unterminated
 empty string to be an error condition, whereas XP does not.  One to watch out for.
 
     // RegMonkey.cpp : Defines the entry point for the console application.
     //
-    
+
     #include "stdafx.h"
-    
+
     bool RegSetString(HKEY iKey, const char *iKeyName,
     				  const std::string &iValue)
     {
     	size_t valueLength = iValue.length();
-    	LONG res = RegSetValueExA(iKey, iKeyName, 0, REG_SZ, 
+    	LONG res = RegSetValueExA(iKey, iKeyName, 0, REG_SZ,
     		reinterpret_cast<const BYTE*>(iValue.c_str()),
     		valueLength);
     	return (res == ERROR_SUCCESS);
     }
-    
-    
+
+
     int _tmain(int argc, _TCHAR* argv[])
     {
     	HKEY key;
@@ -80,4 +80,3 @@ empty string to be an error condition, whereas XP does not.  One to watch out fo
     	RegCloseKey(key);
     	return 0;
     }
-    

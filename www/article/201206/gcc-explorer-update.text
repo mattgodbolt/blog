@@ -16,7 +16,7 @@ New features:
      website.
 
 <p class="picture">
-<img src="/201206/screenshot.png" width="400" height="118" 
+<img src="/201206/screenshot.png" width="400" height="118"
  alt="Line art picture of collision"/>
   <br/>Interactively explore how your code compiles to assembly
 </p>

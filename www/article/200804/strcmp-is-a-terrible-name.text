@@ -4,14 +4,14 @@ Date: 2008-04-14 12:45:00
 Label: Coding
 Summary: My thoughts on the ill-named strcmp function.
 
-One of those gotchas you find early in your C programming career is the 
+One of those gotchas you find early in your C programming career is the
 `strcmp` string comparison routine.  It takes two const char pointers to null-
-terminated strings and returns a integer: zero if the two strings match, -1 if 
+terminated strings and returns a integer: zero if the two strings match, -1 if
 the second is lexicographically less than the first, else 1.
 
-However, it's really easy to forget this and assume the routine compares _for 
-equality_, and that the return value is effectively a boolean.  I'm sure we've 
-all forgotten this at some point and ended up debugging a problem which turns 
+However, it's really easy to forget this and assume the routine compares _for
+equality_, and that the return value is effectively a boolean.  I'm sure we've
+all forgotten this at some point and ended up debugging a problem which turns
 out to be inverted logic in a string compare.
 
 Why can't `strcmp` return `true` for equality?  Well, its return value is a
@@ -24,8 +24,8 @@ A common idiom for using `strcmp` is this:
     if (!strcmp(name, "Bob"))
         printf("Hello Bob");
 
-What's with the logical not operator? Of course it's to turn the implied false 
-(from the zero if the strings are equal) into the true needed to compare for 
+What's with the logical not operator? Of course it's to turn the implied false
+(from the zero if the strings are equal) into the true needed to compare for
 equality (which is what the programmer actually wanted).  It's easy to forget
 the not operator.  Another common idiom is:
 
@@ -44,9 +44,9 @@ combines both:
 This kind of bug is hard to spot when reading through code.  You tend to see what you
 expect to see there, not what's actually there.
 
-I think it would have been much less error-prone if the function had been 
-named `strdiff`.  To me this better indicates that the function returns the 
-difference between two strings.  The example code reads a little more 
+I think it would have been much less error-prone if the function had been
+named `strdiff`.  To me this better indicates that the function returns the
+difference between two strings.  The example code reads a little more
 naturally:
 
     :::cpp

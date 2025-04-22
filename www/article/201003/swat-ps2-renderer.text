@@ -40,7 +40,7 @@ Combining the buffers
 
 The tricky bit then came as we needed to combine the textured scene with the light buffer by multiplying the two together. Unfortunately the PS2 doesn't have a multiplicative blending mode: the best it can do is multiply textures by a constant value and by either `alpha` or `(1-alpha)`. Even worse, its idea of "multiplying" two values together is actually `(x * y) >> 7` --- that is, the result is double the value you'd expect. (Multiplying two 8-bit values together gives a 16-bit answer, and usually you'd shift this back down 8 to get an 8-bit answer out). This "feature" allows you to brighten things by up to 2 times during lighting (for mock specular effects), but actually throws one bit of accuracy each multiply. Aargh!
 
-Thankfully the creative chaps at Sony had published a cunning way to get around these limitations[^pettheory]. 
+Thankfully the creative chaps at Sony had published a cunning way to get around these limitations[^pettheory].
 
 [^pettheory]: I have a theory that part of the success of the PlayStation consoles comes from their complexity to program and their insane limitations --- this gives a gradual increase in game quality as developers learn new tricks the quality improves, giving the console a long lifetime. Gamers see continual improvements in game quality. Compared to Xbox say, where there doesn't seem to be as big a difference between the quality of first-generation games compared to the later ones.
 

@@ -41,7 +41,7 @@ Nothing too surprising there, you might think.
 
 Let's see what happens on GCC:
 
-    error: ISO C++ says that these are ambiguous, even 
+    error: ISO C++ says that these are ambiguous, even
            though the worst conversion for the first is
            better than the worst conversion for the second:
     note: candidate 1: operator==(int, int) <built-in>
@@ -79,7 +79,7 @@ The second, less obvious way of comparing the two values is:
 ### Comparitively speaking
 
 Given these two choices, which is best?  This is covered in [13.3.3][overmatchbest]
---- one of the most complex bit of standardese I've ever looked at.  This determines whether 
+--- one of the most complex bit of standardese I've ever looked at.  This determines whether
 one function might be better than another when choosing between them for function overloading.
 Quoting the relevant bits of the standards document here:
 
@@ -88,7 +88,7 @@ Quoting the relevant bits of the standards document here:
 > "Let ICS_i_(F) denote the implicit conversion sequence that converts the _i_-th
   argument in the list to the type of the _i_-th parameter of [a function]..."
 
-> "Given these definitions, a [viable function][viable] F1 is defined to be a better function 
+> "Given these definitions, a [viable function][viable] F1 is defined to be a better function
   than another viable function F2 if for all arguments _i_, ICS_i_(F1) is not a [worse
   conversion sequence][overicsrank] than ICS_i_(F2), and then...[cut for brevity]"
 
@@ -124,10 +124,10 @@ So what does GCC's error message mean?  Looking at it again:
 
 The "worst conversion for the first" is the worst conversion for F1.  Both conversions needed to call
 F1 are considered to be of equal weighting: the `char`→`int` and `MyEnum`→`int` are both standard conversions.
- 
+
 The "worst conversion for the second" is the user-defined conversion `MyEnum`→`double`→`MyClass`.
 
-Comparing these two conversions is like saying "if I _had_ to pick one, which one is the least worst?" 
+Comparing these two conversions is like saying "if I _had_ to pick one, which one is the least worst?"
 The user-defined conversion of F2 is a worse conversion than F1's
 standard conversion.  This makes F1 seem a better choice --- its worst-case choice of parameter
 conversion is better than F2's worst-case.
@@ -141,7 +141,7 @@ I'm not quite sure why the ISO committee chose to leave this case ambiguous.  Ea
 versions of GCC don't seem to have been quite so pernickity: it would appear that this
 strict behaviour was only implemented in GCC 3.3 and above.
 
-Getting back to the original problem, in this case (and indeed in Rich's original case) 
+Getting back to the original problem, in this case (and indeed in Rich's original case)
 solving the problem is quite easy.  By making the `double` constructor in `MyClass` an `explicit`
 one, you prevent it from being used as during implicit conversion.  This leaves
 only one way to compare the `char` and `MyEnum`, which is using the built-in `operator==(int,int)`.

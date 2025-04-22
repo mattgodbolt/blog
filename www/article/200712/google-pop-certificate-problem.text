@@ -7,7 +7,7 @@ Status: Public
 Last night I noticed my hosted Google mail accounts filling up with messages.  Usually
 my email client at work drains all the new messages into its inbox, meaning my web account
 empties as quickly as messages come in.
-When I got into the office this morning I found it was [Thunderbird][] complaining of a certificate problem --- 
+When I got into the office this morning I found it was [Thunderbird][] complaining of a certificate problem ---
 Thunderbird was connecting to pop.googlemail.com but getting an expired certificate
 from cpop.corp.google.com.
 

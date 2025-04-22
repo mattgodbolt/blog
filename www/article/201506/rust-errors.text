@@ -21,7 +21,7 @@ The only thing remotely
 exception-like is the last-resort "panic" that prints a diagnostic message and
 exits the current thread.
 
-Functions that can fail should return a 
+Functions that can fail should return a
 [`Result<T, E>`](https://doc.rust-lang.org/std/result/index.html) which itself is an enum
 holding either a return value of type `T` (wrapped in `Ok`), or an error of
 type `E` (which is wrapped in `Err`). Callers
@@ -41,7 +41,7 @@ open a file one might do one of the following:
         // Error? Return from this function with the
         // error.
         Err(x) => return x,
-        // All ok? Get the file 
+        // All ok? Get the file
         Ok(f) => f
     };
 

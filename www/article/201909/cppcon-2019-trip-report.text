@@ -43,7 +43,7 @@ An excellent theoretical founding in how relationships between objects affect th
 * Herb Sutter -
  [De-fragmenting C++: Making Exceptions and RTTI More Affordable and Usable ("Simplifying C++" #6 of N)](https://www.youtube.com/watch?v=ARYP83yNAWk) - more on Herb's
  quest to make C++ better for all users, and to heal the rift with those unable to use RTTI or exceptions.
- 
+
 ### The best of the rest
 
 There were **so many** to choose from at each timeslot it was very hard
@@ -54,7 +54,7 @@ on what makes good code is spot on. We learned a number of good naming practices
 * [JF Bastien](https://twitter.com/jfbastien)'s "Let's Deprecate `volatile`" was a masterpiece. Simple, but elegant slides (with some neat little touches),
 an animated speaker who is passionate about the subject, and lots and lots of funny edge cases in C and C++. Fabulous.
 * [Hana Dusíková](https://twitter.com/hankadusikova)'s talk on her latest updates to her [compile-time regular expression library](https://github.com/hanickadot) was fabulous.
-Her interactive slides that show how the DFAs and NFAs are built really help get the point across, and of course she's just 
+Her interactive slides that show how the DFAs and NFAs are built really help get the point across, and of course she's just
 so knowledgeable about how to efficiently and effectively use compile-time programming.
 * Matt Kulukundis gave an expert presentation (with cameos from [Hyrum Wright](https://www.hyrumslaw.com)) on the latest
 in the abseil hash map implementation. The topic's 100% up my street, of course, but Matt is a great presenter (and advertiser of Mountain Dew).

@@ -5,7 +5,7 @@ Summary: A further look at BBC BASIC's in-memory format, specifically the line n
 Label: Coding
 
 As mentioned [yesterday][], BBC BASIC stores a binary representation of line numbers instead
-of the ASCII for statements like `GOTO` and `GOSUB`.  After talking with my mate 
+of the ASCII for statements like `GOTO` and `GOSUB`.  After talking with my mate
 Richard Talbot-Watkins I've learnt [the reason][rich] it's not stored in pure `HI/LO` binary form is so the
 interpreter can skip quickly along a line, looking for the `ELSE` token during `IF` statement
 parsing.
