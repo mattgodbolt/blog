@@ -41,3 +41,15 @@ repos:
         additional_dependencies: [types-pytz, types-markdown]
         args: [--ignore-missing-imports, --warn-unused-ignores, --warn-redundant-casts, --warn-unreachable]
         files: ^pygen/
+
+  # Run pytest to ensure all tests pass
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: make test
+        language: system
+        pass_filenames: false
+        always_run: true
+        # Can be skipped with SKIP=pytest
+        stages: [pre-commit]
