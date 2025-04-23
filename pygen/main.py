@@ -569,23 +569,6 @@ def GetArticleDict(globalData, article):
     }
 
 
-def GetTemplateDependencies(globalData: GlobalData, template: str, includePath: str) -> set[str]:
-    """Get template dependencies.
-
-    Args:
-        globalData: Global data object
-        template: Template filename
-        includePath: Path to include files
-
-    Returns:
-        Set of template file paths including dependencies
-    """
-    # Process template includes
-    ignored, dependencies = ETL.process_includes(template, includePath)
-    dependencies.add(template)
-    return dependencies
-
-
 def OutputArticleHtml(globalData, article):
     template = globalData.config["ArticleTemplate"]
     articleDirectory = globalData.config["ArticleDirectory"]
@@ -600,22 +583,9 @@ def OutputArticleHtml(globalData, article):
     output.close()
 
 
-def MyMax(objects, key):
-    """Replacement for max(obj, key) as python 2.4 doens't have it"""
-    if not objects:
-        raise ValueError("max() arg is empty")
-    maximum = objects[0]
-    maximumValue = key(maximum)
-    for value in objects[1:]:
-        thisValue = key(value)
-        if thisValue > maximumValue:
-            maximumValue = thisValue
-            maximum = value
-    return maximum
-
-
 def OutputArticles(globalData, articles, template, label, outputName):
-    latestUpdate = MyMax(articles, key=lambda a: a.Dates[-1]).Dates[-1]
+    # Find the article with the most recent update date
+    latestUpdate = max(articles, key=lambda a: a.Dates[-1]).Dates[-1]
     d = {
         "year": str(datetime.datetime.now().year),
         "label": label,
@@ -671,13 +641,14 @@ def Generate(forceGenerate: bool) -> None:
 
     Args:
         forceGenerate: Force regeneration of all files
+
+    Note:
+        The forceGenerate parameter is currently not used.
     """
     globalData = GlobalData()
     ReadGeneratorConfig("generator.conf", globalData)
 
     CheckConfig(globalData)
-    if forceGenerate:
-        globalData.config["ForceRefresh"] = True
 
     ScanArticleDirectory(globalData)
 
