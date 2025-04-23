@@ -3,8 +3,10 @@ import codecs
 import datetime
 import os
 import re
+from collections.abc import Callable
 from datetime import timedelta
 from datetime import timezone as dt_timezone
+from typing import Any, Optional
 from warnings import warn
 from xml.etree import ElementTree
 
@@ -27,62 +29,105 @@ class GlobalData:
     """A holding structure for global data.  Nicer than global variables."""
 
     def __init__(self):
-        self.config = {}
-        self.articles = {}
-        self.labels = set()
+        # The config dictionary stores both strings and other values like booleans
+        self.config: dict[str, Any] = {}
+        self.articles: dict[str, "Article"] = {}
+        self.labels: set["Label"] = set()
 
-    def GetValue(self, value, label):
+    def GetValue(self, value: str, label: Optional["Label"]) -> str:
+        """Get a configuration value, optionally with label-specific overrides.
+
+        Args:
+            value: Configuration key to look up
+            label: Optional label to use for label-specific overrides
+
+        Returns:
+            Configuration value or empty string if not found
+        """
         if label:
-            labelName = value + "." + label.name
+            labelName = f"{value}.{label.name}"
             if labelName in self.config:
-                return self.config[labelName]
-            wildcardName = value + ".*"
+                result = self.config[labelName]
+                return str(result) if result is not None else ""
+            wildcardName = f"{value}.*"
             if wildcardName in self.config:
-                return self.config[wildcardName].replace("*", label.filename)
+                result = self.config[wildcardName]
+                return str(result).replace("*", label.filename) if result is not None else ""
             return ""
         else:
-            return self.config.get(value, "")
+            result = self.config.get(value, "")
+            return str(result) if result is not None else ""
 
-    def GetInheritedValue(self, value, label):
+    def GetInheritedValue(self, value: str, label: Optional["Label"]) -> str:
+        """Get a required configuration value, optionally with label-specific overrides.
+
+        Args:
+            value: Configuration key to look up
+            label: Optional label to use for label-specific overrides
+
+        Returns:
+            Configuration value (throws exception if not found)
+        """
         if label:
-            labelName = value + "." + label.name
+            labelName = f"{value}.{label.name}"
             if labelName in self.config:
-                return self.config[labelName]
-            wildcardName = value + ".*"
+                result = self.config[labelName]
+                return str(result) if result is not None else ""
+            wildcardName = f"{value}.*"
             if wildcardName in self.config:
-                return self.config[wildcardName].replace("*", label.filename)
+                result = self.config[wildcardName]
+                return str(result).replace("*", label.filename) if result is not None else ""
 
-        return self.config[value]
+        result = self.config[value]
+        return str(result) if result is not None else ""
 
-    def GetInheritedInt(self, value, label):
+    def GetInheritedInt(self, value: str, label: Optional["Label"]) -> int:
+        """Get a required configuration value as integer, with optional label-specific overrides.
+
+        Args:
+            value: Configuration key to look up
+            label: Optional label to use for label-specific overrides
+
+        Returns:
+            Configuration value as integer
+        """
         return int(self.GetInheritedValue(value, label))
 
-    def GetPublicArticles(self, label):
-        def is_public_with_label(article):
+    def GetPublicArticles(self, label: Optional["Label"]) -> list["Article"]:
+        """Get public articles, optionally filtered by label.
+
+        Args:
+            label: Optional label to filter articles by
+
+        Returns:
+            List of public articles
+        """
+
+        def is_public_with_label(article: "Article") -> bool:
             return article.Status == "public" and label in article.Labels
 
-        def is_public(article):
+        def is_public(article: "Article") -> bool:
             return article.Status == "public"
 
         if label:
-            filter_func = is_public_with_label
+            filter_func: Callable[["Article"], bool] = is_public_with_label
         else:
             filter_func = is_public
         return list(filter(filter_func, list(self.articles.values())))
 
 
 class Article:
-    """An article"""
+    """An article with metadata and content."""
 
-    def __init__(self, globalData, name):
+    def __init__(self, globalData: GlobalData, name: str):
         self.BaseName = name.replace("\\", "/")
         self.ArticleModified = 0
         self.HtmlModified = 0
         self.Status = "public"
         self.Author = globalData.config["DefaultArticleAuthor"]
         self.LicenseURL = globalData.config["DefaultArticleLicenseURL"]
-        self.Dates = []
-        self.Labels = []
+        self.Dates: list[datetime.datetime] = []
+        self.Labels: list["Label"] = []
         self.Summary = ""
         self.Via = ""
         self.ArticleText = ""
@@ -92,10 +137,21 @@ class Article:
         self.RawTitle = ""
         self.Title = ""
         self.URLPrefix = globalData.config["ArticleURLPrefix"]
-        self.PrevArticle = None
-        self.NextArticle = None
+        self.PrevArticle: "Article" | None = None
+        self.NextArticle: "Article" | None = None
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
+        """Get attributes using case-insensitive names and computed properties.
+
+        Args:
+            name: Attribute name to retrieve
+
+        Returns:
+            Attribute value
+
+        Raises:
+            AttributeError: If attribute not found
+        """
         name = name.lower()
         if name == "title":
             return self.Title
@@ -128,30 +184,38 @@ class Article:
         elif name == "labels":
             return self.Labels
 
-        raise AttributeError("Unknown attribute " + name)
+        raise AttributeError(f"Unknown attribute {name}")
 
 
 class Label:
-    """Holds information about a label."""
+    """Holds information about a label (category)."""
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
         self.filename = name.replace(" ", "-")
 
-    def __lt__(self, other):
+    def __lt__(self, other: "Label") -> bool:
         return self.name < other.name
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Label):
+            return NotImplemented
         return self.name == other.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.name)
 
-    def __repr__(self):
-        return "Label(%s)" % self.name
+    def __repr__(self) -> str:
+        return f"Label({self.name})"
 
 
-def ReadGeneratorConfig(filename, globalData):
+def ReadGeneratorConfig(filename: str, globalData: GlobalData) -> None:
+    """Read configuration from a file into the GlobalData object.
+
+    Args:
+        filename: Path to configuration file
+        globalData: Global data object to store configuration in
+    """
     lineNumber = 0
 
     for line in open(filename):
@@ -171,26 +235,41 @@ def ReadGeneratorConfig(filename, globalData):
             warn(f"{filename}:{lineNumber} : Missing ':'", stacklevel=2)
 
 
-def CheckConfig(globalData):
-    def IsPresent(key):
+def CheckConfig(globalData: GlobalData) -> None:
+    """Validate configuration settings.
+
+    Args:
+        globalData: Global data object with configuration to validate
+
+    Raises:
+        Exception: If configuration is invalid
+    """
+
+    def IsPresent(key: str) -> None:
         if key not in globalData.config:
             raise Exception(f"Missing required configuration option '{key}'")
 
-    def IsDir(key):
+    def IsDir(key: str) -> None:
         IsPresent(key)
         if not os.path.isdir(globalData.config[key]):
             raise Exception(f"Missing directory '{globalData.config[key]}' for configuration option '{key}'")
 
-    def IsFile(key):
+    def IsFile(key: str) -> None:
         IsPresent(key)
         if not os.path.isfile(globalData.config[key]):
             raise Exception(f"Missing file '{globalData.config[key]}' for configuration option '{key}'")
 
-    def CreateDummy(key, value=""):
+    def CreateDummy(key: str, value: str = "") -> None:
+        """Create a config entry if it doesn't exist.
+
+        Args:
+            key: Configuration key to check/create
+            value: Default value to set if key doesn't exist
+        """
         if key not in globalData.config:
             globalData.config[key] = value
 
-    def IsNumber(key):
+    def IsNumber(key: str) -> None:
         IsPresent(key)
         try:
             value = int(globalData.config[key])
@@ -204,17 +283,29 @@ def CheckConfig(globalData):
     IsPresent("ArticleURLPrefix")
     IsFile("ArticleTemplate")
 
-    if not CreateDummy("FrontPageTemplate"):
+    # Check if FrontPageTemplate is already defined
+    has_frontpage = "FrontPageTemplate" in globalData.config
+    if not has_frontpage:
+        CreateDummy("FrontPageTemplate")
+    if has_frontpage:
         IsFile("FrontPageTemplate")
         IsPresent("FrontPageArticleCount")
         IsPresent("FrontPageOutput")
 
-    if not CreateDummy("AtomFeedTemplate"):
+    # Check if AtomFeedTemplate is already defined
+    has_atomfeed = "AtomFeedTemplate" in globalData.config
+    if not has_atomfeed:
+        CreateDummy("AtomFeedTemplate")
+    if has_atomfeed:
         IsFile("AtomFeedTemplate")
         IsPresent("AtomFeedArticleCount")
         IsPresent("AtomFeedOutput")
 
-    if not CreateDummy("ArchiveTemplate"):
+    # Check if ArchiveTemplate is already defined
+    has_archive = "ArchiveTemplate" in globalData.config
+    if not has_archive:
+        CreateDummy("ArchiveTemplate")
+    if has_archive:
         IsFile("ArchiveTemplate")
         IsPresent("ArchiveOutput")
 
@@ -478,13 +569,21 @@ def GetArticleDict(globalData, article):
     }
 
 
-def GetTemplateDependencies(globalData, template, includePath):
+def GetTemplateDependencies(globalData: GlobalData, template: str, includePath: str) -> set[str]:
+    """Get template dependencies.
+
+    Args:
+        globalData: Global data object
+        template: Template filename
+        includePath: Path to include files
+
+    Returns:
+        Set of template file paths including dependencies
+    """
     # Process template includes
-    ignored, fileList = ETL.process_includes(template, includePath)
-    fileList.add(template)
-    # Get modification times for all dependencies
-    fileList = [os.path.getmtime(file) for file in fileList]
-    return fileList
+    ignored, dependencies = ETL.process_includes(template, includePath)
+    dependencies.add(template)
+    return dependencies
 
 
 def OutputArticleHtml(globalData, article):
@@ -567,7 +666,12 @@ def GenerateArticleIndices(globalData, label):
         OutputArticles(globalData, articles, archiveTemplate, label, archiveOutput)
 
 
-def Generate(forceGenerate):
+def Generate(forceGenerate: bool) -> None:
+    """Generate the entire blog.
+
+    Args:
+        forceGenerate: Force regeneration of all files
+    """
     globalData = GlobalData()
     ReadGeneratorConfig("generator.conf", globalData)
 
