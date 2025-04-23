@@ -25,7 +25,7 @@ $(VENV): $(POETRY)
 	$(SYS_PYTHON) -m venv $(VENV)
 
 $(DEPS): pyproject.toml poetry.lock | $(VENV)
-	$(POETRY) install --sync
+	$(POETRY) sync
 	cp pyproject.toml $(DEPS)
 
 .PHONY: deps
