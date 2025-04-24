@@ -1,0 +1,56 @@
+AI coding: parallels with the Semiconductor Revolution
+Date: 2025-04-24 11:22:00 America/Chicago
+Status: Draft
+Summary: AI is not coming for your job, if you're a senior programmer. But raises questions for junior folk
+Label: Blog, Coding, AI
+
+I've been spending quite a bit of time with AI coding tools lately, particularly [Claude Code](https://docs.anthropic.com/claude/features/claude-code) from Anthropic. This has got me thinking about how AI is being perceived in the programming world - specifically the concerns many have about AI displacing entry-level programming jobs.
+
+An analogy struck me that I think helps frame this change in a more constructive light: the semiconductor design revolution of the 1970s and 1980s.
+
+## The Semiconductor Design Parallel
+
+Cast your mind back to the early days of semiconductor design. The 6502 processor that powered many early home computers (including my beloved Spectrum's arch-rival, the Commodore 64) was designed with just 3,500 transistors[^1]. Each gate was individually hand-designed, drawn, and carefully placed on acetate sheets - a painstaking, labor-intensive process.
+
+Fast forward a few years, and automated software began laying out the tracks and gates. Design shifted to libraries of standardized gate designs. Today's processors contain billions of transistors - a scale that would be utterly impossible to design with 1970s methods.
+
+But here's the key insight: this automation didn't eliminate semiconductor jobs. It transformed them, enabling engineers to create vastly more complex and powerful chips.
+
+## What This Means for Programming and AI
+
+The parallel with AI and programming seems clear. Tools like Claude Code aren't eliminating the need for programmers - they're changing what we can accomplish and how we work.
+
+When I collaborate with Claude Code, I find myself working with it much as I would with a junior programmer. I provide context, objectives, and guidance about project-specific norms that aren't explicitly documented. The AI doesn't have the broader understanding that comes from experience, but it can handle implementation details effectively.
+
+This collaboration has actually forced me to better document my preferred approaches and project-specific conventions - something that benefits both AI assistants and human collaborators alike.
+
+## The Creativity Question
+
+One potential limitation of the semiconductor analogy is that AI addresses both scale and creativity aspects of programming, while CAD tools for circuit design primarily tackled complexity scaling.
+
+I've had moments where Claude has surprised me with creative suggestions. During a recent presentation on a [Sinclair Spectrum emulator](https://github.com/mattgodbolt/jsbeeb)[^2], I asked Claude Code to add tests to the project. Instead, it suggested adding some "cool features" for the presentation - showing a contextual understanding that tests might not be the priority for a demo.
+
+Is this true creativity or pattern-matching from similar scenarios it's observed? The line is blurry, but it suggests AI tools might eventually contribute to the creative aspects of programming in ways CAD tools never did for circuit design.
+
+## The Junior Developer Dilemma
+
+There's a legitimate concern here: if experienced developers like me can leverage multiple AI assistants to handle work traditionally done by juniors, how do newcomers gain the experience needed to eventually become senior programmers?
+
+This is the paradox we need to solve. The "apprenticeship model" of programming might become more important, not less. Junior programmers might work directly with seniors to learn how to effectively direct AI tools while absorbing the higher-level thinking that experienced developers bring.
+
+Education will need to evolve, teaching both fundamentals and AI collaboration skills. We might see new types of entry-level positions focused on AI supervision, prompt engineering, and quality control.
+
+## Looking Forward
+
+The semiconductor design evolution didn't eliminate jobs - it enabled creations of previously impossible complexity. Similarly, AI tools like Claude Code won't replace programmers but will redefine what we can accomplish.
+
+Rather than viewing AI as a replacement for entry-level jobs, we should see it as establishing a new layer of abstraction in software development - where human developers increasingly focus on problem definition, architectural decisions, and creative direction, while delegating more implementation details to AI assistants.
+
+Companies have a vested interest in continuing to hire and develop junior talent, even if AI can handle some traditional entry-level tasks. Without this pipeline, who will guide the AIs in the future when us old-timers retire?
+
+What are your thoughts? Do you see AI as complementary to human programming, or are there aspects of this transition that worry you?
+
+---
+
+[^1]: The MOS Technology 6502 was released in 1975 with approximately 3,500 transistors. Modern processors like Apple's M2 Ultra contain over 134 billion transistors - a 38-million-fold increase.
+[^2]: While I'm known for [Compiler Explorer](https://godbolt.org/), I've also worked on emulators like jsbeeb, which emulates the BBC Micro, another classic 8-bit computer from my youth. The Spectrum emulator mentioned here was a similar project used in recent presentations.
