@@ -1,38 +1,52 @@
 AI coding: parallels with the Semiconductor Revolution
-Date: 2025-04-24 11:22:00 America/Chicago
-Status: Draft
+Date: 2025-04-24 11:43:00 America/Chicago
+Status: Public
 Summary: AI is not coming for your job, if you're a senior programmer. But raises questions for junior folk
 Label: Blog, Coding, AI
 
-I've been spending quite a bit of time with AI coding tools lately, particularly [Claude Code](https://docs.anthropic.com/claude/features/claude-code) from Anthropic. This has got me thinking about how AI is being perceived in the programming world - specifically the concerns many have about AI displacing entry-level programming jobs.
+### Use of AI Disclaimer
+
+This article was inspired after a long conversation with Claude during a dog walk. These are my ideas; but I did use AI to bounce
+ideas back and forth and help summarise a half-hour chat into a digestible form. I figured I should be up front about that,
+like I was in [my last post](/202504/blog-modernisation).
+
+---
+
+I've been spending quite a bit of time with AI coding tools lately, particularly [Claude Code](https://docs.anthropic.com/claude/features/claude-code) from Anthropic. This has got me thinking about how AI is being perceived in the programming world -- specifically the concerns many have about AI displacing entry-level programming jobs.
 
 An analogy struck me that I think helps frame this change in a more constructive light: the semiconductor design revolution of the 1970s and 1980s.
 
-## The Semiconductor Design Parallel
+### The Semiconductor Design Parallel
 
-Cast your mind back to the early days of semiconductor design. The 6502 processor that powered many early home computers (including my beloved Spectrum's arch-rival, the Commodore 64) was designed with just 3,500 transistors[^1]. Each gate was individually hand-designed, drawn, and carefully placed on acetate sheets - a painstaking, labor-intensive process.
+Cast your mind back to the early days of semiconductor design. The 6502 processor that powered many early home computers (including my beloved BBC Micro's arch-rival, the Commodore 64) was designed with just 3,500 transistors[^1]. Each gate was individually hand-designed, drawn, and carefully placed on acetate sheets - a painstaking, labor-intensive process[^4].
 
-Fast forward a few years, and automated software began laying out the tracks and gates. Design shifted to libraries of standardized gate designs. Today's processors contain billions of transistors - a scale that would be utterly impossible to design with 1970s methods.
+<p class="picture">
+<a href="6502-die.jpeg">
+<img src="6502-die.jpeg" width="300" height="225" alt="A die shot of the 6502 CPU"/></a>
+ <br/>The 6502, in all its glory, laid out and drawn by hand. Thanks to <a href="http://www.visual6502.org/">Visual 6502</a>.
+</p>
+
+Fast forward a few years, and automated software began laying out the tracks and gates. Design shifted to libraries of standardised gate designs. Today's processors contain billions of transistors - a scale that would be utterly impossible to design with 1970s methods.
 
 But here's the key insight: this automation didn't eliminate semiconductor jobs. It transformed them, enabling engineers to create vastly more complex and powerful chips.
 
-## What This Means for Programming and AI
+### What This Means for Programming and AI
 
 The parallel with AI and programming seems clear. Tools like Claude Code aren't eliminating the need for programmers - they're changing what we can accomplish and how we work.
 
 When I collaborate with Claude Code, I find myself working with it much as I would with a junior programmer. I provide context, objectives, and guidance about project-specific norms that aren't explicitly documented. The AI doesn't have the broader understanding that comes from experience, but it can handle implementation details effectively.
 
-This collaboration has actually forced me to better document my preferred approaches and project-specific conventions - something that benefits both AI assistants and human collaborators alike.
+This collaboration has actually forced me to better document my preferred approaches and project-specific conventions - something that benefits both AI assistants and human collaborators alike. This observation was made by Daisy Hollman in her [ACCU keynote](https://accuconference.org/2025/session/learning-to-stop-writing-code-and-why-you-wont-miss-it), and I've found it to be true so far.
 
-## The Creativity Question
+### The Creativity Question
 
 One potential limitation of the semiconductor analogy is that AI addresses both scale and creativity aspects of programming, while CAD tools for circuit design primarily tackled complexity scaling.
 
-I've had moments where Claude has surprised me with creative suggestions. During a recent presentation on a [Sinclair Spectrum emulator](https://github.com/mattgodbolt/jsbeeb)[^2], I asked Claude Code to add tests to the project. Instead, it suggested adding some "cool features" for the presentation - showing a contextual understanding that tests might not be the priority for a demo.
+I've had moments where Claude has surprised me with creative suggestions: During a [recent presentation](https://accuconference.org/2025/session/teaching-an-old-dog-new-tricks-a-tale-of-two-emulators)[^5] which involved a [ZX Spectrum emulator](https://github.com/mattgodbolt/specbolt)[^2], I asked Claude Code to add "an impressive feature"  to the project (I suggested it add tests). Instead, it suggested adding some "cool features" for the presentation (3D support, an AI gaming assistant, a memory access visualiser[^3]) - showing a contextual understanding that tests might not be the priority for a demo. Even the AIs don't really want to write tests it seems!
 
 Is this true creativity or pattern-matching from similar scenarios it's observed? The line is blurry, but it suggests AI tools might eventually contribute to the creative aspects of programming in ways CAD tools never did for circuit design.
 
-## The Junior Developer Dilemma
+### The Junior Developer Dilemma
 
 There's a legitimate concern here: if experienced developers like me can leverage multiple AI assistants to handle work traditionally done by juniors, how do newcomers gain the experience needed to eventually become senior programmers?
 
@@ -40,7 +54,9 @@ This is the paradox we need to solve. The "apprenticeship model" of programming 
 
 Education will need to evolve, teaching both fundamentals and AI collaboration skills. We might see new types of entry-level positions focused on AI supervision, prompt engineering, and quality control.
 
-## Looking Forward
+### Looking Forward
+
+Concerns remain about the ethics of AIs: the data they're trained on, the carbon footprint they consume. These are real considerations: I'm becoming a bit of an Anthropic fan on this front as their approach seems mindful of these considerations.
 
 The semiconductor design evolution didn't eliminate jobs - it enabled creations of previously impossible complexity. Similarly, AI tools like Claude Code won't replace programmers but will redefine what we can accomplish.
 
@@ -48,9 +64,10 @@ Rather than viewing AI as a replacement for entry-level jobs, we should see it a
 
 Companies have a vested interest in continuing to hire and develop junior talent, even if AI can handle some traditional entry-level tasks. Without this pipeline, who will guide the AIs in the future when us old-timers retire?
 
-What are your thoughts? Do you see AI as complementary to human programming, or are there aspects of this transition that worry you?
-
----
+What are your thoughts? Do you see AI as complementary to human programming, or are there aspects of this transition that worry you? Ping me on [bsky.app](https://bsky.app/profile/matt.godbolt.org) or [Mastodon](https://hachyderm.io/@mattgodbolt).
 
 [^1]: The MOS Technology 6502 was released in 1975 with approximately 3,500 transistors. Modern processors like Apple's M2 Ultra contain over 134 billion transistors - a 38-million-fold increase.
-[^2]: While I'm known for [Compiler Explorer](https://godbolt.org/), I've also worked on emulators like jsbeeb, which emulates the BBC Micro, another classic 8-bit computer from my youth. The Spectrum emulator mentioned here was a similar project used in recent presentations.
+[^2]: While I'm known for [Compiler Explorer](https://godbolt.org/), I've also worked on emulators like [jsbeeb](https://bbc.xania.org), which emulates the BBC Micro, another classic 8-bit computer from my youth. The Spectrum emulator mentioned here was a similar project, this time written in C++, and used in my ACCU presentation.
+[^3]: Ultimately I went with the memory access visualiser, and it worked a treat...I was very impressed.
+[^4]: I highly recommend Chuck Peddle's [oral history](https://archive.computerhistory.org/resources/access/text/2014/08/102739939-05-01-acc.pdf) where he talks about it. There's a [four hour](https://www.youtube.com/watch?v=enHF9lMseP8) video of it too. What a character. RIP, Chuck.
+[^5]: Yes, my talk was the day after Daisy's, and the changes I made to the emulator were done by Claude that evening, in my hotel room, and I presented the updated project and slides the next day!
