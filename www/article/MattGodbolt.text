@@ -2,59 +2,58 @@ About me - Matt Godbolt
 Status: draft
 Date: 2006-05-01 08:25:00
 
-Hi there, I'm Matt Godbolt --- pleased to meet you.  Please, come in, sit down, make yourself at home.
+Hi there, I'm Matt Godbolt --- pleased to meet you. Please, come in, sit down, make yourself at home.
 
 <p class="picture"><img width="512" height="512" alt="[Piccie of me]" src="/media/MattGodbolt2019.jpg" /></p>
 
-Let me tell you a bit about myself.  I was born on August 16<sup>th</sup> 1976 to
+Let me tell you a bit about myself. I was born on August 16th 1976 to
 Richard and Christine Godbolt.
+
 My first computer came at age 8, a [48k Sinclair Spectrum][speccie],
-you know the ones with rubber keys.  I was captivated, and remember fondly one Christmas getting
+you know the ones with rubber keys. I was captivated, and remember fondly one Christmas getting
 my poor long-suffering mother to read out long program listings while I typed them in, hours of work
-and then a fairly pitiful result like a Union Jack flag being drawn on the screen.  She couldn't understand
+and then a fairly pitiful result like a Union Jack flag being drawn on the screen. She couldn't understand
 what I saw in it all --- but for me it was just the beginning!
-[speccie]: http://en.wikipedia.org/wiki/ZX_Spectrum "The Sinclair ZX Spectrum"
 
 <img width="162" height="130" class="pic-left" alt="Onslaught!" src="http://www.stairwaytohell.com/lostandfound/Onslaught-scr.jpg" />
 
 During my school years I met like-minded [Richard Talbot-Watkins](https://twitter.com/richtw1), and we started making little programs
-for our computers.  By now I'd upgraded to a BBC Master computer (via a [Spectrum +3][plus3]), and Rich
+for our computers. By now I'd upgraded to a BBC Master computer (via a [Spectrum +3][plus3]), and Rich
 and I had a fairly lucrative (for 15 year olds!) side-job doing little snippets of code for UK magazine
-[Acorn User][au].  We even wrote a few games (you'll need a good BBC emulator for this) --- [Frogman][frogman],
+[Acorn User][au]. We even wrote a few games (you'll need a good BBC emulator for this) --- [Frogman][frogman],
 and were in negotiations for a 4-part series in Acorn User on our game [Onslaught][onslaught] when sadly
 the publication ceased covering the BBC computer.
 
 [plus3]: http://en.wikipedia.org/wiki/ZX_Spectrum#ZX_Spectrum_.2B3_.281987.29 "The Spectrum +3"
 [frogman]: http://www.stairwaytohell.com/bbc/archive/diskimages/Unreleased/Frogman-demo.zip "ZIP archive of unreleased BBC game Frogman"
-[onslaught]: http://bbc.xania.org/?disc=%7CUnreleased%2FOnslaught-demo.zip&autoboot  "ZIP archive of unreleased BBC type-in game Onslaught"
+[onslaught]: http://bbc.xania.org/?disc=%7CUnreleased%2FOnslaught-demo.zip&autoboot "ZIP archive of unreleased BBC type-in game Onslaught"
 [au]: https://en.wikipedia.org/wiki/Acorn_User "Acorn User magazine"
+[speccie]: http://en.wikipedia.org/wiki/ZX_Spectrum "The Sinclair ZX Spectrum"
 
-At school I was always into science, in particular physics.  During secondary school I used to write
-little applications to demonstrate things like fluids and gases, and gravitational attraction.  By now
+At school I was always into science, in particular physics. During secondary school I used to write
+little applications to demonstrate things like fluids and gases, and gravitational attraction. By now
 I'd moved to the Acorn Archimedes computer, a 32-bit beast of a machine for the time, so I sadly completely
-missed out on all the 16-bit fun most of my associates have had.  When it came to deciding on what to do
-after school, I plumped for a Physics degree at [Exeter University][exeter].  There I met the Internet!
-
-[exeter]: http://www.ex.ac.uk/ "Exeter University Website"
+missed out on all the 16-bit fun most of my associates have had. When it came to deciding on what to do
+after school, I plumped for a Physics degree at [Exeter University][exeter]. There I met the Internet!
 
 <img width="176" height="120" class="pic-right" alt="Blurp!" src="/media/blurp-thumb.gif" />
 
-The internet took up a lot of my time at Uni, but so did programming.  I continued developing software
+The internet took up a lot of my time at Uni, but so did programming. I continued developing software
 for my Acorn, creating or co-creating [IRC clients][IRClient], [Sega Master System emulators][miracle]
-and even some [games][blurp].  The revenue from the shareware, particularly my IRC client !IRClient
+and even some [games][blurp]. The revenue from the shareware, particularly my IRC client !IRClient
 kept me in beer for the duration of Uni --- a big thanks to all those who actually paid up!
 
+In addition I helped set up a (sadly now defunct) Multi-User Dungeon, [Xania][Xania] --- which explains the
+domain name you're visiting now --- xania.org. That spawned my love of online games --- later in life
+I would become rather addicted to them!
+
+[exeter]: http://www.ex.ac.uk/ "Exeter University Website"
 [IRClient]: http://web.archive.org/web/20030618153052/http://www.willothewisp.demon.co.uk/IRClient/ "IRClient --- an IRC client for Risc OS computers"
 [miracle]: http://web.archive.org/web/20030605151933/http://www.willothewisp.demon.co.uk/SMS/ "!Miracle, a Sega Master System emulator for Risc OS computers"
 [blurp]: http://web.archive.org/web/20030409083034/http://www.willothewisp.demon.co.uk/blurp.html "Blurp! An unreleased Risc OS game"
-
-In addition I helped set up a (sadly now defunct) Multi-User Dungeon, [Xania][Xania] --- which explains the
-domain name you're visiting now --- xania.org.  That spawned my love of online games --- later in life
-I would become rather addicted to them!
-
 [Xania]: http://web.archive.org/web/20001206205500/http://www.xania.org/ "Xania Multi User Dungeon"
 
-Out of Uni I started work at Argonaut Games.  There I worked on  several titles:
+Out of Uni I started work at Argonaut Games. There I worked on several titles:
 
 * [Croc -- Legend of the Gobbos][Croc] --- where I worked on the PC port of this PSX classic.
 * [Red Dog -- Superior Firepower][RedDog] --- I was responsible for making the tool chain and programming the graphics engine.
@@ -69,21 +68,16 @@ Out of Uni I started work at Argonaut Games.  There I worked on  several titles:
 [RedDog]: http://www.gamerankings.com/htmlpages2/198441.asp "Red Dog reviews"
 [SWAT]: http://www.gamerankings.com/htmlpages2/537529.asp "Review of SWAT:GST"
 [rocksteady]: http://www.rocksteadyltd.com/ "RockSteady Studios"
-[uc]: http://en.wikipedia.org/wiki/Urban_Chaos:_Riot_Response
+[uc]: http://en.wikipedia.org/wiki/Urban_Chaos:_Riot_Response "Urban Chaos: Riot Response"
 
-Sadly, all good things come to an end, and Argonaut folded at the end of 2004.
-Many things have been said about its sad demise, and I shan't add anything new to
-the debate, preferring instead to let it pass, and move on...which I did by setting
-up my own company.  Me and an ex-colleague Nik Hemmings have had some cunning
-ideas on the back burner for some time, and Argonaut's downfall was the kick up the
-bottom we both needed to actually take our pub idea into reality.
+Sadly, all good things come to an end, and Argonaut folded at the end of 2004. Many things have been said about its sad demise, and I shan't add anything new to the debate, preferring instead to let it pass, and move on…which I did by setting up my own company. Me and an ex-colleague Nik Hemmings have had some cunning ideas on the back burner for some time, and Argonaut's downfall was the kick up the bottom we both needed to actually take our pub idea into reality.
 
 We started our own company, [ProFactor Software][pf] --- developing
-unique services products for C and C++ programmers.  We developed a source code reformatting
+unique services products for C and C++ programmers. We developed a source code reformatting
 package, [StyleManager][sm], a #include graph generator, [IncludeManager][inky], and ProFactor
-continues to work on loads of other interesting things.  While working there,
+continues to work on loads of other interesting things. While working there,
 I also worked on some games stuff; first at PKR (a now defunct online poker
-compnay), and some contract work for Rockstar Games (Manhunt 2 and some work
+company), and some contract work for Rockstar Games (Manhunt 2 and some work
 on the PSP port of Midnight Club).
 
 [pf]: http://www.profactor.co.uk/ "ProFactor Software"
@@ -91,47 +85,58 @@ on the PSP port of Midnight Club).
 [inky]: http://www.profactor.co.uk/includemanager.php "IncludeManager - a C and C++ #include file grapher"
 [pfnews]: http://www.profactor.co.uk/news.php "ProFactor News"
 
-In 2008 I was offered a chance to work for [Google][] --- two very good friends of mine, [Malcolm Rowe][malc]
-and [Phil Norman][phil] were already working there and had been badgering me to apply.  Eventually my
-name was put forward, and one thing lead to another, and before I knew it I was offered a job in their mobile department.
+In 2008 I was offered a chance to work for [Google][google] --- two very good friends of mine, [Malcolm Rowe][malc]
+and [Phil Norman][phil] were already working there and had been badgering me to apply. Eventually my
+name was put forward, and one thing led to another, and before I knew it I was offered a job in their mobile department.
+
+Google is somewhere I've always wanted to work, and after an awful lot of consideration, I decided to leave ProFactor and try my luck there. ProFactor continued without me, and it ran for many successful years under Nik's capable hands.
+
+At Google I got to play with mobile phones, working on the YouTube mobile app on S60 phones (remember them?), Windows Mobile, and latterly Android. Towards the end of my time at Google I also briefly worked on the mobile app that eventually became Google+.
 
 [google]: http://www.google.co.uk "like this needs a link"
-[malc]: http://www.farside.org.uk/
-[phil]: http://splodge.fluff.org/~phil/
+[malc]: http://www.farside.org.uk/ "Malcolm Rowe's website"
+[phil]: http://splodge.fluff.org/~phil/ "Phil Norman's website"
 
-Google is somewhere I've always wanted to work, and after an awful lot of consideration, I decided to leave ProFactor and try
-my luck there.  ProFactor continues without me, and I wish it every success in the future in Nik's very capable hands.
-
-At Google I got to play with mobile phones, working on the YouTube mobile app
-on S60 phones (remember them?), Windows Mobile, and latterly Android.
-Towards the end of my time at Google I also briefly worked on the mobile app
-that eventually became Google+.
-
-All good things come to an end, however. After two happy years at Google I moved on to try my hand at something quite different:
-I went to work for a trading company, DRW, and worked there for over 7 years
-on fun and exciting (but somewhat secret) projects. DRW
-offered my family and me a fantastic opportunity to move to the United States,
-and we are now very happily based just outside of Chicago, Illinois.
+After two happy years at Google I moved on to try my hand at something quite different: I went to work for a trading company, DRW, and worked there for over 7 years on fun and exciting (but somewhat secret) projects. DRW offered my family and me a fantastic opportunity to move to the United States, and we are now very happily based just outside of Chicago, Illinois.
 
 In April 2018 I left DRW to pursue a new opportunity, still in Chicago. I spent a year at
-Coinbase, then five happy years at quantative hedge fund, [Aquatic](https://aquatic.com).
-I'm currently on a break between jobs, working on [Compiler Explorer][gccex] and spending time
-with my family.
+Coinbase, then five happy years at quantative hedge fund, [Aquatic][aquatic].
+I left Aquatic in November 2024 and I'm currently enjoying a break, working on [Compiler Explorer][gccex], spending time with my family, learning new things (like AI), and preparing for conference talks. I'll be starting a new role later in 2025.
+
+[aquatic]: https://aquatic.com "Aquatic hedge fund"
 
 You can learn more about my working life at [my LinkedIn profile][linkedin].
 
 [linkedin]: http://www.linkedin.com/in/godbolt "Matt Godbolt's LinkedIn Profile"
 
 In 2012 I released my first major open source tool - [Compiler Explorer][gccex]
-which has been a runaway success.  Go check it out if you're ever intrigued
+which has been a runaway success. Go check it out if you're ever intrigued
 how your C++, Go, D, Rust, or other compiled language code ends up looking after compilation.
+The site has grown significantly over the years and now has numerous commercial sponsors,
+regularly running dozens of AWS instances to handle the load. We're processing around a million
+C++ compilations each week! You can see our stats at [stats.compiler-explorer.com][stats].
+While I still use the site myself for its original purpose --- investigating compiler optimisations --- I'm
+thrilled at how others use it: for teaching, filing compiler bugs, as a "pastebin" for code, or
+exploring the latest compilers without having to install them. I'm always looking to make
+Compiler Explorer easier for others to contribute to, as the code has gotten quite crufty
+after 14 years of contributions. Help is always wanted!
 
 Another spare-time-sink is my passion for resurrecting old computers and
-writing emulators for them -- now in Javascript.  Building on the Miracle
+writing emulators for them – now in Javascript and C++. Building on the Miracle
 emulator that Rich and I wrote many years before, I made a Javascript
-[Sega Master System emulator][smse].  Next up I wrote [jsbeeb][jsb], which is an
-almost-perfect BBC Micro emulator.  Both run directly in your browser -- give
-it a go!
+[Sega Master System emulator][smse]. Next up I wrote [jsbeeb][jsb], which is an
+almost-perfect BBC Micro emulator. Most recently, for an ACCU talk, I created a C++ ZX Spectrum Emulator:
+"specbolt" ([GitHub][specbolt]), which was my first foray into compiling for WebAssembly.
+You can see it in action at [spectrum.xania.org][spectrum].
+
+I've also helped with "owlet", a BBC Basic editor/IDE that's mostly Dominic Pajak's work and idea.
+My experience with Compiler Explorer's editor came in handy for integrating jsbeeb.
+You can check it out at [bbcmic.ro][owlet].
+
+[specbolt]: https://github.com/mattgodbolt/specbolt/ "Specbolt - A C++ ZX Spectrum Emulator"
+[spectrum]: https://spectrum.xania.org/ "Spectrum.xania.org - play ZX Spectrum games in your browser"
+[owlet]: https://bbcmic.ro/ "BBC Micro web IDE"
+[stats]: https://stats.compiler-explorer.com/ "Compiler Explorer statistics"
 
 Some of my other open source projects include:
 
@@ -139,30 +144,31 @@ Some of my other open source projects include:
 * Resurrecting [Xania MUD][xmud2] using modern C++.
 * A way of indexing and searching large gzipped archives, [zindex][zindex].
 
-[gccex]: https://godbolt.org/ "Compiler Explorer. A fine way to waste some time tinkering with C++, Go, D Rust, or other compiled code"
+[gccex]: https://godbolt.org/ "Compiler Explorer. A fine way to waste some time tinkering with C++, Go, D, Rust, or other compiled code"
 [smse]: https://miracle.xania.org/ "A SMS emulator, but in your browser"
 [jsb]: https://bbc.xania.org/ "A Javascript BBC Micro emulator"
 [seasocks]: https://github.com/mattgodbolt/seasocks "Seasocks, an embeddable C++ websocket server"
 [xmud2]: https://github.com/mattgodbolt/xania "Xania, a multi-user dungeon"
 [zindex]: https://github.com/mattgodbolt/zindex "Index and search your gzipped files"
 
-In late 2020, I started a programming podcast with my friend [Ben Rady](https://benrady.com) called [Two's Complement](https://www.twoscomplement.org).
+In late 2020, I started a programming podcast with my friend [Ben Rady][ben] called [Two's Complement][twos].
+We're still going strong, releasing an episode every month covering everything from AI to testing and mentoring,
+all from the perspective of two later-career developers.
+
+[ben]: https://benrady.com "Ben Rady's website"
+[twos]: https://www.twoscomplement.org "Two's Complement - A programming podcast"
 
 <img width="200" height="187" class="pic-right" alt="My lovely wife, Ness Godbolt" src="/media/NessGodbolt.jpg" />
 
-On the 21st of October 2005 I married my long-term girlfriend, Vanessa.  Through all the trials and tribulations
-of starting a business, she has been 100% behind me.  Ness and I met through a mutual friend a few years back,
-and we got together shortly afterwards.  In September 2004 I asked her to marry me while we were on holiday in
-Cyprus, and the rest as they say is history!
+On the 21st of October 2005 I married my long-term girlfriend, Vanessa. Through all the trials and tribulations of starting a business, she has been 100% behind me. Ness and I met through a mutual friend a few years back, and we got together shortly afterwards. In September 2004 I asked her to marry me while we were on holiday in Cyprus, and the rest as they say is history!
 
 On the 12th of June 2008, we had a son --- [William Anthony Richard Godbolt][warg], and on the 19th
-of April 2010 we had our second --- [Isaac Benjamin Godbolt][ibg].  It's an amazing experience
-becoming and being a father, and one I'm enjoying immensely.  The boys are
-growing up fast and I'm so proud of them both.
+of April 2010 we had our second --- [Isaac Benjamin Godbolt][ibg]. It's an amazing experience
+becoming and being a father, and one I'm enjoying immensely. The boys are now teenagers in high school,
+growing up fast, and I'm incredibly proud of them both. William plays flute and drums while Isaac plays cello,
+and we're just starting to think about university for William.
 
-[warg]: /200806/godbolt-v2
-[ibg]: /201004/another-godbolt
+[warg]: /200806/godbolt-v2 "William Godbolt's birth announcement"
+[ibg]: /201004/another-godbolt "Isaac Godbolt's birth announcement"
 
-So that's me --- I'll try and keep this up-to-date with news and
-more embellishments --- there's so much I've missed out, but then there's so much you won't care about!  Who reads
-these things anyway?
+So that's me --- I'll try and keep this up-to-date with news and more embellishments --- there's so much I've missed out, but then there's so much you won't care about! Who reads these things anyway?
