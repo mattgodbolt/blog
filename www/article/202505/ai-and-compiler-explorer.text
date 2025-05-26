@@ -1,0 +1,69 @@
+On AI, Assembly, and the Art of Project Stewardship
+Date: 2025-05-25 20:43:00 America/Chicago
+Status: Draft
+Summary: Building AI tools while navigating community conscience
+Label: Blog, Coding, AI
+
+Recently, I've been having what can only be described as a very meta relationship with AI[^1]. I'm using [Claude Code](https://www.anthropic.com/claude-code) to help maintain [Compiler Explorer](https://godbolt.org), and in a delightful twist of recursive irony, one of the features I'm working on with Claude Code is... a Claude-powered assembly explanation tool. So Claude is helping me build Claude systems that use Claude to improve Claude prompts for Claude explanations. If that made your head spin, or made you worry, you're not alone.
+
+[^1]: By AI in this post, I'm referring specifically to Large Language Models (LLMs) like Claude, which are one type of AI system. While I'm using the colloquial term "AI" throughout, I'm specifically discussing LLM-based tools.
+
+## The Experimental Feature That Started It All
+
+The idea was simple enough: many people can compile their code and see the resulting assembly, but understanding what that assembly actually *does* is often where the learning journey stalls. So I've been experimenting with an "Explain with Claude" pane that would take your source code, the compiled assembly, and compilation options, then ask Claude to provide a beginner-friendly explanation of what's happening.
+
+The implementation turned out to be beautifully recursive -- I built a [backend service](https://github.com/compiler-explorer/explain) (mostly written with Claude Code's help) that crafts sophisticated prompts for a more capable Claude model, which then generates explanations delivered through a simpler, more cost-effective Claude model. It's Claude all the way down.
+
+## When Screenshots Meet Reality
+
+I shared [some screenshots](https://bsky.app/profile/matt.godbolt.org/post/3lpugqpsadk23) on social media, and the response was mostly positive. People thought it was a reasonable idea, with the expected and sensible caveat that AI explanations might be wrong and should be taken with appropriate skepticism. Fair enough -- I was already planning robust disclaimers about the experimental nature of AI-generated content.
+
+Then I made a beta version available briefly on our [beta site](https://godbolt.org/beta) and shared it with our [Discord community](https://discord.gg/B5WacA7).
+
+The reaction was educational: While many people found it useful, others had visceral negative responses that caught me off guard. Not just "this might be inaccurate" concerns, but fundamental objections to AI integration at all. Some of the feedback felt like folks felt as if something precious was being lost.
+
+## The Philosophy of Fallibility
+
+This led me down a rabbit hole of thinking about human versus artificial intelligence (the concept itself, not the "AI" term). The criticisms seemed to cluster around a few themes: AI hallucinates, AI can't really think, and AI is somehow fundamentally different from human reasoning.
+
+The way I think about it is: If a human assembly expert explained the same code, they'd also have a decent chance of making mistakes. I know I certainly do, especially early in the morning before coffee when I'm arguably just a biological token prediction machine myself.
+
+The "AI lies" critique particularly puzzles me. Yes, AI can produce incorrect information, but calling it "lying" implies intentionality. It doesn't seem right to simultaneously argue that AI can't think *and* that it deliberately deceives.
+
+## Sacred Code and Carbon Concerns
+
+The deeper objections seem to touch on something more fundamental -- a belief that certain cognitive processes are uniquely, sacredly human. I should note this is totally my interpretation and nobody brought this up directly. I understand this sentiment, even if I don't share it. I see humans and AI as different types of reasoning systems, each with their own strengths and failure modes.
+
+Then there are the practical concerns about training data ethics and power consumption. These are serious issues. I can't solve the training data question beyond choosing what I believe to be an [ethical AI provider](https://www.anthropic.com/transparency). On power consumption, I'm exploring carbon offset programs to address Compiler Explorer's environmental impact. That doesn't address power scarcity, I know. It's not perfect, but it's something.
+
+## Finding Common Ground
+
+What's been encouraging, though, is watching genuine dialogue happen. One person who was initially quite skeptical spent considerable time testing the experimental feature, determined to find significant errors. After extensive testing, they managed to stump Claude with some code snippets that, by the person's own admission were a little unfair.
+
+More importantly, through patient conversation and letting the feature speak for itself, I watched that person's stance shift from negative to cautiously neutral. It reminded me that behind strong reactions are often people who care deeply about the same things I do -- code quality, learning, and community.
+
+## The Benevolent Dictator's Dilemma
+
+Which brings me to the crux of this post: the challenge of project stewardship in contentious times. Compiler Explorer belongs to its community, and I genuinely want to consider everyone's perspectives. But as the project's maintainer, I sometimes face the uncomfortable reality of having to make decisions that not everyone will love.
+
+I'm currently minded to move forward with developing this feature further. Here's my reasoning:
+
+It would be entirely opt-in -- nobody would be forced to use it, just like nobody's forced to use any particular compiler or tool in the current system. Clear disclaimers would explain where and what information is sent, how it's processed, and the experimental nature of AI-generated explanations. For users who find assembly intimidating, it could provide a valuable learning stepping stone.
+
+The impact feels proportionate -- relatively small in scope, but potentially high value for users who choose to engage with it.
+
+## Moving Forward, Thoughtfully
+
+I'm not dismissive of the concerns people have raised. AI integration in developer tools touches on deep questions about the nature of learning, expertise, and human agency. These conversations matter, and I'm grateful to be part of a community that cares enough to have them passionately.
+
+But I also believe that tools should serve their users, and for some users, this tool could make the intimidating world of assembly code a little more approachable. With appropriate guardrails and transparency, that feels like a worthy addition to Compiler Explorer's mission.
+
+In the end, open source is about building things that help people learn and create. Sometimes that means making calls that not everyone will agree with, while trying to do so with respect, transparency, and good faith.
+
+And if Claude occasionally explains x86 instructions with the same confidence I have when I'm debugging assembly at 2 AM, well -- at least we're consistently fallible together.
+
+---
+
+### Disclaimer
+
+This article itself was written with AI assistance: dictated and discussed while walking my dog, and proof-read and link suggestions by an LLM.
