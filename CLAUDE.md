@@ -17,6 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Error handling: Use try/except blocks with specific exceptions
 - Variable names: Descriptive, avoid abbreviations
 - For ETL templates: Use consistent spacing for template variables
+- **Spelling: Always use British English spellings** (favourite not favorite, colour not color, realise not realize, optimise not optimize, centre not center, etc.)
 
 ## Development Workflow
 - Always run `pre-commit run --all-files` before running `git add` to ensure code formatting

@@ -1,6 +1,6 @@
 Compiler Explorer and the Promise of URLs That Last Forever
-Date: 2025-05-28 09:55:00 America/Chicago
-Status: Draft
+Date: 2025-05-28 10:12:00 America/Chicago
+Status: Public
 Summary: How we're preserving 12,000 legacy links as Google's URL shortener rides into the sunset
 Label: Blog, Coding, Compiler Explorer
 
@@ -8,13 +8,15 @@ The history is this: back in the old days (2012), we used to store the entire [C
 
 In 2016, [Stack Overflow](https://stackoverflow.com) banned link shorteners because of how they cloak the actual destination of links. Abusers could post innocent goo.gl links that directed folks unwittingly to bad content. However, that meant our Compiler Explorer links were also affected. At the time, we had no intention of storing any user data, so we came up with a hack: we still used goo.gl, but we then rewrote the link we handed out to be `godbolt.org/g/abc123` (where the abc123 is the goo.gl unique ID). We then redirected any hits to `/g/abc123` to `goo.gl/abc123`, which then (finally) redirected back to godbolt.org with the appropriate state in the URL. If you're keeping track, that's three redirects to show you some assembly code. We were really committed to making things complicated. Later, we used Google's API to avoid the redirection dance.
 
-By 2018, the limitations of storing state in the URL started to bite. There's a limit to how long a URL can be (and we'd already started compressing the data in the URL), so we needed a better solution. We finally implemented our own storage solution: we hash the input, save the state as a JSON document on [S3](https://aws.amazon.com/s3/) under the hash, and then give out a shortened form of the hash as a `godbolt.org/z/hashbit` URL. We use [DynamoDB](https://aws.amazon.com/dynamodb/) to store the mapping of shortened hashes to the full paths (accounting for partial collisions, etc.). And, amusingly, we check the short link's hash for rude words and add deliberate extra information into the document until we no longer get a rude word. Yes, we literally check if your shortened URL contains profanity. Because apparently even random hashes can't be trusted to keep it clean. This led to [bug #1297](https://github.com/compiler-explorer/compiler-explorer/issues/1297), which remains one of my favorite issues we've ever had to fix.
+By 2018, the limitations of storing state in the URL started to bite. There's a limit to how long a URL can be (and we'd already started compressing the data in the URL), so we needed a better solution. We finally implemented our own storage solution: we hash the input, save the state as a JSON document on [S3](https://aws.amazon.com/s3/) under the hash, and then give out a shortened form of the hash as a `godbolt.org/z/hashbit` URL. We use [DynamoDB](https://aws.amazon.com/dynamodb/) to store the mapping of shortened hashes to the full paths (accounting for partial collisions, etc.). And, amusingly, we check the short link's hash for rude words and add deliberate extra information into the document until we no longer get a rude word. Yes, we literally check if your shortened URL contains profanity. Because apparently even random hashes can't be trusted to keep it clean. This led to [bug #1297](https://github.com/compiler-explorer/compiler-explorer/issues/1297), which remains one of my favourite issues we've ever had to fix.
 
-We still support the `godbolt.org/g/abc123` links, but... despite Google [solemnly promising](https://developers.googleblog.com/en/transitioning-google-url-shortener-to-firebase-dynamic-links/) that "all existing links will continue to redirect to the intended destination," it went read-only a few years back, and now they're [finally sunsetting it](https://developers.googleblog.com/en/google-url-shortener-links-will-no-longer-be-available/) in August 2025. Here I was in 2014, thinking I was so clever using Google's shortener. "It'll be around forever!" I said. "Google never discontinues products!" I said. Well...
+We still support the `godbolt.org/g/abc123` links, but... despite Google [solemnly promising](https://developers.googleblog.com/en/transitioning-google-url-shortener-to-firebase-dynamic-links/) that "all existing links will continue to redirect to the intended destination," it went read-only a few years back, and now they're [finally sunsetting it](https://developers.googleblog.com/en/google-url-shortener-links-will-no-longer-be-available/) in August 2025. Here I was in 2014, thinking I was so clever using Google's shortener. "It'll be around forever!" I said. "Google never discontinues products!" I said. Er...
 
-That means we'll no longer be able to resolve goo.gl-based links! Which is, to use technical terminology, a complete disaster. One of my founding principles is that Compiler Explorer links should last forever. I can't do anything about the _really_ legacy actual `goo.gl` links, but I can do something about the `godbolt.org/g/abc123` links!
+That means we'll no longer be able to resolve goo.gl-based links! Which is, to use technical terminology, a bit pants. One of my founding principles is that Compiler Explorer links should last forever. I can't do anything about the _really_ legacy actual `goo.gl` links, but I can do something about the `godbolt.org/g/abc123` links!
 
-Over the last few days, I've been scraping everywhere I can think of, collating the links I can find out in the wild, and compiling my own database of links -- and importantly, the URLs they redirect to. So far, I've found 12,000 links from scraping:
+Over the last few days, I've been scraping everywhere I can think of, collating the links I can find out in the wild, and compiling my own database of links[^2] -- and importantly, the URLs they redirect to. So far, I've found 12,000 links from scraping:
+
+[^2]: I have a local sqlite database but the production side uses Dynamo.
 
 - [Google](https://developers.google.com/custom-search) (using their web search API)
 - [GitHub](https://docs.github.com/en/rest) (using their API)
@@ -28,7 +30,7 @@ Over the last few days, I've been scraping everywhere I can think of, collating 
 <br/>12,298 rescued links and counting - not bad for a few days of digital archaeology
 </p>
 
-We're now using the database in preference to `goo.gl` internally, so I'm also keeping an eye on new "g" links that we don't yet have.
+We're now [using the database in preference](https://github.com/compiler-explorer/compiler-explorer/pull/7724) to `goo.gl` internally, so I'm also keeping an eye on new "g" links that we don't yet have.
 
 Thanks to [Peter Cordes](https://stackoverflow.com/users/224132/peter-cordes) for reminding us about this issue and [bringing it to our attention](https://github.com/compiler-explorer/compiler-explorer/discussions/7719)[^1].
 
