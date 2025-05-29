@@ -1,10 +1,4 @@
 SHELL := $(shell which bash) # Use bash instead of bin/sh as shell
-SYS_PYTHON := $(shell which python3 || echo ".python_is_missing")
-export POETRY_HOME=$(CURDIR)/.poetry
-POETRY := $(POETRY_HOME)/bin/poetry
-VENV := $(CURDIR)/.venv
-PYTHON := $(VENV)/bin/python
-DEPS := $(VENV)/.deps
 
 .PHONY: help
 help: ## Show this help
@@ -14,46 +8,40 @@ ifndef VERBOSE
 .SILENT:
 endif
 
-$(SYS_PYTHON):
-	@echo "You need Python 3. I can't find it on the PATH."
-	@false
-
-$(POETRY): $(SYS_PYTHON)
-	curl -sSL https://install.python-poetry.org | $(SYS_PYTHON) -
-
-$(VENV): $(POETRY)
-	$(SYS_PYTHON) -m venv $(VENV)
-
-$(DEPS): pyproject.toml poetry.lock | $(VENV)
-	$(POETRY) sync
-	cp pyproject.toml $(DEPS)
+.PHONY: check-uv
+check-uv:
+	@if ! command -v uv &> /dev/null; then \
+		echo "Error: uv is not installed. Please install it from https://docs.astral.sh/uv/getting-started/installation/"; \
+		exit 1; \
+	fi
 
 .PHONY: deps
-deps: $(DEPS) ## Install dependencies
+deps: check-uv ## Install dependencies
+	uv sync --extra dev
 
 .PHONY: pre-commit-install
 pre-commit-install: deps ## Install pre-commit hooks
-	pre-commit install
+	uv run pre-commit install
 
 .PHONY: lint
 lint: deps ## Run all linters (warnings only)
-	pre-commit run --all-files
+	uv run pre-commit run --all-files
 
 .PHONY: lint-staged
 lint-staged: deps ## Run linters on staged files
-	pre-commit run
+	uv run pre-commit run
 
 .PHONY: format-black
 format-black: deps ## Format Python files with black
-	$(POETRY) run black pygen serve.py
+	uv run black pygen serve.py
 
 .PHONY: format-isort
 format-isort: deps ## Sort imports with isort
-	$(POETRY) run isort pygen serve.py
+	uv run isort pygen serve.py
 
 .PHONY: lint-fix
 lint-fix: format-black format-isort ## Fix formatting and imports
-	$(POETRY) run ruff check --fix pygen serve.py
+	uv run ruff check --fix pygen serve.py
 
 .PHONY: format
 format: lint-fix ## Alias for lint-fix
@@ -61,7 +49,7 @@ format: lint-fix ## Alias for lint-fix
 .PHONY: update
 update: deps ## Generate site content
 	mkdir -p www/feed
-	$(POETRY) run python -m pygen.main
+	uv run python -m pygen.main
 
 .PHONY: publish
 publish: update ## Build and publish to S3
@@ -69,10 +57,10 @@ publish: update ## Build and publish to S3
 
 .PHONY: serve
 serve: update ## Run development server
-	$(POETRY) run python ./serve.py
+	uv run python ./serve.py
 
 .PHONY: test
 test: deps ## Run tests
-	$(POETRY) run pytest
+	uv run pytest
 
 default: serve
