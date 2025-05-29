@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Matt Godbolt's personal blog generator"
 authors = [{name = "Matt Godbolt", email = "matt@godbolt.org"}]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.13,<4.0"
 dependencies = [
     "pytz>=2024.1",
     "markdown>=3.5.2",
@@ -24,10 +24,6 @@ dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
 ]
-
-[build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 120
