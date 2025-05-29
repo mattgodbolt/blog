@@ -10,10 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: '3.10'
+          enable-cache: true
 
       - name: Install dependencies
         run: |
@@ -21,8 +21,7 @@ jobs:
 
       - name: Run pre-commit checks (excluding tests)
         run: |
-          pip install pre-commit
-          SKIP=pytest pre-commit run --all-files
+          SKIP=pytest uv run pre-commit run --all-files
 
       - name: Run tests
         run: |

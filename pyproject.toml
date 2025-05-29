@@ -1,32 +1,29 @@
-[tool.poetry]
+[project]
 name = "xaniablog"
 version = "0.1.0"
 description = "Matt Godbolt's personal blog generator"
-authors = ["Matt Godbolt <matt@godbolt.org>"]
+authors = [{name = "Matt Godbolt", email = "matt@godbolt.org"}]
 readme = "README.md"
-packages = [{include = "pygen"}]
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "pytz>=2024.1",
+    "markdown>=3.5.2",
+    "pygments>=2.17.2",
+    "awscli>=1.32.91",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-pytz = "^2024.1"
-markdown = "^3.5.2"
-pygments = "^2.17.2"
-awscli = "^1.32.91"
-
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^3.6.0"
-black = "^24.2.0"
-isort = "^5.13.2"
-ruff = "^0.2.1"
-mypy = "^1.8.0"
-types-pytz = "^2024.1.0.20240416"
-types-markdown = "^3.5.0.20240505"
-pytest = "^7.4.0"
-pytest-cov = "^4.1.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=3.6.0",
+    "black>=24.2.0",
+    "isort>=5.13.2",
+    "ruff>=0.2.1",
+    "mypy>=1.8.0",
+    "types-pytz>=2024.1.0.20240416",
+    "types-markdown>=3.5.0.20240505",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
 
 [tool.black]
 line-length = 120
