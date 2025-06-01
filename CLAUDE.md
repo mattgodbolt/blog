@@ -32,3 +32,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - conf/: Templates and configuration
 - www/: Website content and generated files
 - Article format: Markdown with YAML-like headers
+
+## Dependencies
+- All dependencies are managed via pyproject.toml and uv
+- Never add defensive try/except imports for dependencies listed in pyproject.toml
+- If a dependency is required, it should be properly declared and installed via `make deps`

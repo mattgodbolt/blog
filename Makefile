@@ -56,7 +56,7 @@ publish: update ## Build and publish to S3
 	./publish.sh
 
 .PHONY: serve
-serve: update ## Run development server
+serve: ## Run development server
 	uv run python ./serve.py
 
 .PHONY: test
