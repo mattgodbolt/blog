@@ -77,7 +77,7 @@ class BlogWatcher(FileSystemEventHandler):
         # Only trigger on files we care about
         path = Path(event.src_path)
         if not (
-            path.suffix in [".text", ".html", ".atom", ".conf"] or "conf/" in str(path) or "www/article/" in str(path)
+            path.suffix in [".text", ".conf"] or "conf/" in str(path)
         ):
             return
 
@@ -159,6 +159,7 @@ class BlogServer:
                     "--include=*.html",
                     "--include=*.png",
                     "--include=*.jpeg",
+                    "--include=*.svg",
                     "--include=*.py",
                     "--include=*.zip",
                     "--include=*.cpp",

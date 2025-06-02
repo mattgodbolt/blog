@@ -37,3 +37,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - All dependencies are managed via pyproject.toml and uv
 - Never add defensive try/except imports for dependencies listed in pyproject.toml
 - If a dependency is required, it should be properly declared and installed via `make deps`
+
+## Markdown Syntax
+- This blog uses Python-Markdown 3.8, which has slightly different syntax from GitHub Markdown
+- **Important**: Bullet lists require a blank line before them to render properly
+- See README.md for complete markdown syntax requirements and examples

@@ -6,7 +6,7 @@ rm -rf out
 mkdir out out/htdocs out/htdocs_fixup
 
 rsync -rlp --exclude=/article www/ out/htdocs
-rsync -rlp --include='*.html' --include='*.png' --include='*.jpeg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ out/htdocs
+rsync -rlp --include='*.html' --include='*.png' --include='*.jpeg' --include='*.svg' --include='*.py' --include='*.zip' --include='*.cpp' --include='*/' --include='**/media/***' --exclude='*' www/article/ out/htdocs
 
 aws s3 sync out/htdocs/ s3://web.xania.org/
 

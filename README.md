@@ -40,6 +40,45 @@ def hello_world():
     print("Hello, world!")
 ```
 
+## Markdown Syntax Requirements
+
+This blog uses **Python-Markdown 3.8** with extensions. The syntax is mostly standard Markdown, but has some specific requirements:
+
+### Bullet Lists
+
+**Important**: Lists require a **blank line before them** to render properly:
+
+```markdown
+Text before the list:
+
+- Item 1  ← Note the blank line above
+- Item 2
+- Item 3
+```
+
+**Won't work:**
+```markdown
+Text directly followed by:
+- Item 1  ← Missing blank line above
+```
+
+### Nested Lists
+
+Use exactly **4 spaces** for nested items:
+
+```markdown
+* Main item:
+    - Sub item (4 spaces)
+    - Another sub item
+        - Nested deeper (8 spaces)
+```
+
+### Other List Requirements
+
+- Always include a space after the bullet character: `- Item` not `-Item`
+- All bullet characters work: `-`, `*`, and `+`
+- Mix bullet types if desired, but be consistent within each level
+
 ### Header Fields
 
 - **Title**: The first line of the file (no explicit key)
