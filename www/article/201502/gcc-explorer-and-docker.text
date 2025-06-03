@@ -2,7 +2,7 @@ Experiences with Docker and GCC Explorer
 Date: 2015-02-02 17:00:00 America/Chicago
 Status: Public
 Summary: Musings on Docker
-Label: Coding
+Label: Coding, Compiler Explorer
 
 [GCC Explorer](http://gcc.godbolt.org) has long ran on
 [Amazon EC2 Instances](http://aws.amazon.com/ec2/) which have been marvellous.

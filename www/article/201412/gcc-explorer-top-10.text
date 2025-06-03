@@ -2,7 +2,7 @@ GCC Explorer's top 10 compilers
 Date: 2014-12-16 13:00:00 America/Chicago
 Status: Public
 Summary: Wondering which compilers I can retire from GCC Explorer
-Label: Coding
+Label: Coding, Compiler Explorer
 
 I've had a post-it note on my computer for the over six months to upgrade the
  [GCC Explorer](http://gcc.godbolt.org) cluster to Ubuntu 14.04 from its

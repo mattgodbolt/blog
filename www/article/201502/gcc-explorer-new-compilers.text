@@ -2,7 +2,7 @@ Announcing new compilers for GCC Explorer
 Date: 2015-02-08 23:00:00 America/Chicago
 Status: Public
 Summary: Yup, more compilers
-Label: Coding
+Label: Coding, Compiler Explorer
 
 I'm very pleased to announce that [GCC Explorer](http://gcc.godbolt.org) now
 supports some new compilers, and new architectures:

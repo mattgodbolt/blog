@@ -2,7 +2,7 @@ How it works: Compiler Explorer
 Date: 2016-09-04 10:00:00 America/Chicago
 Status: Public
 Summary: I explain how Compiler Explorer runs on Amazon's cloud computing infrastructure
-Label: Coding
+Label: Coding, Compiler Explorer
 
 I've been running [Compiler Explorer][ce] for over four years now, and a lot
 has changed in that time. In addition to C++, it now supports [Go][], [Rust][]

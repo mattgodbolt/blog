@@ -2,7 +2,7 @@ GCC Explorer - an interactive take on compilation
 Date: 2012-05-24 16:40:00 America/Chicago
 Status: Public
 Summary: Introducing a new way to stare at the disassembly of your compiled C and C++
-Label: Coding
+Label: Coding, Compiler Explorer
 
 One of the things I spend a fair amount of time doing at [work][drw] is
 compiling my C/C++ code and looking at the disassembly output.  Call me

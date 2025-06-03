@@ -2,7 +2,7 @@ Even more compilers for GCC explorer
 Date: 2015-02-18 17:50:00 America/Chicago
 Status: Public
 Summary: Yup, even more compilers
-Label: Coding
+Label: Coding, Compiler Explorer
 
 As promised in the [last post](/201502/gcc-explorer-new-compilers) I've added
 GCC 4.9.2 to [GCC explorer][ge]. Also new is clang 3.5.1 and experimental builds of

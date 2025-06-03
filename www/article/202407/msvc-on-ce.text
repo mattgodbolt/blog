@@ -2,7 +2,7 @@ MSVC and CE
 Date: 2024-07-11 14:00:00 America/Chicago
 Status: Public
 Summary: Microsoft Compilers on Compiler Explorer
-Label: Coding
+Label: Coding, Compiler Explorer
 
 The eagle-eyed among you may have noticed a change in the way
 compiling using Microsoft Visual Studio compilers works on

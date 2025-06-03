@@ -2,7 +2,7 @@ Leaks in javascript
 Date: 2015-05-07 12:45:00 America/Chicago
 Status: Public
 Summary: Debugging GCC Explorer's javascript memory leaks
-Label: Coding
+Label: Coding, Compiler Explorer
 
 Regular users of [GCC Explorer](https://gcc.godbolt.org) may have noticed its
 uptime was getting a little choppy. Having moved to using

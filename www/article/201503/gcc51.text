@@ -2,7 +2,7 @@ GCC 5.1 on GCC Explorer
 Date: 2015-05-04 11:30:00 America/Chicago
 Status: Public
 Summary: More compilers!
-Label: Coding
+Label: Coding, Compiler Explorer
 
 Bit late to mention it here, but [GCC Explorer](http://gcc.godbolt.org)
 now supports GCC 5.1, and in fact has done since the day it was released!

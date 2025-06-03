@@ -2,7 +2,7 @@ On AI, Assembly, and the Art of Project Stewardship
 Date: 2025-05-25 20:49:00 America/Chicago
 Status: Public
 Summary: Building AI tools while navigating community conscience
-Label: Blog, Coding, AI
+Label: Blog, Coding, AI, Compiler Explorer
 
 Recently, I've been having what can only be described as a very meta relationship with AI[^1]. I'm using [Claude Code](https://www.anthropic.com/claude-code) to help maintain [Compiler Explorer](https://godbolt.org), and in a delightful twist of recursive irony, one of the features I'm working on with Claude Code is... a Claude-powered assembly explanation tool. So Claude is helping me build Claude systems that use Claude to improve Claude prompts for Claude explanations. If that made your head spin, or made you worry, you're not alone.
 

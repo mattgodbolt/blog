@@ -2,7 +2,7 @@ Compiler Explorer's embedded view
 Date: 2016-11-02 11:25:00 America/Chicago
 Status: Public
 Summary: A new feature in Compiler Explorer: embedded views
-Label: Coding
+Label: Coding, Compiler Explorer
 
 Today I updated [Compiler Explorer][ce] to support better sharing,
 specifically to allow embedding a Compiler Explorer view into another site,
