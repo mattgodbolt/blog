@@ -76,9 +76,7 @@ class BlogWatcher(FileSystemEventHandler):
 
         # Only trigger on files we care about
         path = Path(event.src_path)
-        if not (
-            path.suffix in [".text", ".conf"] or "conf/" in str(path)
-        ):
+        if not (path.suffix in [".text", ".conf"] or "conf/" in str(path)):
             return
 
         # Debounce rapid changes
