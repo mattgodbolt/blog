@@ -1,0 +1,170 @@
+digraph compiler_explorer_architecture {
+  // Graph attributes
+  rankdir=TB;
+  bgcolor="white";
+
+  // Node styles
+  node [shape=box, style=rounded, fontname="Arial"];
+
+  // User/Browser layer at top
+  subgraph cluster_browser {
+    label="User Interface";
+    style="filled";
+    fillcolor="lightblue";
+    rank=source;
+
+    user [label="User\n(Browser)", style="filled", fillcolor="white"];
+    monaco [label="Monaco Editor\n(Code Input)", style="filled", fillcolor="white"];
+    goldenlayout [label="GoldenLayout\n(UI Framework)", style="filled", fillcolor="white"];
+  }
+
+  // Backend services in middle
+  subgraph cluster_backend {
+    label="Backend Services";
+    style="filled";
+    fillcolor="lightyellow";
+    rank=same;
+
+    // Load balancer
+    alb [label="Application\nLoad Balancer", style="filled", fillcolor="orange"];
+
+    // Web servers
+    subgraph cluster_instances {
+      label="EC2 Instances";
+      style="filled";
+      fillcolor="lightgreen";
+
+      nginx1 [label="nginx", style="filled", fillcolor="white"];
+      express1 [label="Express.js", style="filled", fillcolor="white"];
+      nginx2 [label="nginx", style="filled", fillcolor="white"];
+      express2 [label="Express.js", style="filled", fillcolor="white"];
+    }
+
+    // Compilation process
+    subgraph cluster_compilation {
+      label="Compilation Process";
+      style="filled";
+      fillcolor="lightcyan";
+
+      queue [label="Queue\n(Max 2)", style="filled", fillcolor="yellow"];
+      nsjail [label="nsjail", style="filled", fillcolor="red"];
+      compiler [label="Compiler", style="filled", fillcolor="pink"];
+    }
+
+    // Runtime storage
+    subgraph cluster_runtime_storage {
+      label="Runtime Storage";
+      style="filled";
+      fillcolor="lightgray";
+
+      efs [label="EFS\n(3.9TB)", style="filled", fillcolor="white"];
+      dynamodb [label="DynamoDB\n(Links)", style="filled", fillcolor="white"];
+    }
+  }
+
+  // Admin/Build infrastructure at bottom
+  subgraph cluster_admin {
+    label="Build & Administration";
+    style="filled";
+    fillcolor="lavender";
+    rank=sink;
+
+    // CI/CD and monitoring
+    subgraph cluster_cicd {
+      label="CI/CD & Monitoring";
+      style="filled";
+      fillcolor="lightpink";
+
+      github_actions [label="GitHub Actions", style="filled", fillcolor="white"];
+      grafana [label="Grafana", style="filled", fillcolor="white"];
+      prometheus [label="Prometheus", style="filled", fillcolor="white"];
+    }
+
+    // Build containers
+    subgraph cluster_build_containers {
+      label="Build Containers";
+      style="filled";
+      fillcolor="lightsteelblue";
+
+      gcc_container [label="GCC Builder", style="filled", fillcolor="white"];
+      rust_container [label="Rust Builder", style="filled", fillcolor="white"];
+      msvc_container [label="MSVC Builder", style="filled", fillcolor="white"];
+      gpu_container [label="CUDA Builder", style="filled", fillcolor="white"];
+    }
+
+    // Long term storage
+    s3 [label="S3 Buckets\n(Long Term Storage)", style="filled", fillcolor="lightyellow"];
+  }
+
+  // User request flow (top to bottom)
+  user -> monaco;
+  user -> goldenlayout;
+  monaco -> alb [label="Request"];
+  goldenlayout -> alb;
+
+  alb -> nginx1;
+  alb -> nginx2;
+
+  nginx1 -> express1;
+  nginx2 -> express2;
+
+  express1 -> queue;
+  express2 -> queue;
+
+  queue -> nsjail;
+  nsjail -> compiler;
+
+  // Runtime data access
+  compiler -> efs [style=dotted, label="Access Compilers"];
+  express1 -> dynamodb [style=dotted, label="Short Links"];
+  express2 -> dynamodb [style=dotted];
+
+  // Short link data storage
+  dynamodb -> s3 [style=dotted, label="Link Data"];
+
+  // Response flow (bottom to top)
+  compiler -> express1 [label="Assembly", style=bold, color=blue];
+  compiler -> express2 [label="Assembly", style=bold, color=blue];
+  express1 -> alb [style=bold, color=blue];
+  express2 -> alb [style=bold, color=blue];
+  alb -> goldenlayout [style=bold, color=blue];
+
+  // Build flow (separate from user flow)
+  github_actions -> gcc_container [style=dashed, color=green, label="Trigger Builds"];
+  github_actions -> rust_container [style=dashed, color=green];
+  github_actions -> msvc_container [style=dashed, color=green];
+  github_actions -> gpu_container [style=dashed, color=green];
+
+  gcc_container -> s3 [style=dashed, color=orange, label="Store"];
+  rust_container -> s3 [style=dashed, color=orange];
+  msvc_container -> s3 [style=dashed, color=orange];
+  gpu_container -> s3 [style=dashed, color=orange];
+
+  s3 -> efs [style=dashed, color=purple, label="Install"];
+
+  // Monitoring flow
+  express1 -> prometheus [style=dotted, color=gray, label="Metrics"];
+  express2 -> prometheus [style=dotted, color=gray];
+  prometheus -> grafana [color=gray];
+
+  // Legend - arranged in 2x3 grid for more compact layout
+  subgraph cluster_legend {
+    label="Legend";
+    style="filled";
+    fillcolor="white";
+
+    legend1 [label="Solid: User Requests", style="filled", fillcolor="black", fontcolor="white"];
+    legend2 [label="Blue: Response Flow", style="filled", fillcolor="blue", fontcolor="white"];
+    legend3 [label="Green: Build Triggers", style="filled", fillcolor="green", fontcolor="white"];
+    legend4 [label="Orange: Artifact Storage", style="filled", fillcolor="orange"];
+    legend5 [label="Purple: Installation", style="filled", fillcolor="purple", fontcolor="white"];
+    legend6 [label="Grey: Monitoring", style="filled", fillcolor="gray", fontcolor="white"];
+
+    // Force 2x3 layout with invisible edges
+    legend1 -> legend2 -> legend3 [style=invis];
+    legend4 -> legend5 -> legend6 [style=invis];
+    legend1 -> legend4 [style=invis];
+    legend2 -> legend5 [style=invis];
+    legend3 -> legend6 [style=invis];
+  }
+}
