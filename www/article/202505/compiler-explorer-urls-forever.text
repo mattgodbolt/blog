@@ -4,6 +4,8 @@ Status: Public
 Summary: How we're preserving 12,000 legacy links as Google's URL shortener rides into the sunset
 Label: Blog, Coding, Compiler Explorer
 
+<p class="ai-disclaimer">Written with LLM assistance.<br/>Details at end.</p>
+
 The history is this: back in the old days (2012), we used to store the entire [Compiler Explorer](https://godbolt.org) state in the URL. That got unwieldy (who would have thought encoding an entire compiler state in a URL might get a bit long?), so we added support for Google's link shortener [goo.gl](https://goo.gl) in March 2014. That meant short links were of the form `goo.gl/abc123`. Clicking a goo.gl link would eventually redirect you to the full URL link on our site, and we'd decode the state from the URL.
 
 In 2016, [Stack Overflow](https://stackoverflow.com) banned link shorteners because of how they cloak the actual destination of links. Abusers could post innocent goo.gl links that directed folks unwittingly to bad content. However, that meant our Compiler Explorer links were also affected. At the time, we had no intention of storing any user data, so we came up with a hack: we still used goo.gl, but we then rewrote the link we handed out to be `godbolt.org/g/abc123` (where the abc123 is the goo.gl unique ID). We then redirected any hits to `/g/abc123` to `goo.gl/abc123`, which then (finally) redirected back to godbolt.org with the appropriate state in the URL. If you're keeping track, that's three redirects to show you some assembly code. We were really committed to making things complicated. Later, we used Google's API to avoid the redirection dance.

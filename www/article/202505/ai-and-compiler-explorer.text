@@ -4,6 +4,8 @@ Status: Public
 Summary: Building AI tools while navigating community conscience
 Label: Blog, Coding, AI, Compiler Explorer
 
+<p class="ai-disclaimer">Written with LLM assistance.<br/>Details at end.</p>
+
 Recently, I've been having what can only be described as a very meta relationship with AI[^1]. I'm using [Claude Code](https://www.anthropic.com/claude-code) to help maintain [Compiler Explorer](https://godbolt.org), and in a delightful twist of recursive irony, one of the features I'm working on with Claude Code is... a Claude-powered assembly explanation tool. So Claude is helping me build Claude systems that use Claude to improve Claude prompts for Claude explanations. If that made your head spin, or made you worry, you're not alone.
 
 [^1]: By AI in this post, I'm referring specifically to Large Language Models (LLMs) like Claude, which are one type of AI system. While I'm using the colloquial term "AI" throughout, I'm specifically discussing LLM-based tools.

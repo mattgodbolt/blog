@@ -101,3 +101,16 @@ table.ps td.red { background-color: #ffaaaa; }
 table.ps td.green { background-color: #aaffaa; }
 table.ps td.blue { background-color: #aaaaff; }
 table.ps td.alpha { background-color: #aaaaaa; }
+
+.ai-disclaimer {
+    float: right;
+    font-size: 0.8em;
+    font-style: italic;
+    color: #666;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 0.5em;
+    margin: 0 0 1em 1em;
+    max-width: 250px;
+    text-align: center;
+}

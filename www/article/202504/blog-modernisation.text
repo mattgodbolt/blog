@@ -4,6 +4,8 @@ Status: Public
 Summary: Bringing my decade-old blog generator into 2025 with the help of Anthropic's Claude
 Label: Blog, Coding, Python, AI
 
+<p class="ai-disclaimer">Written with LLM assistance.</p>
+
 ## Important note!
 
 The following code was written by Claude AI. I didn't do any editing on it, other than telling it to use
