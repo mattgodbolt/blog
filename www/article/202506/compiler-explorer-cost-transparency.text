@@ -1,0 +1,58 @@
+Compiler Explorer Cost Transparency
+Date: 2025-06-11 07:36:00 America/Chicago
+Summary: In which I try and show how we spend your kind Patreon donations
+Status: Public
+Label: Compiler Explorer
+
+<p class="ai-disclaimer">Written with LLM assistance.<br/>Details at end.</p>
+
+I've been meaning to do this for ages - a proper breakdown of where all the [Patreon](https://www.patreon.com/c/mattgodbolt), [GitHub](https://github.com/sponsors/compiler-explorer), Paypal, and commercial sponsorship money goes to keep [Compiler Explorer](https://godbolt.org) running.
+
+TL;DR: we're spending about **$3,100 per month** (~$37,000 annually) to serve around [8 million backend compilations monthly](/202506/how-compiler-explorer-works). That works out to roughly **$0.00039 per compilation** - shockingly good value!
+
+Taking April 2025 as an example, our costs are split 80% on AWS costs ($2,550) and 20% on operational costs ($550); for a total of $3,100. The operational bit includes monitoring tools ([Grafana](https://stats.compiler-explorer.com/), Papertrail, Sentry), my share of office costs whilst I'm between "real" jobs, and community expenses like the [Discord server](https://discord.gg/B5WacA7) and shipping stickers to supporters.
+
+Our infrastructure serves peak days of up to 1.66 million requests across x86_64, ARM64, and GPU platforms. We have a pretty impressive uptime for a bunch of amateurs (99.98% uptime in the last 30 days). And we genuinely [don't know who you are or what you're compiling](https://godbolt.org/#privacy), which is important to me personally.
+
+The traffic patterns are always interesting to look at - we see clear daily cycles with US daytime hours being busiest, weekend dips, and holiday lulls. January 2025 was our peak month at $3,345, showing how much extra it can cost at busier times.
+
+## Cost Optimisations
+
+We've done _some_ work to get the most for our money out of AWS (Amazon Web Services, where most of our infrastructure is):
+
+- Spot instances for the x86 production fleet (60-90% cost savings vs on-demand). Spot instances are ones where we "bid" for otherwise unused AWS resources.
+- Careful scheduling for build infrastructure saves ~$481/month compared to running it 24/7.
+- Single load balancer serving all environments - production, staging, beta, and our sub-environments for GPU and aarch64.
+- EFS lifecycle policies automatically moving old and less frequently-accessed data to cheaper storage. EFS is Amazon's elastic network file system, where we store all the compilers.
+
+Compilation volumes are down from 14+ million monthly peaks in 2024 to around 8 million now, but infrastructure costs stay relatively steady. Daily builds of all the compilers require a certain fixed cost, and all the storage adds up too.
+
+Monthly costs bounce around $3,100-3,300, with the occasional spike when everything gets busy. It's a pretty manageable amount, though we do try to look for easy optimisation opportunities without breaking things.
+
+## Full Transparency
+
+I'm trying to be as transparent as possible here. I strongly believe Compiler Explorer is a project _by_ the community _for_ the community. I've put together a [detailed cost report](https://github.com/compiler-explorer/infra/blob/main/cost-reports/CostReportJune2025.md) that breaks down every aspect of the infrastructure. The report covers seven months of data (October 2024 - April 2025) and shows exactly where every dollar goes. It's probably very boring reading, but I think that transparency matters when you're asking for community support.
+
+One part the cost report doesn't go in to is revenue. That breaks down as roughly:
+
+- $1400 per month from Patreon
+- $335 per month from GitHub sponsors
+- $40 per month from ad hoc Paypal donations
+- $2700 per month from commercial sponsors
+- Total: $4475 per month (!)
+
+I pay some amount of tax on those revenues (though my accountant does something clever), but I[^nai] don't pass that cost on to Compiler Explorer. Some of the surplus gets saved in a separate bank account. I still need to set up a business account and do all the paperwork etc to make it even more separate. Compiler Explorer isn't a significant source of income for me: I'm just glad to be able to subsidise it with my time while I'm in between jobs.
+
+[^nai]: Currently, at least. And probably very naively.
+
+## Thank You
+
+To everyone supporting CE through [Patreon](https://patreon.com/mattgodbolt), [GitHub Sponsors](https://github.com/sponsors/mattgodbolt), PayPal donations, or [commercial sponsorship](https://godbolt.org/#sponsors) - thank you. This level of infrastructure wouldn't exist without your support, and I hope this breakdown shows we're being proportionate and respectful of those contributions.
+
+The fact that we can serve 8 million compilations a month for $3,100 is still pretty amazing to me!
+
+---
+
+### Disclaimer
+
+This article was a collaboration between a human and an [LLM](https://anthropic.com). I provided the detailed cost report (which also used LLM assistance, particularly with all the AWS queries needed) and asked Claude to help draft a blog post summarising the key points in my usual style. The LLM helped structure the content, and assisted me in proofreading and links.
