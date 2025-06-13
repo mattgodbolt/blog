@@ -6,7 +6,7 @@ Label: Coding, Compiler Explorer
 
 <p class="ai-disclaimer">Written with LLM assistance.<br/>Details at end.</p>
 
-Ever wondered what happens when you hit that compile button on [Compiler Explorer](https://godbolt.org)? Last week I was looking at our metrics dashboard, and then I realised: we now do **92 million compilations a year**. That's 1.8 million a week...for a site that started as a hacky way to justify to my boss that it would be OK to turn on C++17 features[^jord], that's not bad.
+Ever wondered what happens when you hit that compile button on [Compiler Explorer](https://godbolt.org)? Last week I was looking at our metrics dashboard, and then I realised: we now do **92 million compilations a year**. That's 1.8 million a week...for a site that started as a hacky way to justify to my boss that it would be OK to turn on C++11 features[^jord], that's not bad.
 
 [^jord]: Jordan, I'm sorry - this tale has taken on a life of its own. Compiler Explorer started as a shell script running `watch "gcc -S example.cpp -O1 | c++filt | grep -v ..."` in a `screen` session with a `vim` panel on one side and the script on the other. I was trying to show that C++11 range-based `for` loops generated _identical_ code to their non-range-based equivalents.
 
