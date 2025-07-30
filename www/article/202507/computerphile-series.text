@@ -4,7 +4,7 @@ Status: Draft
 Summary: Behind-the-scenes look at recording a CPU fundamentals series for Computerphile
 Label: Personal, Coding
 
-<p class="ai-disclaimer">Written with LLM assistance.</p>
+<p class="ai-disclaimer">Written with LLM assistance.<br/>Details at end.</p>
 
 I've been meaning to write about something that's become a regular part of my life over the past year and a bit: my [Computerphile videos](https://www.youtube.com/playlist?list=PLzH6n4zXuckpwdGMHgRH5N9xNHzVGCxwf). If you've ever wondered what really happens inside your computer at the lowest level[^pg], this series is for you.
 
@@ -23,8 +23,8 @@ Time passed, but when Compiler Explorer popped up in another Computerphile video
 ## Making the Recordings
 
 <p class="picture">
-<a href="/202507/my-view.jpg">
-<img src="/202507/my-view-thumb.jpg" width="600" height="450"
+<a href="/202507/my-view.jpeg">
+<img src="/202507/my-view-thumb.jpeg" width="600" height="450"
  alt="My recording setup showing webcam pointing down at desk, with laptop and second camera visible"/>
 </a>
 <br/>My recording setup in all its glory - webcam pointing down at the desk, laptop for Google Meet, and the Osmo camera perched behind.
