@@ -1,0 +1,67 @@
+Behind the Scenes: My "How Computers Really Work" Series on Computerphile
+Date: 2025-07-30 11:50:00 America/Chicago
+Status: Draft
+Summary: Behind-the-scenes look at recording a CPU fundamentals series for Computerphile
+Label: Personal, Coding
+
+<p class="ai-disclaimer">Written with LLM assistance.</p>
+
+I've been meaning to write about something that's become a regular part of my life over the past year and a bit: my [Computerphile videos](https://www.youtube.com/playlist?list=PLzH6n4zXuckpwdGMHgRH5N9xNHzVGCxwf). If you've ever wondered what really happens inside your computer at the lowest level[^pg], this series is for you.
+
+[^pg]: At least, the lowest levels that programmers usually deal with. I hope to go "lower" at some point.
+
+The series covers the fundamentals of CPU operation: machine code, maths, pipelining, branch prediction, out of order execution, register renaming, interrupts, supervisor/kernel mode, and how MMUs work. This morning I recorded an episode (not yet released) that puts it all together, showing how these features combine in an operating system to enable pre-emptive multitasking.
+
+Throughout the series, I've used simple real-world analogies to explain complex concepts. Central to my explanations is the idea that the CPU is made up of robots doing simple work, with memory represented as "pigeon holes" (those grid-like arrangements of mailboxes in shared buildings). This approach comes straight from the [1980s Usborne Computer books](https://usborne.com/us/books/computer-and-coding-books) I loved as a kid -- still available as free PDFs, bless Usborne! They used these same analogies, and they've stuck with me ever since.
+
+## How It All Started
+
+My journey with Computerphile began in 2021 when [Dr Steve Bagley](https://scholar.google.com/citations?user=8qvcFYcAAAAJ&hl=en), one of their regular contributors, contacted me about my [jsbeeb online BBC Micro emulator](https://bbc.xania.org). They were doing an episode on the BBC Micro and wanted to link to it. Through that conversation, I got chatting with the crew and volunteered to do some videos myself.
+
+Time passed, but when Compiler Explorer popped up in another Computerphile video in late 2023, I pinged [Sean Riley](https://mastodonapp.uk/@seanski44) (who films and edits these videos) again. We started recording this CPU fundamentals series, and it's been a fantastic experience working with him.
+
+## Making the Recordings
+
+<p class="picture">
+<a href="/202507/my-view.jpg">
+<img src="/202507/my-view-thumb.jpg" width="600" height="450"
+ alt="My recording setup showing webcam pointing down at desk, with laptop and second camera visible"/>
+</a>
+<br/>My recording setup in all its glory - webcam pointing down at the desk, laptop for Google Meet, and the Osmo camera perched behind.
+</p>
+
+Unlike most Computerphile recordings, Sean and I aren't in the same physical location, which adds some interesting technical challenges. Here's my setup:
+
+- I point my webcam down at my desk and use OBS Studio to record everything I write and draw.
+- To capture the chatty talk-to-Sean bits, I have another camera pointing at me. I started with my Pixel phone, but upgraded to a second-hand DJI Pocket Osmo 2 (which I prop up behind my laptop).
+- For audio, I use my [Two's Complement podcast](https://twoscomplement.org/) Blue Yeti microphone on its boom.
+- OBS presents a "virtual camera" that I join the Google Meet with, so Sean can see what I'm writing in real-time.
+- I upload all the recordings to AWS, and Sean pulls them down for editing.
+
+It's been fun to use silly props to explain concepts. My wife specifically bought me props to help with explanations, including a kid's abacus that makes a brief appearance as the "ALU" of our robot CPU. I've also used snap bracelets and silly putty to demonstrate the difference between static and dynamic RAM. I like to think that these kinds of gimmicks help make the videos a bit more stand-out and the concepts more memorable.
+
+Not everything's gone smoothly: especially when you're managing multiple recording devices remotely. We've had our share of technical difficulties -- all on my side, I should add:
+
+- That time I forgot to hit record on my phone and we had to redo the entire episode.
+- Multiple instances of corrupt audio requiring creative editing solutions.
+- The notorious "face tracking incident" where I left the Osmo camera on face tracking mode, creating a nauseating viewing experience as the camera followed my every movement (I move a lot when explaining things!)
+
+Sean does an amazing job making me look clever with his editing, and his animations in the videos are fantastic. Given how rubbish my handwriting is, the animations bring back some clarity, and are fun in their own right.
+
+Overall I've been happy with how the videos have come out, with view counts ranging from 40,000 to 200,000 each. Before I get too excited about that...these numbers don't quite match Computerphile's million-view blockbusters, but the comments are generally positive with viewers appreciating this more niche content. Not everyone loves the analogies (according to the comments, they're not everyone's cup of tea), but those who connect with them really seem to appreciate the approach.
+
+## The Future
+
+I'm continuing to work with Sean on new episodes and I'm pretty excited about what's next. In the near term, I hope to tackle assemblers and compilers. I'd love to go even lower level -- explaining how CPU behaviour is built from logic gates, and potentially diving into die shots of something like a 6502 to show how we can understand its operation from its physical layout and semiconductor properties.
+
+On the other end of the spectrum, I have ideas for high-performance computing tricks, how Ethernet works (perhaps starting with floppy disk and hard disk encodings), and more. But I don't want to give away too many spoilers!
+
+If you're interested in understanding how computers really work at a fundamental level, please check out the [playlist](https://www.youtube.com/playlist?list=PLzH6n4zXuckpwdGMHgRH5N9xNHzVGCxwf). Let me know what you think, and what topics you'd like to see covered in future episodes. And if you find the series useful, please share[^like] it with your geeky pals!
+
+[^like]: "Don't forget to like and subscribe. And tap that bell icon!"
+
+Working with Sean has been fab, and getting to publish content on such a prominent YouTube channel has been a real bucket-list tick for me. And who knows, maybe one day I'll actually make it to Nottingham to meet Sean and record in person!
+
+### Disclaimer
+
+This article was written with AI assistance, for a bit of brain-storming and proof-reading.
