@@ -8,7 +8,7 @@ Label: Coding, Compiler Explorer
 
 Today we finished migrating Compiler Explorer to [CEFS](https://github.com/compiler-explorer/infra/blob/main/docs/cefs.md) — the Compiler Explorer File System[^name]. After three years of attempts, we finally have a working solution for mounting our thousands of SquashFS compiler images on demand instead of all at boot time.
 
-If you want to know _why_ on earth we'd be mounting thousands of SquashFS images at bootup, have a look my post on [how Compiler Explorer works](/202506/how-compiler-explorer-works) -- it's a long tale of trying to squeeze performance out of NFS[^woman].
+If you want to know _why_ on earth we'd be mounting thousands of SquashFS images at bootup, have a look at my post on [how Compiler Explorer works](/202506/how-compiler-explorer-works) -- it's a long tale of trying to squeeze performance out of NFS[^woman].
 
 [^name]: Naming is hard, and I didn't look far but I know there's a bunch of other CEFSes out there. Oops.
 [^woman]: Sometimes I think all software engineering boils down to patching over the problems you created for yourself the time before. I find myself singing "There was [an old woman who swallowed a fly](https://en.wikipedia.org/wiki/There_Was_an_Old_Lady_Who_Swallowed_a_Fly)..." under my breath sometimes as I force a horse into my program to catch the cow...
