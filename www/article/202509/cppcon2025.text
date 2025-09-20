@@ -1,0 +1,45 @@
+CppCon 2025
+Date: 2025-09-20 08:22:00 America/Denver
+Status: Public
+Summary: A quick overview of my time at CppCon 2025
+Label: Coding, Blog
+
+It's Saturday morning, the day after CppCon 2025 finished, and I'm preparing to get on the plane back home to Chicago.
+
+It's been a busy week: I somewhat overcommitted myself and prepared and presented three talks, and participated in two panels. I had something to present or do every day but Thursday.
+
+I'm just taking stock: it's been a few years since I've been at CppCon, and I had a fantastic time. I've missed catching up with so many of my C++ pals.
+
+As always the talks I saw were excellent, and got me excited about the future of C++. In particular Barry Revzin's talk on Reflection (and [Herb Sutter's later keynote](https://www.youtube.com/watch?v=7z9NNrRDHQU) covering similar topics) was really inspiring. Other gems of the conference included:
+
+* Daisy Hollman's AI talk - bringing us up to date with what's available in the AI world for C++, and what we might see soon
+* Egor Suvorov's floating point pitfall talk
+* Steve Downey taught us about upcoming `std::optional<T&>` (can't wait for this feature)
+* Nevin Liber's heartfelt personal retrospective on 15 years of C++ standardization work
+* Andy Soffer showed how [Bronto](https://brontosource.dev/) could be the future of refactoring C++
+* Jason Turner's talks (one on AI best practices, another on implicit conversions)
+* Seeing Ben McMorran live code a Compiler Explorer MCP (!)
+* Pixar's great talk on their open source work (not recorded either; you had to just be there! A hidden gem)
+* Vittorio's brilliant DoD keynote. A really slick presentation, presented so well with great visualisations
+* Daniel Lemire and Francisco Geiman Thiesen's talk on reflection-based JSON parsing at speed
+* Madeline Schneider's talk unpacking how USB works and how to write C++ to model it
+* Michael Caisse introduced us to a declarative way of specifying and accessing hardware registers
+* Ben Deane's logging library talk (sadly also not recorded!)
+
+<p class="picture">
+<a href="/202509/cppcon-laurie.jpeg">
+<img src="/202509/cppcon-laurie.jpeg" width="365" height="274" alt="Matt and Laurie Kirk"/>
+</a>
+<br/>Laurie being very kind and letting me take a selfie</p>
+
+Of course, the "hallway track" (informally chatting with folks as we mill around) was great too. I met lots of new friends, and caught up with old acquaintances too. And bumped into (and got a selfie with) Laurie Kirk aka [LaurieWired](https://www.youtube.com/@lauriewired)!
+
+<p class="picture">
+<a href="/202509/cppcon-me.jpeg">
+<img src="/202509/cppcon-me.jpeg" width="300" height="400" alt="Some plonker on stage banging on about something C++ and assembly"/>
+</a>
+<br/>No doubt saying something deep and thought-provoking. Or just making a poor joke</p>
+
+My own talks went pretty well: I was able to talk about emulators, introduce people to some of the more esoteric features of Compiler Explorer, and at the end got a chance to wax a bit on how important assembly is to C++.
+
+It's been a blast: see you next year CppCon!
