@@ -57,7 +57,7 @@ publish: update ## Build and publish to S3
 
 .PHONY: serve
 serve: ## Run development server
-	uv run python ./serve.py
+	uv run --extra dev python ./serve.py
 
 .PHONY: test
 test: deps ## Run tests
