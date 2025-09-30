@@ -26,7 +26,7 @@ class HexasmLexer(RegexLexer):
         "root": [
             # Match hex bytes (pairs separated by single spaces), then multiple spaces, then GAS instruction
             (
-                r"((?:[0-9a-fA-F]{2} )+)( {2,})(.*?)$",
+                r"((?:[0-9a-fA-F]{2} )*[0-9a-fA-F]{2})( {2,})(.*?)$",
                 bygroups(Number.Hex, Whitespace, using(GasLexer)),
             ),
             # Fallback for any other line
