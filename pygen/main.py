@@ -20,6 +20,13 @@ from pygen.precis import PrecisExtension
 
 pygments.lexers.LEXERS["AsmLexer"] = ("pygen.asm_lexer", "AsmLexer", ("asm",), ("*.asm",), ("text/asm"))
 pygments.lexers.LEXERS["BasicLexer"] = ("pygen.basic_lexer", "BasicLexer", ("basic",), ("*.basic",), ("text/basic"))
+pygments.lexers.LEXERS["HexasmLexer"] = (
+    "pygen.hexasm_lexer",
+    "HexasmLexer",
+    ("hexasm",),
+    ("*.hexasm",),
+    ("text/hexasm"),
+)
 
 # Default timezone for articles that don't specify one
 defaultTimeZone = timezone("Europe/London")
@@ -477,6 +484,16 @@ def XHtmlToHtml(xhtml):
     return xhtmlToHtmlRe.sub(r"\1>", xhtml).replace("&nbsp;", "&#160;")
 
 
+def remove_empty_spans(html):
+    """Remove empty <span></span> tags inserted by Pygments.
+
+    Pygments intentionally adds empty spans at the start of code blocks to work around
+    an HTML parsing rule where browsers strip the first newline after <pre> tags.
+    Since we don't need this workaround, we remove them in post-processing.
+    """
+    return html.replace("<span></span>", "")
+
+
 def CleanUpXHtml(title, xhtml):
     full = f"<fakeroot>\n{xhtml}\n</fakeroot>"
     try:
@@ -504,17 +521,21 @@ def ProcessArticle(globalData, article):
         article.RawTitle,
         markdown(article.ArticleText, extensions=extensions, extension_configs=ex_conf, output_format="xhtml"),
     )
-    article.HtmlText = markdown(
-        article.ArticleText,
-        extensions=[*extensions, "markdown.extensions.smarty"],
-        extension_configs=ex_conf,
-        output_format="html",
+    article.HtmlText = remove_empty_spans(
+        markdown(
+            article.ArticleText,
+            extensions=[*extensions, "markdown.extensions.smarty"],
+            extension_configs=ex_conf,
+            output_format="html",
+        )
     )
-    article.HtmlIntro = markdown(
-        article.ArticleText,
-        extensions=[*extensions, "markdown.extensions.smarty", PrecisExtension()],
-        extension_configs=ex_conf,
-        output_format="html",
+    article.HtmlIntro = remove_empty_spans(
+        markdown(
+            article.ArticleText,
+            extensions=[*extensions, "markdown.extensions.smarty", PrecisExtension()],
+            extension_configs=ex_conf,
+            output_format="html",
+        )
     )
 
 

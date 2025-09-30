@@ -52,6 +52,12 @@ div.codehilite {
     padding: 0.25em;
 }
 
+div.codehilite code {
+    padding: 0;
+    border: none;
+    background-color: transparent;
+}
+
 .article div, .article table {
     margin-left: auto;
     margin-right: auto;
