@@ -45,7 +45,7 @@ pre {
     overflow-y: hidden;
     background-color: #f4f4f4;
     margin: auto;
-    max-width: 40em;
+    max-width: 80%;
 }
 
 div.codehilite {
