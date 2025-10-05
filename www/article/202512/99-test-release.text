@@ -1,0 +1,24 @@
+Testing Blog Infrastructure
+Date: 2025-10-04 14:00:00 America/Chicago
+Status: Draft
+Summary: Test post for blog deployment automation
+Label: Meta, Testing
+
+This is a test post to verify blog deployment automation is working correctly.
+
+## Purpose
+
+Testing the following:
+
+- Build pipeline generates correct `.text` files
+- Deployment script can commit and push to the blog repository
+- GitHub Actions deployment completes successfully
+- Post becomes accessible at the expected URL
+
+## Technical Details
+
+This post uses the same infrastructure as regular blog posts but is marked as `Status: Draft` to prevent it from appearing on the main blog index.
+
+## Cleanup
+
+This test post will be removed after verification is complete.
