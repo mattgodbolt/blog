@@ -1,0 +1,17 @@
+Introducing the Advent of Compiler Optimisations 2025
+Date: 2025-11-13 13:40:00 America/Chicago
+Status: Public
+Summary: Announcing AoCO 2025 - daily December posts about compiler optimisations
+Label: Coding, AoCO2025
+
+Today I'm announcing a project that's been in the making for around a year. As my time off draws to a close, I've been working on an "Advent of" type project, to be released one a day from the 1st of December until the 25th.
+
+This December will be the Advent of Compiler Optimisations: I'll release one blog post and video each day, each detailing a fun and interesting C or C++ optimisation that your compiler can do. I'll go into the details of when it applies, how to interpret the assembly, and perhaps as importantly, when it doesn't apply.
+
+I'll be covering some very low-level, architecture-specific tricks as well as larger, more high-level optimisations. While I mostly cover x86-64, I do touch on 64-bit and 32-bit ARM as well.
+
+You can follow along by watching the [AoCO2025 tag](/AoCO2025) on this blog, subscribing to me on [YouTube](https://www.youtube.com/mattgodbolt), or following the [YouTube playlist](https://youtube.com/playlist?list=PL2HVqYf7If8cY4wLk7JUQ2f0JXY_xMQm2&si=rEu5UQ2EuNafCvii). There's no videos up yet (though I may yet record and post an introduction in the next few days).
+
+It's been a colossal amount of work, but a lot of fun too. I hope you enjoy learning how amazing compilers are as much as I do!
+
+See you on the first of December!
