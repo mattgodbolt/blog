@@ -10,7 +10,9 @@ This December will be the Advent of Compiler Optimisations: I'll release one blo
 
 I'll be covering some very low-level, architecture-specific tricks as well as larger, more high-level optimisations. While I mostly cover x86-64, I do touch on 64-bit and 32-bit ARM as well.
 
-You can follow along by watching the [AoCO2025 tag](/AoCO2025) on this blog, subscribing to me on [YouTube](https://www.youtube.com/mattgodbolt), or following the [YouTube playlist](https://youtube.com/playlist?list=PL2HVqYf7If8cY4wLk7JUQ2f0JXY_xMQm2&si=rEu5UQ2EuNafCvii). There's no videos up yet (though I may yet record and post an introduction in the next few days).
+You can follow along by watching the [AoCO2025 tag](/AoCO2025) on this blog, subscribing to me on [YouTube](https://www.youtube.com/mattgodbolt), or following the [YouTube playlist](https://youtube.com/playlist?list=PL2HVqYf7If8cY4wLk7JUQ2f0JXY_xMQm2&si=rEu5UQ2EuNafCvii).
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/j-BwR-Cw0Gk?si=GeHCTsWqkQ5DzSp_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen"></iframe>
 
 It's been a colossal amount of work, but a lot of fun too. I hope you enjoy learning how amazing compilers are as much as I do!
 
