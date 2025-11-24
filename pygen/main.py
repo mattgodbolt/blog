@@ -38,8 +38,8 @@ class GlobalData:
     def __init__(self):
         # The config dictionary stores both strings and other values like booleans
         self.config: dict[str, Any] = {}
-        self.articles: dict[str, "Article"] = {}
-        self.labels: set["Label"] = set()
+        self.articles: dict[str, Article] = {}
+        self.labels: set[Label] = set()
 
     def GetValue(self, value: str, label: Optional["Label"]) -> str:
         """Get a configuration value, optionally with label-specific overrides.
@@ -117,7 +117,7 @@ class GlobalData:
             return article.Status == "public"
 
         if label:
-            filter_func: Callable[["Article"], bool] = is_public_with_label
+            filter_func: Callable[[Article], bool] = is_public_with_label
         else:
             filter_func = is_public
         return list(filter(filter_func, list(self.articles.values())))
@@ -134,7 +134,7 @@ class Article:
         self.Author = globalData.config["DefaultArticleAuthor"]
         self.LicenseURL = globalData.config["DefaultArticleLicenseURL"]
         self.Dates: list[datetime.datetime] = []
-        self.Labels: list["Label"] = []
+        self.Labels: list[Label] = []
         self.Summary = ""
         self.Via = ""
         self.ArticleText = ""
@@ -144,8 +144,8 @@ class Article:
         self.RawTitle = ""
         self.Title = ""
         self.URLPrefix = globalData.config["ArticleURLPrefix"]
-        self.PrevArticle: "Article" | None = None
-        self.NextArticle: "Article" | None = None
+        self.PrevArticle: Article | None = None
+        self.NextArticle: Article | None = None
 
     def __getattr__(self, name: str) -> Any:
         """Get attributes using case-insensitive names and computed properties.
@@ -187,7 +187,7 @@ class Article:
         elif name == "permalink":
             return self.URLPrefix + self.BaseName
         elif name == "datemonthprev":
-            return self.PrevArticle and self.PrevArticle.DateMonth or ""
+            return (self.PrevArticle and self.PrevArticle.DateMonth) or ""
         elif name == "labels":
             return self.Labels
 
@@ -677,7 +677,7 @@ def Generate(forceGenerate: bool) -> None:
         try:
             ReadArticle(globalData, article)
         except Exception:
-            print("Failed to read article '%s'" % article.BaseName)
+            print(f"Failed to read article '{article.BaseName}'")
             raise
 
     # Remove invalid articles
