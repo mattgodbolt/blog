@@ -597,7 +597,7 @@ def OutputArticleHtml(globalData, article):
     dictionary = GetArticleDict(globalData, article)
 
     print("Processing article", article.RawTitle)
-    html, deps = ETL.process(template, ".", dictionary)
+    html, _deps = ETL.process(template, ".", dictionary)
 
     output = codecs.open(articleHtml, "w", "utf-8")
     output.write(html)
@@ -614,7 +614,7 @@ def OutputArticles(globalData, articles, template, label, outputName):
         "latestUpdateISO": FormatISODate(latestUpdate),
         "allLabels": globalData.labels,
     }
-    html, deps = ETL.process(template, ".", d)
+    html, _deps = ETL.process(template, ".", d)
     output = codecs.open(outputName, "w", "utf-8")
     output.write(html)
     output.close()
