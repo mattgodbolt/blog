@@ -1,0 +1,60 @@
+Why xor eax, eax?
+Date: 2025-12-01 06:00:00 America/Chicago
+Status: Public
+Summary: Why do compilers love xor-ing registers so much?
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>In [one of my talks on assembly](https://youtu.be/7PFwUpXKLrg), I show a list of the [20 most executed instructions](https://mattgodbolt.github.io/yow-conversational-asm/#/2/2) on an average x86 Linux desktop. All the usual culprits are there, `mov`, `add`, `lea`, `sub`, `jmp`, `call` and so on, but the surprise interloper is `xor` - "eXclusive OR". In my 6502 hacking days, the presence of an exclusive OR was a sure-fire indicator you'd either found the encryption part of the code, or some kind of sprite routine. It's surprising then, that a Linux machine just minding its own business, would be executing so many.
+
+That is, until you remember that compilers love to emit a `xor` when setting a register to zero:
+
+<iframe width="100%" height="200px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,directives,libraryCode,binary,demangle,intel,labels,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+main()+%7B%0A++return+0%3B%0A%7D'"></iframe>
+
+We know that exclusive-OR-ing anything with itself generates zero, but why _does_ the compiler emit this sequence? Is it just showing off?
+
+In the example above, I've compiled with `-O2` and enabled [Compiler Explorer](https://godbolt.org)'s "Compile to binary object" so you can view the machine code that the CPU sees, specifically:
+
+    :::hexasm
+    31 c0           xor eax, eax
+    c3              ret
+
+If you change GCC's optimisation level down to `-O1` you'll see:
+
+    :::hexasm
+    b8 00 00 00 00  mov eax, 0x0
+    c3              ret
+
+The much clearer, more intention-revealing `mov eax, 0` to set the EAX register to zero takes up five bytes, compared to the two of the exclusive OR. By using a slightly more obscure instruction, we save three bytes every time we need to set a register to zero, which is a pretty common operation. Saving bytes makes the program smaller, and makes more efficient use of the instruction cache.
+
+It gets better though! Since this is a _very_ common operation, x86 CPUs spot this "zeroing idiom" early in the pipeline and can specifically optimise around it: the out-of-order tracking systems knows that the value of "eax" (or whichever register is being zeroed) does not depend on the previous value of eax, so it can allocate a fresh, dependency-free zero register renamer slot. And, having done that _it removes the operation from the execution queue_ - that is the `xor` takes zero execution cycles![^retire] It's essentially optimised out by the CPU!
+
+[^retire]: It still has to retire, so some on-chip resources are still allocated to it.
+
+You may wonder why you see `xor eax, eax` but never `xor rax, rax` (the 64-bit version), even when returning a `long`:
+
+<iframe width="100%" height="200px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,directives,libraryCode,binary,demangle,intel,labels,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'long+get_zero_long()+%7B%0A++return+0%3B%0A%7D'"></iframe>
+
+In this case, even though `rax` is needed to hold the full 64-bit `long` result, by writing to `eax`, we get a nice effect: Unlike other partial register writes, when writing to an `e` register like `eax`, the architecture zeros the top 32 bits for free. So `xor eax, eax` sets all 64 bits to zero.
+
+Interestingly, when zeroing the "extended" numbered registers (like `r8`), GCC still uses the `d` (double width, ie 32-bit) variant:
+
+<iframe width="100%" height="400px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,directives,libraryCode,binaryObject,demangle,intel,labels,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'extern+void+needs_many_longs(%0A++long+rdi,+long+rsi,+long+rdx,%0A++long+rcx,+long+r8,+long+r9)%3B%0A%0Avoid+test()+%7B%0A++needs_many_longs(0,+0,+0,+0,+0,+0)%3B%0A%7D'"></iframe>
+
+Note how it's `xor r8d, r8d` (the 32-bit variant) even though with the REX prefix (here `45`) it would be the same number of bytes to `xor r8, r8` the full width. Probably makes something easier in the compilers, as clang does this too.
+
+`xor eax, eax` saves you code space _and_ execution time! Thanks compilers!
+
+
+_See [the video](https://youtu.be/eLjZ48gqbyg) that accompanies this post._
+
+---
+
+_This post is day 1 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
