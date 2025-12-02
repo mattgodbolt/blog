@@ -1,0 +1,46 @@
+Addressing the adding situation
+Date: 2025-12-02 06:00:00 America/Chicago
+Status: Public
+Summary: We learn why adding on x86 isn't as obvious as you might think
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>[Yesterday](01-xor-eax-eax) we saw how compilers zero registers efficiently. Today let's look at something a tiny bit less trivial (though not by much): adding two integers. What do you think a simple x86 function to add two ints[^abi] would look like? An `add`, right? Let's take a look!
+
+<iframe width="100%" height="150px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,trim,libraryCode,labels,intel,directives,demangle',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+add(int+x,+int+y)+%7B%0A++return+x+%2B+y%3B%0A%7D'"></iframe>
+
+[^abi]: The Linux system I'm compiling for here passes parameters in `edi` and `esi`, and expects the result in `eax`. We'll cover calling conventions later in the series.
+
+Probably not what you were thinking, right? x86 is unusual in mostly having a maximum of two operands per instruction[^but]. There's no `add` instruction to add `edi` to `esi`, putting the result in `eax`. On an ARM machine this would be a simple `add r0, r0, r1` or similar, as ARM has a separate destination operand. On x86, things like `add` are not `result = lhs + rhs` but `lhs += rhs`. This can be a limitation, as we don't get to control which register the result goes into, and we in fact lose the old value of `lhs`.
+
+So how do compilers work around this limitation? The answer lies in an unexpected place - the sophisticated memory addressing system of the x86. Nearly every operand can be a memory reference - there's no specific "load" or "store"; a `mov` can just refer to memory directly. Those memory references are pretty rich: you can refer to memory addressed by a constant, relative to a register, or relative to a register plus an offset (optionally multiplied by 1, 2, 4 or 8). Something like `add eax, word ptr [rdi + rsi * 4 + 0x1000]` is still a single instruction[^cisc]!
+
+[^but]: Though some AVX instructions and some multiplies do allow a separate destination.
+
+[^cisc]: As someone who grew up with 6502, and then 32-bit ARM, coming to the x86 ISA was quite a shock. The x86 is truly a "Complex Instruction Set Computer".
+
+Sometimes you don't want to _access_ the memory at one of these complex addresses, you just want to calculate what the address would be. Sort of like C's "address-of" (`&`) operator. That's what `lea` ([Load Effective Address](https://www.felixcloutier.com/x86/lea)) does: it calculates the address without touching memory.
+
+Why is this useful for addition? Well, if we're not actually accessing memory, we can abuse the addressing hardware as a calculator! That complex addressing mode with its register-plus-register-times-scale is really just shifting and adding - so `lea` becomes a cheeky way to do three-operand addition[^three].
+
+[^three]: Three-operand meaning we can specify two source registers and a separate destination, unlike `add` which overwrites one of its operands.
+
+The compiler writes our simple addition in terms of the address of memory at `rdi` offset by `rsi`. We get a full add of two registers _and_ we get to specify the destination too. You'll notice that the operands are referenced as `rdi` and `rsi` (the 64-bit version) even though we only wanted a 32-bit add: because we are using the memory addressing system it unconditionally calculates a 64-bit address. However, in this case it doesn't matter; those top bits[^zero] are discarded when the result is written to the 32-bit `eax`.
+
+[^zero]: Those top bits should be zero, as the ABI requires it: the compiler relies on this here. Try editing the example above to pass and return `long`s to compare.
+
+Using `lea` often saves an instruction, is useful if both of the operands are still needed later on in other calculations (as it leaves them unchanged), and can execute on x86's [multiple execution units](https://mattgodbolt.github.io/ooo/#/0/1) in the same cycle. Compilers know this though, so you don't have to worry!
+
+
+_See [the video](https://youtu.be/BOvg0sGJnes) that accompanies this post._
+
+---
+
+_This post is day 2 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
