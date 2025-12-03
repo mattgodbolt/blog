@@ -5,7 +5,7 @@ Summary: We learn why adding on x86 isn't as obvious as you might think
 Label: Coding, AoCO2025
 
 <p class="ai-disclaimer">Written by me, proof-read by an LLM.
-<br/>Details at end.</p>[Yesterday](01-xor-eax-eax) we saw how compilers zero registers efficiently. Today let's look at something a tiny bit less trivial (though not by much): adding two integers. What do you think a simple x86 function to add two ints[^abi] would look like? An `add`, right? Let's take a look!
+<br/>Details at end.</p>[Yesterday](/202512/01-xor-eax-eax) we saw how compilers zero registers efficiently. Today let's look at something a tiny bit less trivial (though not by much): adding two integers. What do you think a simple x86 function to add two ints[^abi] would look like? An `add`, right? Let's take a look!
 
 <iframe width="100%" height="150px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,trim,libraryCode,labels,intel,directives,demangle',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+add(int+x,+int+y)+%7B%0A++return+x+%2B+y%3B%0A%7D'"></iframe>
 
