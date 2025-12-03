@@ -1,0 +1,41 @@
+You can't fool the optimiser
+Date: 2025-12-03 06:00:00 America/Chicago
+Status: Public
+Summary: Pattern recognition can see through obfuscated code to find the right instruction
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Sometimes you'll step through code in a debugger and find a complex-looking loop... that executes as a single instruction. The compiler saw through the obfuscation and generated the obvious code anyway.
+
+Consider this assortment of highly questionable unsigned addition routines[^greg] - for variety, here compiled for ARM (unlike [yesterday's addition example](/202512/02-adding-integers)).
+
+[^greg]: Thanks to long-term Compiler Explorer Patron Greg Baker for this example.
+
+<iframe width="100%" height="380px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:armv8-clang2110,filters:'directives,trim,libraryCode,intel,labels,commentOnly,demangle',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'unsigned+add_v1(unsigned+x,+unsigned+y)+%7B%0A++return+x+%2B+y%3B%0A%7D%0A%0Aunsigned+add_v2(unsigned+x,+unsigned+y)+%7B%0A++x+%2B%3D+y%3B%0A++return+x%3B%0A%7D%0A%0Aunsigned+add_v3(unsigned+x,+unsigned+y)+%7B%0A++while+(x--)+%2B%2By%3B%0A++return+y%3B%0A%7D%0A%0Aunsigned+add_v4(unsigned+x,+unsigned+y)+%7B%0A++if+(y+%3D%3D+0)+return+x%3B++//+x+%2B+0+%3D+x%0A++//+x+%2B+y+%3D%3D+(x+%2B+1)+%2B+(y+-+1)%0A++return+add_v4(x+%2B+1,+y+-+1)%3B%0A%7D'"></iframe>
+
+Despite these all being very different ways of returning `x + y`, the compiler sees through it all and recognises that it's just a single `add w0, w1, w0`[^arm] instruction. Even the recursive `add_v4` - which calls itself - gets optimised down to the same single instruction[^tco].
+
+[^arm]: ARM supports three operands, so you should read this as `w0 = w1 + w0`.
+[^tco]: We'll cover tail-call optimisation and how it enables this later in the series.
+
+The compiler's ability to recognise patterns and replace them with efficient alternatives - even when the code is pretty obfuscated - is a superpower. It lets programmers choose _how_ to write their code that's intention-revealing (not like these contrived examples, obviously!) and leave the code generation up to the compiler, knowing that most of the time it'll do the right thing.
+
+So how does the compiler spot these patterns? Is it maintaining a database of "silly ways to add numbers"? Not quite. Internally, it translates your code into an intermediate representation - a simplified, abstract form that's easier to analyse. When the compiler sees the while loop in `add_v3`, it transforms it into something like "increment y by x, then return y", which it then recognises as mathematically equivalent to "return x + y". This process of converting different code patterns into a standard, canonical form is what lets the compiler treat them all identically. By the time code generation happens, all four functions look the same to the optimiser[^opt].
+
+[^opt]: You can "Open in Compiler Explorer" the example above and then experiment with the "Opt Pipeline Viewer" to see some of the ways the compiler is doing this.
+
+This pattern recognition is remarkably robust - the compiler will happily optimise code you'd never want to write in the first place. Throughout this series we'll see how far this canonicalisation can take us.
+
+
+_See [the video](https://youtu.be/wHg9lYPMvvE) that accompanies this post._
+
+---
+
+_This post is day 3 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
