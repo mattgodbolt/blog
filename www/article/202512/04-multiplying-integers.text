@@ -1,0 +1,50 @@
+Multiplying with a constant
+Date: 2025-12-04 06:00:00 America/Chicago
+Status: Public
+Summary: Compilers know all the tricks for avoiding doing actual multiplies.
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>So far we've covered addition, and subtraction mostly follows suit. There's an obvious next step: multiplication. Specifically, let's try multiplying by constants on x86[^tomorrow]. We'll try several constants: 2, 3, 4, 16, 25 and 522.
+
+[^tomorrow]: We'll look at ARM's architectural features for efficient arithmetic tomorrow, including multiplication.
+
+Before you look at the code below, make your predictions for what instructions the compiler will pick, then see if you were right or not. Let's start with x86:
+
+<iframe width="100%" height="480px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'libraryCode,commentOnly,intel,labels,directives,demangle,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+mul_by_2(int+x)+%7B%0A++return+x+%2A+2%3B%0A%7D%0A%0Aint+mul_by_3(int+x)+%7B%0A++return+x+%2A+3%3B%0A%7D%0A%0Aint+mul_by_4(int+x)+%7B%0A++return+x+%2A+4%3B%0A%7D%0A%0Aint+mul_by_16(int+x)+%7B%0A++return+x+%2A+16%3B%0A%7D%0A%0Aint+mul_by_25(int+x)+%7B%0A++return+x+%2A+25%3B%0A%7D%0A%0Aint+mul_by_522(int+x)+%7B%0A++return+x+%2A+522%3B%0A%7D'"></iframe>
+
+So - it's mostly `lea` again! By this point maybe you feel like the [Square Hole Girl](https://www.youtube.com/watch?v=cUbIkNUFs-4), for each of those multiplies I bet you thought, "it will use the `mul` instruction, surely?" Or, for the powers of two, a shift, right? As you probably know, generally speaking adds and shifts are much cheaper than multiplication on CPUs[^typical].
+
+[^typical]: Typically for integers: adds are single-cycle, but multiplies take a few cycles, like 3 or 4. [uops](https://uops.info/table_overview.html) has all the gory details for x86 processors. Generally speaking, arithmetic is about as difficult for computers as humans: Adding and subtracting is easy, multiplication is harder, with division being the trickiest. We'll look at division later.
+
+But again, our friendly versatile `lea` instruction lets us add _and_ multiply by 1, 2, 4 or 8. The compiler knows this, and builds a multiply by two out of adding `rdi` with itself, multiply by three as `rdi + rdi*2`, four as `0 + rdi*4`. The various choices here are to do with the specifics of the opcode encoding; the compiler avoids having to add the 32-bit constant `0` where it can as that adds four bytes of `00` in the machine code. You can toggle the "link to binary" option to see that in the pane above.
+
+Moving on to the multiply by 16, finally the compiler generates a shift! Here again we see the annoying x86 foible where we need to move the value from the input register `edi` to the output `eax` and then shift it, as the x86 doesn't let us do that in one step.
+
+The multiply by 25 is cute: the compiler computes `x * 5` by `rdi + rdi*4`, and then does it again to get `x * 5 * 5` = `x * 25`. Neat!
+
+Finally by 522 the compiler seems to accept defeat, and uses an actual multiply. Here it's using the newer three-argument `imul` so it can actually output the result of `x * 522` directly into `eax`.
+
+But! We're cleverer than the compiler. We know that 522 is 512 + 8 + 2, and each of those powers of two can be computed efficiently with a shift; so why not rephrase as `(x << 9) + (x << 3) + (x << 1)`? Let's give that a go!
+
+<iframe width="100%" height="140px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'libraryCode,commentOnly,intel,labels,directives,demangle,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+mul_by_522(int+x)+%7B%0A++return+(x+%3C%3C+9)+%2B+(x+%3C%3C+3)+%2B+(x+%3C%3C+1)%3B%0A%7D'"></iframe>
+
+Well, shucks. The compiler saved us from ourselves. Just like [yesterday](/202512/03-more-adding-integers), it spotted what we were doing. It knows that adding that set of shifted powers of two is tantamount to a multiply. And - more importantly - it knows that _for modern x86_, the multiply is faster than shifting and adding. So it has our back.[^back]
+
+[^back]: If you crank the options way back using `-m32 -march=pentium` you'll see it _does_ use shifts and adds, as multiplication was more expensive back then. But either way; we should let the compiler decide how best to multiply based on which CPU we are targeting, and stop trying to micro-optimise this kind of thing ourselves.
+
+The message here is clear: compilers know all the shift and add tricks for multiplication, and when they're appropriate. You don't need to write `return x << 9; // multiply by 512` any more - just write the code for humans to consume and let the optimiser do its magic.
+
+
+_See [the video](https://youtu.be/1X88od0miHs) that accompanies this post._
+
+---
+
+_This post is day 4 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
