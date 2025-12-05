@@ -1,0 +1,70 @@
+ARM's barrel shifter tricks
+Date: 2025-12-05 06:00:00 America/Chicago
+Status: Public
+Summary: The ARM architecture has a cool feature, and compilers know how to use it
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>[Yesterday](/202512/04-multiplying-integers) we talked about how the compiler handles multiplication with a constant on x86. x86 has some architectural quirks (like `lea`) that give the compiler quite some latitude for clever optimisations. But do other processors have similar fun quirks?
+
+Today we're going to look at what code gets generated for the ARM processor. Let's see how our examples come out:
+
+<iframe width="100%" height="560px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:armv8-clang2110,filters:'directives,demangle,libraryCode,intel,labels,commentOnly,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+mul_by_2(int+x)+%7B%0A++return+x+%2A+2%3B%0A%7D%0A%0Aint+mul_by_3(int+x)+%7B%0A++return+x+%2A+3%3B%0A%7D%0A%0Aint+mul_by_4(int+x)+%7B%0A++return+x+%2A+4%3B%0A%7D%0A%0Aint+mul_by_16(int+x)+%7B%0A++return+x+%2A+16%3B%0A%7D%0A%0Aint+mul_by_25(int+x)+%7B%0A++return+x+%2A+25%3B%0A%7D%0A%0Aint+mul_by_522(int+x)+%7B%0A++return+x+%2A+522%3B%0A%7D'"></iframe>
+
+Here we see ARM's orthogonal and sensible instruction[^arm] set, along with its superpower: the barrel shifter. On ARM, many instructions can include a shift of the second operand. While not always completely "free" on modern processors[^modern], it's cheap enough that the compiler can use it to avoid separate shift instructions.
+
+[^modern]: On modern cores like the Cortex-A76, small left shifts (≤4 bits) on add/sub are essentially free, but larger shifts or right shifts can add latency. Still much better than needing separate instructions!
+
+Multiplying by 2 is just a shift:
+
+```asm
+mul_by_2(int):
+  lsl w0, w0, #1    ; w0 = w0 << 1
+  ret
+```
+
+Multiplying by 3 is an add with `w0` plus itself left shifted by 1, as a single instruction:
+
+```asm
+mul_by_3(int):
+  add w0, w0, w0, lsl #1  ; w0 = w0 + (w0 << 1)
+  ret
+```
+
+Multiplying by 4 and 16 are also simple shifts, but there's no shortcut for multiplying by 25 or 522: The compiler has to generate a multiply instruction there.
+
+[^arm]: After Z80 and 6502, ARM was the next ISA I learned and I spent many of my formative years writing in pure ARM assembly language, so it has a very special place in my heart.
+
+It's also interesting that the operands can't be constant values except for `mov`; so the constant value of 25 or 522 have to be loaded before they can be used in the multiply. ARM has a fixed-size instruction format - every instruction is 4 bytes long[^thumb], so there's limited space to pack all the operands in.
+
+[^thumb]: I'm ignoring the thumb mode here, which uses 2 byte instructions.
+
+On older 32-bit ARM there's an even cooler trick to let us multiply by one-less-than-a-power-of-two, using `rsb` (reverse subtract, `dest = op2 - op1`). If we pick 32-bit armv7 we get to see this in action:
+
+<iframe width="100%" height="160px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:armv7-clang2110,filters:'directives,demangle,libraryCode,intel,labels,commentOnly,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+mul_by_7(int+x)+%7B%0A++return+x+%2A+7%3B%0A%7D'"></iframe>
+
+```asm
+mul_by_7(int):
+  rsb r0, r0, r0, lsl #3    ; r0 = (r0 << 3) - r0
+  bx lr
+```
+
+Here in a single instruction it calculates `result = (8 * x) - x`. Cool stuff, but only on 32-bit ARMs. I guess that's the price of progress?[^contact]
+
+[^contact]: If I'm missing something obvious, please let me know! I'm still learning 64-bit ARM, so there could be something I'm missing here.
+
+Different architectures, different tricks: x86 has `lea`, ARM has the barrel shifter. The compiler knows them all, so we don't have to.
+
+
+_See [the video](https://youtu.be/TZubUyr2UEY) that accompanies this post._
+
+---
+
+_This post is day 5 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
