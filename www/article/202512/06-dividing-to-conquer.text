@@ -1,0 +1,49 @@
+Division
+Date: 2025-12-06 06:00:00 America/Chicago
+Status: Public
+Summary: Division doesn't have to be slow with some clever tricks
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Broadly [computers have the same kind of trouble with integer arithmetic that we do](https://www.youtube.com/watch?v=PpaQrzoDW2I), addition and subtraction are quick, multiplication takes a bit longer, and then division is where things start to get really slow. On an average x86, addition is single-cycle (and many can happen at once), multiplication is three or so cycles, and then division can be up to a hundred![^div] And usually only a single divide can happen at a time, too.
+
+[^div]: Recent Intel processors have substantially improved this - Skylake's 64-bit integer divide could take up to 96 cycles, but Alder Lake is now maxing out at 18 cycles.
+
+It's worth avoiding divides then, and compilers know this too. Let's start with the easy cases: you probably know that shifting right effectively divides by powers of two. You've likely seen `return x >> 9;` to divide the `int` `x` by 512, right? Let's see what the compiler does if we use the more obvious `return x / 512;`:
+
+<iframe width="100%" height="200px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'labels,intel,demangle,trim,libraryCode,directives,commentOnly',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+divide_by_512(int+x)+%7B%0A++++return+x+/+512%3B%0A%7D'"></iframe>
+
+Well, the stupid compiler has generated all these extra instructions! How dumb! Clearly we can't trust compilers and should go back to our much cooler `x >> 9`, right?
+
+No... the compiler is being correct here. This is a great example of the compiler _doing what you asked_ not _what you meant_. When you divide in C, the language rules are "round towards zero". That's great, shifting down does indeed round down. But **only for positive numbers**. Shifting (effectively) rounds towards negative infinity. The compiler is forced to emit those extra instructions to appropriately round negative numbers up! We may not have realised it, but by using the signed integer type `int`, we _asked_ the compiler to do this.
+
+```asm
+test edi, edi         ; set sign flags etc based on x
+lea eax, [rdi+511]    ; eax = x + 511 (bias for negative rounding)
+cmovns eax, edi       ; eax = (x >= 0) ? x : (x + 511)
+sar eax, 9            ; eax = eax >> 9
+```
+
+It's a neat sequence that does _what we asked_. But what if we _knew_ `x` was never negative? Can we get the compiler to do _what we wanted_? Absolutely:
+
+<iframe width="100%" height="160px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'labels,intel,demangle,trim,libraryCode,directives,commentOnly',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'unsigned+divide_by_512(unsigned+x)+%7B%0A++++return+x+/+512u%3B%0A%7D'"></iframe>
+
+Simply by dividing by an _unsigned_ constant 512, we tell the compiler what we wanted, and it does the right thing[^cast].
+
+This idea will pop up again in later episodes: sometimes we have to be very careful to align what we'd like to happen with what we actually wrote in our code. The compiler has its hands tied by the language specification, and sometimes it does things that may surprise you if you don't remember that. Tools like [Compiler Explorer](https://godbolt.org) can help you develop your intuition.
+
+[^cast]: If, like me, you run with `-Wsign-conversion`, you'll also need to take and return an `unsigned`, or else cast or similar.
+
+
+_See [the video](https://youtu.be/7Rtk0qOX9zs) that accompanies this post._
+
+---
+
+_This post is day 6 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
