@@ -1,0 +1,93 @@
+Multiplying our way out of division
+Date: 2025-12-07 06:00:00 America/Chicago
+Status: Public
+Summary: How compilers avoid expensive division with multiplication tricks
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>I occasionally give presentations to undergraduates, and one of my favourites is taking the students on a journey of optimising a "binary to decimal" routine[^yeah]. There are a number of tricks, which I won't go in to here, but the opening question I have is "how do you even turn a number into its ASCII representation?"
+
+[^yeah]: A decade ago many trading systems still used [FIX](https://en.wikipedia.org/wiki/Financial_Information_eXchange) to accept new orders, and that's essentially ASCII. Taking prices and quantities and quickly turning them into ASCII used to be important!
+
+If you've never stopped to think about it, take a moment now to do so, it can be a fun problem.
+
+The simple[^naive] approach is to use `number % 10` to get the rightmost digit (adding 48 to turn it into the ASCII number), then divide by ten, and keep going until the number is zero. This produces the digits backwards[^bit], but you can reverse them afterwards, which I won't show here. This routine is one of the few legitimate uses of `do while` in C, as we always want to emit at least one digit even if the number _is_ zero to start with. The code looks something like:
+
+[^naive]: Yes I know I said I wouldn't go into it, but the faster implementation I wrote uses bit trickery to get log(10) of the number, then dispatches via template trickery to a "N-digit" routine that then uses a 100-entry lookup table to look up pairs of digits. Fun stuff.
+
+[^bit]: If you can get the log(10) you can get the number of digits in the output, and then you can start at the right spot in the output buffer and write the number backwards.
+
+<iframe width="100%" height="440px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'demangle,commentOnly,directives,labels,trim,intel,libraryCode',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'char+%2Ato_decimal_backwards(%0A++++unsigned+number,+char+%2Abuf)%0A%7B%0A++do+%7B%0A++++%2Abuf%2B%2B+%3D+static_cast%3Cchar%3E(number+%25+10u)+%2B+!'0!'%3B%0A++++number+/%3D+10u%3B%0A++%7D+while+(number)%3B%0A++return+buf%3B%0A%7D'"></iframe>
+
+Here the compiler does a fantastic job. [Yesterday](/202512/06-dividing-to-conquer) we saw how division by powers of two can be optimised to shifts; today we'll see the compiler manages to avoid expensive division even when we _aren't_ dividing by a power of two. It also gets the remainder cheaply, which we usually get for free from the divide instruction.
+
+The transformation is quite clever - let's walk through the annotated assembly:
+
+```asm
+to_decimal_backwards(unsigned int, char*):
+  mov rax, rsi              ; rax = buf
+  mov esi, 3435973837       ; esi = 0xcccccccd
+.L2:
+  mov edx, edi              ; edx = number
+  mov ecx, edi              ; ecx = number
+  add rax, 1                ; ++buf
+
+  imul rdx, rsi             ; rdx *= 0xcccccccd
+  shr rdx, 35               ; rdx = rdx >> 35
+                            ; rdx = number / 10 [see below]
+
+  lea r8d, [rdx+rdx*4]      ; r8 = rdx * 5
+  add r8d, r8d              ; r8 = rdx * 5 * 2 = rdx * 10
+                            ; r8 = (number / 10) * 10 [rounded down]
+  sub ecx, r8d              ; ecx = number - (number / 10) * 10
+                            ; ecx = number % 10
+  add ecx, 48               ; ecx = '0' + (number % 10)
+  cmp edi, 9                ; number > 9?
+  mov edi, edx              ; number = number / 10
+  mov BYTE PTR [rax-1], cl  ; *(buf-1) = '0' + (number % 10)
+  ja .L2                    ; loop if number (prior to divide) >= 10
+  ret
+```
+
+There's a lot to unpack here, several different optimisations, but the main one is how the compiler has turned division by a constant ten into a multiply and a shift. There's a magic constant `0xcccccccd` and a shift right of 35! Shifting right by 35 is the same as dividing by 2<sup>35</sup> - what's going on?[^imul]
+
+[^imul]: You might wonder why the compiler uses `imul` (signed multiply) even though we're working with unsigned values. The low 64 bits of the result are identical for both signed and unsigned multiplication, and `imul` has more flexible operand forms that let us specify three operands.
+
+Let's see what happens each step of the algorithm:
+
+```py
+>>> 1234 * 0xcccccccd
+4239991714858
+>>> 4239991714858 // (2**35)
+123
+>>> 123 * 10
+1230
+>>> 1234 - 1230
+4
+```
+
+What's happening is that `0xcccccccd / 2**35` is very close to ⅒ (around 0.10000000000582077). By multiplying our input value by this constant first, then shifting right, we're doing fixed-point multiplication by ⅒ - which is division by ten. The compiler knows that for all possible unsigned integer values, this trick will always give the right answer. For other values and signednesses, sometimes it needs to account for rounding, for example, dividing a signed value by three:
+
+<iframe width="100%" height="220px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'demangle,commentOnly,directives,labels,trim,intel,libraryCode',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+div_by_3(int+x)+%7B%0A++return+x+/+3%3B%0A%7D'"></iframe>
+
+Here we see that it has to account for rounding. If you edit the code above and try dividing by fifteen, you'll see that causes even more code to be emitted. However, it's all still faster than a real divide instruction.
+
+Back to our ASCII conversion example, to get the remainder (the modulus); the compiler takes the (truncated) `number / 10`, multiplies it back up by 10 using `lea` tricks (we've covered this [before](/202512/02-adding-integers)), and then the difference between the original number and this computed value is the remainder.
+
+The rest of the optimisations are the compiler trying to do work eagerly (like incrementing `buf`), and checking one loop iteration ahead: there's no point looping if the current number is less than or equal to 9.
+
+Overall, some very clever optimisations that avoid division entirely!
+
+
+_See [the video](https://youtu.be/V9Pvv1tkocM) that accompanies this post._
+
+---
+
+_This post is day 7 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
