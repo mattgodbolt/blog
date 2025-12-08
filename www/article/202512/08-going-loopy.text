@@ -1,0 +1,85 @@
+Going loopy
+Date: 2025-12-08 06:00:00 America/Chicago
+Status: Public
+Summary: Exploring the ways optimisers deal with loop constructs
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Which loop style is "best"? This very question led to the creation of Compiler Explorer! In 2011 I was arguing with my team about whether we could switch all our loops from ordinal or iterator-style to the "new" range-for[^java]. I wrote a small [shell script](https://mattgodbolt.github.io/ce-behind-the-scenes/#/1/3) to iteratively show the compiler output as I edited code in `vim`, and the seed of [Compiler Explorer](https://godbolt.org) was born.
+
+C and C++ have many ways to phrase loops: `for()`, `while()`, `do..while()`, range-for (`for (x : container)`), STL algorithms like `std::for_each`, and now range transformations! Let's see if loop style actually matters for performance.
+
+[^java]: That might seem odd - why would we expect it to be slower? In this instance we had just been bitten by a similar issue in Java - a range-for equivalent in Java creates a temporary iteration object each time around, and we were trying to write "garbage free" java. This caught us out, so the team was a bit sensitive to this kind of issue.
+
+Let's look at similar functions that calculate the sum of a `std::vector<int>`, using different looping strategies. First, let's use the ordinal-based approach:
+
+<iframe width="100%" height="440px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'labels,intel,directives,demangle,trim,libraryCode,commentOnly',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cvector%3E%0A%0Aint+sum(const+std::vector%3Cint%3E+%26vec)+%7B%0A++int+sum+%3D+0%3B%0A++for+(std::size_t+index+%3D+0%3B%0A+++++++index+%3C+vec.size()%3B%0A+++++++%2B%2Bindex)+%7B%0A++++sum+%2B%3D+vec%5Bindex%5D%3B%0A++%7D%0A++return+sum%3B%0A%7D'"></iframe>
+
+To explain the generated assembly code, we need to take a look at the innards of a `std::vector`[^atleast]. Internally, the vector holds three pointers: one to the beginning of the allocated data ("start"), one to the just past the end of the used data ("finish"), and a last one to the end of the storage (the space which we can grow into without reallocating). It does not explicitly store the size. Let's look at the first few instructions:
+
+[^atleast]: At least, the GNU implementation. As best I know all standard library implementations follow this pattern, but I don't think the C++ standard requires them to work exactly this way.
+
+```asm
+  mov rsi, QWORD PTR [rdi]      ; rsi = vec->start
+  mov rcx, QWORD PTR [rdi+8]    ; rcx = vec->finish
+  sub rcx, rsi                  ; rcx = finish - start
+  je .L4                        ; if zero; early return
+  sar rcx, 2                    ; rcx >>= 2 (divide by sizeof(int))
+                                ; rcx = vec.size()
+  xor eax, eax                  ; eax = 0 (this will be "index")
+  xor edx, edx                  ; edx = 0 (this will be "sum")
+```
+
+The first thing we do is get the start and finish pointers of the vector, and then subtract them to work out the size (returning early if it's zero). So far so good! (The .L4 label just returns 0, so I'll ignore it in this description).
+
+Next we see the loop itself:
+
+```asm
+.L3:
+  add edx, DWORD PTR [rsi+rax*4]; edx += *(int*)(start + index*4)
+  add rax, 1                    ; ++index
+  cmp rax, rcx                  ; if index == size?
+  jb .L3                        ; if not, loop
+  mov eax, edx                  ; return "sum"
+  ret
+```
+
+Here we see the slightly bonkers x86 addressing mode we touched on in the [earlier lea post](/202512/02-adding-integers) which lets us read a value from memory calculated from the start plus the index (times four, as each `int` is four bytes), _and_ add it in a single instruction. CISC, am I right?
+
+Anyway, everything seems ok in this loop, right? Except, it bothers me that we calculate the size at all. I mean, we don't _really_ care what size it is, we just want to iterate over every element, right?[^raxret]
+
+[^raxret]: Honestly it also annoys me the register allocator didn't put `sum` into `rax` from the start to save on the `mov eax, edx` at the end, but that's minor.
+
+How about we rephrase this to use the pointers directly? We can fish out the start pointer with `.data()`, and calculate the end pointer by adding the size (and hope the optimiser spots it doesn't need to _actually_ use the size, it can just use the `end` directly). What does that look like?
+
+<iframe width="100%" height="360px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'labels,intel,directives,demangle,trim,libraryCode,commentOnly',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cvector%3E%0A%0Aint+sum(const+std::vector%3Cint%3E+%26vec)+%7B%0A++int+sum+%3D+0%3B%0A++const+int+%2Afirst+%3D+vec.data()%3B%0A++const+int+%2Aend+%3D+vec.data()+%2B+vec.size()%3B%0A++while+(first+!!%3D+end)+%7B%0A++++sum+%2B%3D+%2Afirst%3B%0A++++%2B%2Bfirst%3B%0A++%7D%0A++return+sum%3B%0A%7D'"></iframe>
+
+That's _much_ better! The optimiser _has_ avoided all the shifts and size calculation in the setup code, and the inner loop is simply reading and walking a pointer forward.
+
+Any time you see C++ code with naked pointers in it, you should ask yourself if there's a better way, though. So, let's see what would happen if we used the fancy range-for:
+
+<iframe width="100%" height="360px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'labels,intel,directives,demangle,trim,libraryCode,commentOnly',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cvector%3E%0A%0Aint+sum(const+std::vector%3Cint%3E+%26vec)+%7B%0A++int+sum+%3D+0%3B%0A++for+(auto+value+:+vec)+%7B%0A++++sum+%2B%3D+value%3B%0A++%7D%0A++return+sum%3B%0A%7D'"></iframe>
+
+**Exactly** the same code as our `while`-based, pointer approach! The compiler canonicalised the range-for into identical assembly. Less error-prone pointer manipulation, more intention-revealing C++ code, _and_ the best code generation!
+
+Even with a standard algorithm, the pattern continues:
+
+<iframe width="100%" height="360px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'labels,intel,directives,demangle,trim,libraryCode,commentOnly',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cnumeric%3E%0A%23include+%3Cvector%3E%0A%0Aint+sum(const+std::vector%3Cint%3E+%26vec)+%7B%0A++return+std::accumulate(begin(vec),+end(vec),+0)%3B%0A%7D'"></iframe>
+
+Identical again! Canonicalisation rewrites all these different loop forms into the same basic setup, generating optimal code every time[^except]. Whether you write explicit loops or use standard algorithms, the compiler sees through to the underlying iteration pattern. Write clear, intention-revealing code - the optimiser has your back.
+
+[^except]: With the exception of the ordinal-based one where the compiler doesn't work out it can drop the loop index.
+
+
+_See [the video](https://youtu.be/FB8Hgj3TpJM) that accompanies this post._
+
+---
+
+_This post is day 8 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
