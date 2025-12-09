@@ -1,0 +1,103 @@
+Induction variables and loops
+Date: 2025-12-09 06:00:00 America/Chicago
+Status: Public
+Summary: Compilers can rewrite loops to avoid expensive calculations
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Loop optimisations often surprise us. What looks expensive might be fast, and what looks clever might be slow.
+
+[Yesterday](/202512/08-going-loopy) we saw how the compiler canonicalises loops so it (usually) doesn't matter how you write them, they'll come out the same. What happens if we do something a little more expensive inside the loop?
+
+Let's take a look at something that looks like it would need an "expensive" multiply each loop iteration[^dont]:
+
+[^dont]: Please don't write code like this: don't write unchecked to an output array, use `std::span` or similar, or return a `std::vector<>`, or any number of better ways. I'm trying to balance small code output for teaching purposes against "real world" code.
+
+<iframe width="100%" height="360px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'trim,demangle,intel,labels,commentOnly,directives,libraryCode',options:'-O2+-mtune%3Dhaswell+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'void+output_times_table(%0A++++int+table,%0A++++int+count,%0A++++int+%2Aoutput)%0A%7B%0A++for+(int+index+%3D+0%3B+index+%3C+count%3B+%2B%2Bindex)+%7B%0A++++%2Aoutput%2B%2B+%3D+index+%2A+table%3B%0A++%7D%0A%7D'"></iframe>
+
+Despite our "times table" seemingly requiring a multiply for each step, the compiler realises it can rephrase the loop to keep an accumulator, and add `table` each iteration instead:
+
+```asm
+.L3:
+  add rdx, 4                ; advance the output pointer
+  mov DWORD PTR [rdx-4], eax; write "accumulator"
+  add eax, edi              ; add "table" to the accumulator
+  cmp rdx, rcx              ; have we reached the end?
+  jne .L3                   ; loop if not
+```
+
+That "accumulator" is called an induction variable, and if you know a thing about maths[^math], you know we can rewrite lots of things as a series of sums. For example, if we wanted to output squares (x²) instead, we might expect the compiler to smartly turn this into a series of additions[^expl], something like[^haswell]:
+
+[^math]: Translation for Americans: "math".
+[^expl]: The difference between adjacent squares goes up by 1, 3, 5, 7...
+[^haswell]: You might spot I'm using `haswell` tuning here: this is to keep it in line with later analysis I'm going to do. In this particular case it doesn't make a code generation difference, but it keeps the analysis in sync with the code here, and is close to the default `-mtune=generic` the compiler uses. The analysis tool we'll use assumes a much newer CPU, and that erodes the point I'm making in this particular post.
+
+<iframe width="100%" height="380px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'trim,demangle,intel,labels,commentOnly,directives,libraryCode',options:'-O2+-mtune%3Dhaswell+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'void+output_squares(int+count,+int+%2Aoutput)+%7B%0A++int+square+%3D+0%3B%0A++int+delta+%3D+1%3B%0A++for+(int+i+%3D+0%3B+i+%3C+count%3B+%2B%2Bi)+%7B%0A++++%2Aoutput%2B%2B+%3D+square%3B%0A++++square+%2B%3D+delta%3B%0A++++delta+%2B%3D+2%3B%0A++%7D%0A%7D'"></iframe>
+
+But in fact, if we try it, the compiler goes back to squaring with `imul`:
+
+<iframe width="100%" height="360px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'trim,demangle,intel,labels,commentOnly,directives,libraryCode',options:'-O2+-mtune%3Dhaswell+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'void+output_squares(int+count,+int+%2Aoutput)+%7B%0A++for+(int+i+%3D+0%3B+i+%3C+count%3B+%2B%2Bi)+%7B%0A++++%2Aoutput%2B%2B+%3D+i+%2A+i%3B%0A++%7D%0A%7D'"></iframe>
+
+What's going on here?! Yet again, the compiler is probably smarter than us: multiplies are pretty quick (around 3 cycles), and by keeping each loop iteration independent of the previous iteration, the processor can actually run many multiplications simultaneously.
+
+In our manual induction variable code, each loop iteration requires the results of the previous loop iteration - a _loop carried dependency_ - which could prevent this overlapping of calculations.
+
+To test this theory, we can use `llvm-mca` - the [LLVM Machine Code Analyser](https://llvm.org/docs/CommandGuide/llvm-mca.html). This tool runs a CPU simulation and can show this overlapping[^assume] of computation. I've used it to generate a timeline of what happens on the CPU, cycle by cycle. In this view, instructions run from top to bottom, and time left to right. Each instruction's journey through the pipeline is shown: `D` is decode, `e` is execution, `E` is execution complete, `R` is retired (fully complete). `=` shows a stall. Each row shows one instruction - for example, `[0,2]` means iteration 0, instruction 2.
+
+Watch how the instructions from different iterations overlap - that's the key to performance here. This trace is for the induction variable version:
+
+[^assume]: It assumes perfect branch prediction and no cache misses, which is a little hopeful but is a decent starting point.
+
+```
+[0,0]     DeER .    .    .  .   add     rsi, 4
+[0,1]     D=eER.    .    .  .   mov     dword ptr [rsi - 4], eax
+[0,2]     DeE-R.    .    .  .   add     eax, edx
+[0,3]     DeE-R.    .    .  .   add     edx, 2
+[0,4]     .DeER.    .    .  .   cmp     rcx, rsi
+[0,5]     .D=eER    .    .  .   jne     .L3
+[1,0]     .DeE-R    .    .  .   add     rsi, 4
+[1,1]     .D=eER    .    .  .   mov     dword ptr [rsi - 4], eax
+[1,2]     . DeER    .    .  .   add     eax, edx
+[1,3]     . DeER    .    .  .   add     edx, 2
+[1,4]     . DeER    .    .  .   cmp     rcx, rsi
+[1,5]     . D=eER   .    .  .   jne     .L3
+```
+
+Nearly the whole first loop iteration is decoded each cycle, and by the third cycle all of the first loop iteration is executing. The first iteration is complete on the 6th cycle, and the second by the seventh cycle, which means once things settle down, an iteration completes every 1½ cycles[^ac]. You can see the full trace [at this Compiler Explorer link](https://aoco.compiler-explorer.com/z/ccE3Y5cGd).
+
+[^ac]: It works out as one and a half due to other constraints you can see if you look at the full trace. Computers are bonkers fast these days.
+
+If we simulate the square-with-multiply version:
+
+```
+[0,0]     DeER .    .    .    .   mov   edx, eax
+[0,1]     D=eeeER   .    .    .   imul  edx, eax
+[0,2]     D====eER  .    .    .   mov   dword ptr [rsi + 4*rax], edx
+[0,3]     DeE----R  .    .    .   inc   rax
+[0,4]     .DeE---R  .    .    .   cmp   rax, rdi
+[0,5]     .D=eE--R  .    .    .   jne   .L3
+[1,0]     .DeE---R  .    .    .   mov   edx, eax
+[1,1]     .D=eeeER  .    .    .   imul  edx, eax
+[1,2]     . D===eER .    .    .   mov   dword ptr [rsi + 4*rax], edx
+[1,3]     . DeE---R .    .    .   inc   rax
+[1,4]     . D=eE--R .    .    .   cmp   rax, rdi
+[1,5]     . D==eE-R .    .    .   jne   .L3
+```
+
+On this simulated Haswell processor, the average loop still takes 1.5 cycles! Check the [full link here](https://aoco.compiler-explorer.com/z/croW7esoj). Despite using a more expensive multiply, and despite a loop iteration now taking 8 cycles, because each loop iteration is independent of the last, we still get the throughput of one iteration every 1½ cycles.
+
+Compilers _are_ smart - trust them. But know how to use tools like [Compiler Explorer](https://godbolt.org) and `llvm-mca` to verify, and always benchmark.
+
+
+_See [the video](https://youtu.be/vZk7Br6Vh1U) that accompanies this post._
+
+---
+
+_This post is day 9 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
