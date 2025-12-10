@@ -1,0 +1,58 @@
+Unrolling loops
+Date: 2025-12-10 06:00:00 America/Chicago
+Status: Public
+Summary: Learning when the compiler decides to unroll loops for performance
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>A common theme for helping the compiler optimise is to give it as much information as possible. Using the [right signedness of types](/202512/06-dividing-to-conquer), targeting the right CPU model, keeping [loop iterations independent](/202512/09-induction-variables), and for today's topic: telling it how many loop iterations there are going to be ahead of time.
+
+Taking the range-based sum example [from our earlier post on loops](/202512/08-going-loopy), but using a `std::span`[^span], we can explore this ability. Let's take a look at what happens if we use a dynamically-sized span - we'd expect it to look very similar to the `std::vector` version:
+
+[^span]: A span is a "pointer and a length", representing a contiguous array of values. The length can optionally be compile-time known, so `std::span<int>` is dynamically sized, but `std::span<int, 8>` is a span of 8 integers.
+
+[^arm]: I'm using this older ARM on purpose: it doesn't have fancy-pants vector instructions, which I'll cover later. We can see the loop optimisation on this simple example without introducing lots of complexity. We'll get there, I promise!
+
+<iframe width="100%" height="200px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:armv7-clang2110,filters:'directives,commentOnly,intel,demangle,libraryCode,labels,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Aint+sum(std::span%3Cint%3E+ints)+%7B%0A++int+sum+%3D+0%3B%0A++for+(auto+value+:+ints)%0A++++sum+%2B%3D+value%3B%0A++return+sum%3B%0A%7D'"></iframe>
+
+The compiler doesn't know how many ints there will be ahead of time, and it generates pretty straightforward code[^odd]:
+
+```asm
+.LBB0_2
+  ldr r3, [r2], #4      ; value = *ints++
+  subs r1, r1, #4       ; count down remaining bytes
+  add r0, r3, r0        ; sum = value + sum
+  bne .LBB0_2           ; loop if no more bytes
+```
+
+[^odd]: Here the compiler has done something unusual - it multiplies up the size by 4 (`lsl r1, r1, #2` in the preamble), and then counts down in fours. I don't know why it doesn't realise it can avoid the shift, and then just count down in ones.
+
+A simple modification to the code to pass a `std::span<int, 8>`, so the compiler now knows it will always loop eight times:
+
+<iframe width="100%" height="200px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:armv7-clang2110,filters:'directives,commentOnly,intel,demangle,libraryCode,labels,trim',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Aint+sum(std::span%3Cint,+8%3E+ints)+%7B%0A++int+sum+%3D+0%3B%0A++for+(auto+value+:+ints)%0A++++sum+%2B%3D+value%3B%0A++return+sum%3B%0A%7D'"></iframe>
+
+The compiler takes advantage of this knowledge by unrolling the loop - it compiles the code as if all eight iterations of the loop had been written out one after another, avoiding the loop counter, and the conditional branch. That saves two instructions per loop iteration (the `subs` and the `bne`), and also allows the compiler to spot more patterns: We see that it loads the first two values at once using the "load multiple" `ldmib` instruction[^pres].
+
+Try changing the `8` in the example above to other values and you'll see the variety of different ways the compiler chooses to implement the loop. At 32 iterations it gets quite register-happy, even spilling onto the stack briefly to get more registers to load. At 50 iterations the optimiser gives up and falls back to regular looping[^tiling].
+
+[^pres]: While it could load even more registers in one go, the compiler has made the tradeoff of getting two reads at once before starting a pattern of loading and adding, to take advantage of the instruction-level parallelism this unlocks.
+
+[^tiling]: I'm a little surprised/disappointed that it doesn't instead "chunk up" the loop into fixed-size blocks of say 16, and then loop over those 4 times to get 48, then add the last two. We'll see ways the compiler might choose to "chunk" later in the series with auto-vectorisation.
+
+Compilers will sometimes partially unroll loops (chunking up unrolled sections in a larger loop), or even speculatively unroll when the count isn't known ahead of time. There's a ton of heuristics at play, and honestly, the compiler's guess is usually pretty good. But it's worth checking your hot loops[^pgo] to see what it's doing - and if you can give it the loop count at compile time, you're setting it up for success.
+
+[^pgo]: Things like profile-guided optimisation (PGO) can help the compiler check its guesses are on-track: You build your program with instrumentation, run it with representative data, then feed the instrumentation output back to the compiler. Some of that data will include loop counts, which can help the optimiser. I won't be covering PGO in this series, but it's worth a look.
+
+
+_See [the video](https://youtu.be/HvF3tF2efEA) that accompanies this post._
+
+---
+
+_This post is day 10 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
