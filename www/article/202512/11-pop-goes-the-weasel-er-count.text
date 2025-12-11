@@ -1,0 +1,71 @@
+Pop goes the...population count?
+Date: 2025-12-11 06:00:00 America/Chicago
+Status: Public
+Summary: Compilers can take advantage of some very specific instructions
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Who among us hasn't looked at a number and wondered, "How many one bits are in there?" No? Just me then?
+
+Actually, this "population count" operation can be pretty useful in some cases like data compression algorithms, [cryptography, chess, error correction](https://vaibhavsagar.com/blog/2019/09/08/popcount/), and [sparse matrix representations](https://faculty.cc.gatech.edu/~echow/pubs/ics26-liuPS.pdf). How might one write some simple C to return the number of one bits in an unsigned 64 bit value?
+
+One way might be to loop 64 times, checking each bit and adding one if set. Or, equivalently, shifting that bit down and adding it to a running count: sometimes the population count operation is referred to as a "horizontal add" as you're adding all the 64 bits of the value together, horizontally. There are "divide and conquer" approaches too, see the amazing [Stanford Bit Twiddling Hacks page](https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive) for a big list.
+
+My favourite way is to loop while the value is non-zero, and use a cute trick to "clear the bottom set bit". The loop count is then the number of set bits. How do you clear the bottom set bit? You `and` a value with itself decremented!
+
+```
+value       : 11010100
+subtract 1  : 11010011
+& value     : 11010000
+```
+
+If you try some examples on paper, you'll see that subtracting one always moves the bottom set bit down by one place, setting all the bits from there down. Everything else is left the same. Then when you `and`, the bottom set bit is guaranteed to be `and`-ed with zero, but everything else remains. Great stuff!
+
+All right, let's see what the compiler makes of this:
+
+<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,trim,labels,demangle,intel,directives,libraryCode',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Ccstdint%3E%0A%0Aunsigned+population_count(std::uint64_t+value)+%7B%0A++unsigned+result+%3D+0%3B%0A++while+(value)+%7B%0A++++//+Clear+bottom+set+bit%0A++++value+%26%3D+value+-+1%3B%0A++++%2B%2Bresult%3B%0A++%7D%0A++return+result%3B%0A%7D'"></iframe>
+
+The core loop is pretty much what we'd expect, using the [lea trick](/202512/02-adding-integers) to get `value - 1`, `and`ing and counting:
+
+```asm
+.L3:
+  lea rax, [rdi-1]          ; rax = value - 1
+  add edx, 1                ; ++result
+  and rdi, rax              ; value &= value - 1
+  jne .L3                   ; ...while (value)
+```
+
+Great stuff, but we can do better. By default gcc and clang both target some kind of "generic" processor which influences which instructions they can use. We're compiling for Intel here, and gcc's default is somewhere around Intel's "nocona" architecture, from 2004. Unless you are running vintage hardware you can probably change it to something better. Let's pick the super up-to-date "westmere" (from 2010...) using `-march=westmere` and see what happens[^sandy]:
+
+[^sandy]: Interestingly, if you select other architectures like `-march=sandybridge` you'll see the compiler emits a seemingly redundant `xor eax, eax` _before_ the `popcnt eax, edi`. This is to work around a performance bug in the CPU[^omg]!
+
+[^omg]: The register renamer / dependency tracking in the out of order engine incorrectly believes that `popcnt` has a dependency on the previous value of the destination register. The `xor eax, eax` breaks this dependency.
+
+<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,trim,labels,demangle,intel,directives,libraryCode',options:'-march%3Dwestmere+-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Ccstdint%3E%0A%0Aunsigned+population_count(std::uint64_t+value)+%7B%0A++unsigned+result+%3D+0%3B%0A++while+(value)+%7B%0A++++//+Clear+bottom+set+bit%0A++++value+%26%3D+value+-+1%3B%0A++++%2B%2Bresult%3B%0A++%7D%0A++return+result%3B%0A%7D'"></iframe>
+
+Wow! The entire routine has been replaced with a **single instruction** - `popcnt rax, rdi`[^arm]. When I first saw this optimisation I was blown away: the compiler recognises a relatively complex loop as being functionally equivalent to a single instruction. Both gcc and clang can do this, and within Compiler Explorer you can use the optimisation pipeline viewer in clang to see that clang's "loop deletion pass" is responsible for this trick:
+
+[^arm]: While this post is using Intel, ARM has `popcount`, and some RISC-V variants have `cpop`, which do the same thing.
+
+<p class="picture">
+<a href="11-popcount-clang-opt.png">
+<img src="11-popcount-clang-opt.png" alt="Screenshot of CE showing the opt pipeline viewer with the loop being replaced with a call to @llvm.ctpop.i64" width="500" height="276">
+</a>
+<br/>Compiler Explorer's <a href="https://aoco.compiler-explorer.com/z/Wra11PPP9">Opt Pipeline View</a>
+</p>
+
+Compilers canonicalise code too, so some similar population count code will also be turned into a single instruction, though sadly not all. In this case, it's probably better to actually use a standard C++ routine to guarantee the right instruction as well as reveal your intention: [`std::popcount`](https://en.cppreference.com/w/cpp/numeric/popcount.html). But even if you don't, the compiler might just blow your mind with a single instruction anyway.
+
+
+_See [the video](https://youtu.be/Hu0vu1tpZnc) that accompanies this post._
+
+---
+
+_This post is day 11 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
