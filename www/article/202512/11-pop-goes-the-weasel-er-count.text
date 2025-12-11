@@ -23,7 +23,7 @@ If you try some examples on paper, you'll see that subtracting one always moves 
 
 All right, let's see what the compiler makes of this:
 
-<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,trim,labels,demangle,intel,directives,libraryCode',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Ccstdint%3E%0A%0Aunsigned+population_count(std::uint64_t+value)+%7B%0A++unsigned+result+%3D+0%3B%0A++while+(value)+%7B%0A++++//+Clear+bottom+set+bit%0A++++value+%26%3D+value+-+1%3B%0A++++%2B%2Bresult%3B%0A++%7D%0A++return+result%3B%0A%7D'"></iframe>
+<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'intel,commentOnly,libraryCode,directives,demangle,trim,labels',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Ccstdint%3E%0A%0Aunsigned+population_count(std::uint64_t+value)+%7B%0A++unsigned+result+%3D+0%3B%0A++while+(value)+%7B%0A++++//+Clear+bottom+set+bit%0A++++value+%26%3D+value+-+1%3B%0A++++%2B%2Bresult%3B%0A++%7D%0A++return+result%3B%0A%7D'"></iframe>
 
 The core loop is pretty much what we'd expect, using the [lea trick](/202512/02-adding-integers) to get `value - 1`, `and`ing and counting:
 
@@ -41,7 +41,7 @@ Great stuff, but we can do better. By default gcc and clang both target some kin
 
 [^omg]: The register renamer / dependency tracking in the out of order engine incorrectly believes that `popcnt` has a dependency on the previous value of the destination register. The `xor eax, eax` breaks this dependency.
 
-<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,trim,labels,demangle,intel,directives,libraryCode',options:'-march%3Dwestmere+-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Ccstdint%3E%0A%0Aunsigned+population_count(std::uint64_t+value)+%7B%0A++unsigned+result+%3D+0%3B%0A++while+(value)+%7B%0A++++//+Clear+bottom+set+bit%0A++++value+%26%3D+value+-+1%3B%0A++++%2B%2Bresult%3B%0A++%7D%0A++return+result%3B%0A%7D'"></iframe>
+<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'intel,commentOnly,libraryCode,directives,demangle,trim,labels',options:'-march%3Dwestmere+-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Ccstdint%3E%0A%0Aunsigned+population_count(std::uint64_t+value)+%7B%0A++unsigned+result+%3D+0%3B%0A++while+(value)+%7B%0A++++//+Clear+bottom+set+bit%0A++++value+%26%3D+value+-+1%3B%0A++++%2B%2Bresult%3B%0A++%7D%0A++return+result%3B%0A%7D'"></iframe>
 
 Wow! The entire routine has been replaced with a **single instruction** - `popcnt rax, rdi`[^arm]. When I first saw this optimisation I was blown away: the compiler recognises a relatively complex loop as being functionally equivalent to a single instruction. Both gcc and clang can do this, and within Compiler Explorer you can use the optimisation pipeline viewer in clang to see that clang's "loop deletion pass" is responsible for this trick:
 
@@ -49,7 +49,7 @@ Wow! The entire routine has been replaced with a **single instruction** - `popcn
 
 <p class="picture">
 <a href="11-popcount-clang-opt.png">
-<img src="11-popcount-clang-opt.png" alt="Screenshot of CE showing the opt pipeline viewer with the loop being replaced with a call to @llvm.ctpop.i64" width="500" height="276">
+<img src="11-popcount-clang-opt.png" alt="Screenshot of CE showing the opt pipeline viewer with the loop being replaced with a call to @llvm.ctpop.i64" width="500" height="276" />
 </a>
 <br/>Compiler Explorer's <a href="https://aoco.compiler-explorer.com/z/Wra11PPP9">Opt Pipeline View</a>
 </p>
