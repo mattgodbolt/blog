@@ -1,0 +1,46 @@
+Unswitching loops for fun and profit
+Date: 2025-12-12 06:00:00 America/Chicago
+Status: Public
+Summary: Duplicating loops around can yield some decent optimisations
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Sometimes the compiler decides the best way to optimise your loop is to... write it twice. Sounds counterintuitive? Let's change our `sum` [example from before](/202512/10-loop-unrolling) to optionally return a sum-of-squares[^armagain]:
+
+<iframe width="100%" height="360px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:armv7-clang2110,filters:'demangle,commentOnly,trim,labels,intel,directives,libraryCode',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Aint+sum(std::span%3Cint%3E+ints,+bool+squared)+%7B%0A++int+sum+%3D+0%3B%0A++for+(auto+value+:+ints)+%7B%0A++++sum+%2B%3D+squared+%3F+value+%2A+value+:+value%3B%0A++%7D%0A++return+sum%3B%0A%7D'"></iframe>
+
+[^armagain]: We're using ARMv7 again here for simplicity and to yet again avoid vectorisation that we'll get to later in this series.
+
+At `-O2` the compiler turns the ternary into: `sum += value * (squared ? value : 1);` - using a multiply and add (`mla`) instruction to do the multiply and add, and conditionally picking either `value` or the constant `1` to avoid a branch inside the loop.
+
+However, if we turn the optimisation level up, the compiler uses a new approach:
+
+<iframe width="100%" height="560px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:armv7-clang2110,filters:'demangle,commentOnly,trim,labels,intel,directives,libraryCode',options:'-O3+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Aint+sum(std::span%3Cint%3E+ints,+bool+squared)+%7B%0A++int+sum+%3D+0%3B%0A++for+(auto+value+:+ints)+%7B%0A++++sum+%2B%3D+squared+%3F+value+%2A+value+:+value%3B%0A++%7D%0A++return+sum%3B%0A%7D'"></iframe>
+
+Here the compiler realises the `bool squared` value doesn't change throughout the loop, and decides to duplicate the loop: one copy that squares each time unconditionally, and one where it never multiplies at all. This is called "loop unswitching".
+
+The check of `squared` is moved out of the loop, and the appropriate loop is then selected, either `.LBB0_4` (non-squaring) or continuing to `.LBB0_2` (the squaring version).
+
+Each loop is perfectly optimised for its duties, and it's as if you had written:
+
+<iframe width="100%" height="200px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'demangle,commentOnly,trim,labels,intel,directives,libraryCode',options:'+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+sum(std::span%3Cint%3E+ints,+bool+squared)+%7B%0A++int+sum+%3D+0%3B%0A++if+(squared)+%7B%0A++++for+(auto+value+:+ints)+%7B%0A++++++sum+%2B%3D+value+%2A+value%3B%0A++++%7D%0A++%7D+else+%7B%0A++++for+(auto+value+:+ints)+%7B%0A++++++sum+%2B%3D+value%3B%0A++++%7D%0A++%7D%0A++return+sum%3B%0A%7D%0A'"></iframe>
+
+By duplicating the loop this way, the compiler makes sure that the multiplication doesn't happen unless you specifically asked for it. In the `-O2` code, the compiler bet on doing the multiply-and-add each time[^bpu] even when it wasn't needed. In the loop unswitching case, we do pay a code size penalty (_some_ code is duplicated, after all), and that's why loop unswitching didn't occur on the lower optimisation setting.
+
+[^bpu]: In this case the compiler determined that just doing the multiply every time would be cheaper than a branch on every iteration to avoid it. Branch predictors do help this in general, but it's still better to do one branch at the beginning and specialise each loop individually.
+
+As always, it's good to trust your compiler's decisions, but know the kinds of trade-offs it's making at various optimisation levels. You can always verify what it's doing with [Compiler Explorer](https://godbolt.org), after all!
+
+
+_See [the video](https://youtu.be/-VCrYshE7iQ) that accompanies this post._
+
+---
+
+_This post is day 12 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
