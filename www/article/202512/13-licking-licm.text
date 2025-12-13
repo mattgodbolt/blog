@@ -1,0 +1,78 @@
+Loop-Invariant Code Motion
+Date: 2025-12-13 06:00:00 America/Chicago
+Status: Public
+Summary: The compiler can move code outside of loops to speed things up
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Look back at [our simple loop example](/202512/08-going-loopy) - there's an optimisation I completely glossed over. Let me show you what I mean:
+
+<iframe width="100%" height="440px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,trim,demangle,labels,directives,libraryCode,intel',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cvector%3E%0A%0Aint+sum(const+std::vector%3Cint%3E+%26vec)+%7B%0A++int+sum+%3D+0%3B%0A++for+(std::size_t+index+%3D+0%3B%0A+++++++index+%3C+vec.size()%3B%0A+++++++%2B%2Bindex)+%7B%0A++++sum+%2B%3D+vec%5Bindex%5D%3B%0A++%7D%0A++return+sum%3B%0A%7D'"></iframe>
+
+On every loop iteration we are calling `vec.size()` to compare the index value, and to check if the index has reached the end of the vector. However, looking in the assembly, the compiler has pulled the size calculation[^recall] out of the loop entirely - the `sar` that divides the "end - start" value by the size of an int is only performed _before_ the loop! The compiler quietly rewrote our code to be:
+
+[^recall]: Recall that the vector holds various pointers, and to determine the count of elements, we need to subtract the `end` from the `start` and divide by the element size.
+
+<iframe width="100%" height="440px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,trim,demangle,labels,directives,libraryCode,intel',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cvector%3E%0A%0Aint+sum(const+std::vector%3Cint%3E+%26vec)+%7B%0A++int+sum+%3D+0%3B%0A++const+auto+vec_size+%3D+vec.size()%3B%0A++for+(std::size_t+index+%3D+0%3B%0A+++++++index+%3C+vec_size%3B%0A+++++++%2B%2Bindex)+%7B%0A++++sum+%2B%3D+vec%5Bindex%5D%3B%0A++%7D%0A++return+sum%3B%0A%7D'"></iframe>
+
+Such a transformation is called Loop-Invariant Code Motion, or LICM. It's not just expressions in the `for` clauses themselves, any code inside the loop that the compiler can prove doesn't depend on which iteration it's in is fair game.
+
+Let's give our loop something more to do: We'll take a `std::string_view`[^sv] and count how many characters fall within a given range (being "capital letters" or "numerics")[^const]. We'll write it naively, using a `get_range()` function that returns the min and max character "in range" as a pair:
+
+[^sv]: A `std::string_view` is, in this case, equivalent to `std::span<char>`.
+[^const]: I haven't actually supplied the body of the `get_range` function here - it would add more code _and_ would show the compiler doing inlining, which I'll cover properly later in this series. However, I do need to use a magic attribute `[[gnu::pure]]` here to let the compiler know that the implementation of this function is "pure" and depends only on its inputs. The compiler usually figures this out for itself from the implementation if it can see it.
+
+<iframe width="100%" height="650px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:clang2110,filters:'commentOnly,trim,demangle,labels,directives,libraryCode,intel',options:'-O1+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cutility%3E%0A%23include+%3Cstring_view%3E%0A%0Aenum+class+RangeType+%7B%0A++Capitals,+Numerics%0A%7D%3B%0A%5B%5Bgnu::pure%5D%5D++//+%3C--+see+footnote!!%0Astd::pair%3Cchar,+char%3E+get_range(RangeType)%3B%0A%0Astd::size_t+count_in_range(%0A++++RangeType+type,%0A++++std::string_view+string)+%7B%0A++std::size_t+num+%3D+0%3B%0A%0A++for+(const+auto+c+:+string)+%7B%0A++++if+(c+%3E%3D+get_range(type).first%0A++++++++%26%26+c+%3C%3D+get_range(type).second)+%7B%0A++++++%2B%2Bnum%3B%0A++++%7D%0A++%7D%0A++return+num%3B%0A%7D'"></iframe>
+
+You can see that clang[^gcc] here has realised the range from `get_range` cannot change during the loop and so has moved it outside:
+
+```asm
+count_in_range:
+; ...preamble removed for brevity...
+  call get_range(RangeType)@PLT     ; call get_range (OUTSIDE OF LOOP)
+  movsx ecx, al                     ; ecx = range.first
+  shr eax, 8
+  movsx edx, al                     ; edx = range.second
+  xor esi, esi                      ; esi = loop counter = 0
+  xor eax, eax                      ; eax = num = 0
+.LBB0_4:
+  movsx edi, byte ptr [rbx + rsi]   ; read next c
+  cmp ecx, edi                      ; compare with first
+  setle r8b                         ; r8b = c >= first
+  cmp edx, edi                      ; compare with second
+  setge dil                         ; dil = c <= second
+  and dil, r8b                      ; dil = dil & r8b
+                                    ; ie 1 if c in range, else 0
+  movzx edi, dil                    ; edi = (zero extended) dil
+  add rax, rdi                      ; num += (1 if in range, else 0)
+  inc rsi                           ; increment loop counter
+  cmp r14, rsi                      ; are we done?
+  jne .LBB0_4                       ; loop if not
+; ...postamble/return removed for brevity...
+```
+
+[^gcc]: Surprisingly, gcc seems unable to take advantage of this optimisation and in fact calls `get_range` _twice_ each iteration, even if I use the even-stricter `[[gnu::const]]` attribute.
+
+Clang has also played some other neat tricks[^ahem] here to avoid a branch inside the loop using `setle` and `setge` to get a 0 or 1 based on a condition code.
+
+[^ahem]: I've deliberately used `-O1` only here to minimise some of the _even more clever_ tricks clang will do here. I will cover some of those later in this series.
+
+Usually I end with a "trust the compiler" type sentiment. However, in this case I was surprised that gcc wasn't able to perform code motion here[^bug]. I guess that's what [Compiler Explorer](https://godbolt.org) is for: Trust the compiler, but know how to verify its output too.
+
+[^bug]: After speaking with some other C++ experts, I filed a [gcc bug](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=122226) on a similar but largely equivalent example. A gcc maintainer suggests it's due to the structure type returned (a `std::pair` here) doesn't go through common subexpression elimination (CSE[^CSE]), which prevents the analysis needed to do LICM.
+
+[^CSE]: We won't cover CSE in this series, but the compiler tries to detect redundant calculation of the same subexpressions, and only does the work once where possible.
+
+
+_See [the video](https://youtu.be/dIwaqJG0WDo) that accompanies this post._
+
+---
+
+_This post is day 13 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
