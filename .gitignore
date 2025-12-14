@@ -29,9 +29,6 @@ htmlcov/
 # Poetry
 dist/
 
-# uv
-uv.lock
-
 # Build artifacts
 *.egg-info/
 
