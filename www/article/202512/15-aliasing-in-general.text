@@ -11,7 +11,7 @@ Let's take a simple example of a counter class[^actually]. It accumulates intege
 
 [^actually]: This example is taken from something similar that actually bit me in my job a few years ago. I was bewildered until I worked out that it was aliasing!
 
-<iframe width="100%" height="590px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,intel,directives,labels,demangle,trim,libraryCode',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Atemplate%3Ctypename+Total%3E%0Astruct+Counter+%7B%0A++Total+total%7B%7D%3B%0A++void+count(std::span%3Cconst+int%3E+span)+%7B%0A++++for+(auto+value+:+span)+%7B%0A++++++total+%2B%3D+static_cast%3CTotal%3E(value)%3B%0A++++%7D%0A++%7D%0A%7D%3B%0A%0Atemplate+class+Counter%3Cint%3E%3B%0Atemplate+class+Counter%3Clong%3E%3B'"></iframe>
+<iframe width="100%" height="590px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'labels,trim,libraryCode,directives,demangle,commentOnly,intel',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Atemplate%3Ctypename+Total%3E%0Astruct+Counter+%7B%0A++Total+total%7B%7D%3B%0A++void+count(std::span%3Cconst+int%3E+span)+%7B%0A++++for+(auto+value+:+span)+%7B%0A++++++total+%2B%3D+static_cast%3CTotal%3E(value)%3B%0A++++%7D%0A++%7D%0A%7D%3B%0A%0Atemplate+class+Counter%3Cint%3E%3B%0Atemplate+class+Counter%3Clong%3E%3B'"></iframe>
 
 At first glance, the two loop bodies look almost identical, as you might expect. In one case we'll accumulate in `eax`, and the other in `rax`, right? The truth is more subtle. Let's first look at the `int` case:
 
