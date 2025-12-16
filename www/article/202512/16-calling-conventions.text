@@ -13,7 +13,7 @@ Before we go on: I'd be remiss if I didn't point out that I can _never_ remember
 
 <p class="picture">
 <a href="https://shop.compiler-explorer.com">
-<img src="16-mugs.jpg" alt="Some Compiler Explorer mugs with ABI information on them" width="655" height="330" />
+<img src="16-mugs.jpeg" alt="Some Compiler Explorer mugs with ABI information on them" width="655" height="330" />
 </a>
 <br/>The Compiler Explorer ABI mug: Get yours at the <a href="https://shop.compiler-explorer.com">CE Shop!</a>
 </p>
@@ -22,7 +22,7 @@ We've already touched on calling conventions as I've commented the assembly in p
 
 [^smaller]: Or their smaller siblings `edi`/`esi`, `di`/`si` etc
 
-<iframe width="100%" height="330px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'demangle,intel,trim,commentOnly,labels,libraryCode,directives',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'using+ArgType+%3D+long%3B%0AArgType+separate_args(ArgType+x,+ArgType+y)+%7B%0A++return+x+%2B+y%3B%0A%7D%0Astruct+StructArgs+%7B%0A++ArgType+x%7B%7D%3B%0A++ArgType+y%7B%7D%3B%0A%7D%3B%0AArgType+struct_args(StructArgs+args)+%7B%0A++return+args.x+%2B+args.y%3B%0A%7D'"></iframe>
+<iframe width="100%" height="330px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'trim,labels,intel,commentOnly,demangle,directives,libraryCode',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'using+ArgType+%3D+long%3B%0AArgType+separate_args(ArgType+x,+ArgType+y)+%7B%0A++return+x+%2B+y%3B%0A%7D%0Astruct+StructArgs+%7B%0A++ArgType+x%7B%7D%3B%0A++ArgType+y%7B%7D%3B%0A%7D%3B%0AArgType+struct_args(StructArgs+args)+%7B%0A++return+args.x+%2B+args.y%3B%0A%7D'"></iframe>
 
 With `ArgType` set to `long` it might surprise you that the body of those two functions are identical! Both are just `lea rax, [rdi+rsi]`: We expect the separate arguments to be in `rdi` and `rsi`, but passing that larger structure by value _also_ got placed in `rdi` and `rsi`. Neat!
 
@@ -42,7 +42,7 @@ It gets more interesting when we pass _lots_ of arguments[^dont]. Even on System
 
 [^dont]: Which in general is a _bad_ idea anyway. Don't pass lots of arguments, use structures and well defined types, not a load of bools and ints and whatnot.
 
-<iframe width="100%" height="400px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'demangle,intel,trim,commentOnly,labels,libraryCode,directives',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'using+ArgType+%3D+long%3B%0Aauto+separate_args(%0A++++ArgType+a,+ArgType+b,+ArgType+c,+ArgType+d,%0A++++ArgType+e,+ArgType+f,+ArgType+g,+ArgType+h)%0A%7B%0A++return+a+%2B+b+%2B+c+%2B+d+%2B+e+%2B+f+%2B+g+%2B+h%3B%0A%7D%0Astruct+StructArgs+%7B%0A++ArgType+a%7B%7D%3B+ArgType+b%7B%7D%3B+ArgType+c%7B%7D%3B%0A++ArgType+d%7B%7D%3B+ArgType+e%7B%7D%3B+ArgType+f%7B%7D%3B%0A++ArgType+g%7B%7D%3B+ArgType+h%7B%7D%3B%0A%7D%3B%0Aauto+struct_args(StructArgs+args)+%7B%0A++return+args.a+%2B+args.b+%2B+args.c+%2B+args.d%0A+++++++%2B+args.e+%2B+args.f+%2B+args.g+%2B+args.h%3B%0A%7D'"></iframe>
+<iframe width="100%" height="400px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'trim,labels,intel,commentOnly,demangle,directives,libraryCode',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'using+ArgType+%3D+long%3B%0Aauto+separate_args(%0A++++ArgType+a,+ArgType+b,+ArgType+c,+ArgType+d,%0A++++ArgType+e,+ArgType+f,+ArgType+g,+ArgType+h)%0A%7B%0A++return+a+%2B+b+%2B+c+%2B+d+%2B+e+%2B+f+%2B+g+%2B+h%3B%0A%7D%0Astruct+StructArgs+%7B%0A++ArgType+a%7B%7D%3B+ArgType+b%7B%7D%3B+ArgType+c%7B%7D%3B%0A++ArgType+d%7B%7D%3B+ArgType+e%7B%7D%3B+ArgType+f%7B%7D%3B%0A++ArgType+g%7B%7D%3B+ArgType+h%7B%7D%3B%0A%7D%3B%0Aauto+struct_args(StructArgs+args)+%7B%0A++return+args.a+%2B+args.b+%2B+args.c+%2B+args.d%0A+++++++%2B+args.e+%2B+args.f+%2B+args.g+%2B+args.h%3B%0A%7D'"></iframe>
 
 In this case we can see the separate args version adding all the registers, and then having to get some off the stack: `add rax, QWORD PTR [rsp+8]` and so on. On the structure side, the whole structure[^value] is copied to the stack, which seems bad[^vec].
 
