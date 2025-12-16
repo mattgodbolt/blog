@@ -1,0 +1,77 @@
+Calling all arguments
+Date: 2025-12-16 06:00:00 America/Chicago
+Status: Public
+Summary: Knowing how compilers call functions can help with design - and optimisation
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Today we're looking at calling conventions[^jason] - which aren't purely optimisation related but are important to understand. The calling convention is part of the ABI (Application Binary Interface), and varies from architecture to architecture and even OS to OS. Today I'll concentrate on the System V ABI for x86 on Linux, as (to me) it's the most sane ABI.
+
+[^jason]: Big thanks to [Jason Turner](https://articles.emptycrate.com/) for suggesting this topic and providing some fun examples.
+
+Before we go on: I'd be remiss if I didn't point out that I can _never_ remember which register has what it in, and for years I had a Post It note on my monitor with a hand-written crib sheet of the ABI. While on holiday I had an idea: Why not put the ABI on a mug! I created these ABI mugs and you can get your own one - and support Compiler Explorer - at the [Compiler Explorer shop](https://shop.compiler-explorer.com/).
+
+<p class="picture">
+<a href="https://shop.compiler-explorer.com">
+<img src="16-mugs.jpg" alt="Some Compiler Explorer mugs with ABI information on them" width="655" height="330" />
+</a>
+<br/>The Compiler Explorer ABI mug: Get yours at the <a href="https://shop.compiler-explorer.com">CE Shop!</a>
+</p>
+
+We've already touched on calling conventions as I've commented the assembly in previous days, but concretely, for x86 Linux, the first couple of parameters go in `rdi` and `rsi`[^smaller]. This makes sense for discrete integer types, and even pointers. What about structures? Let's compare two functions:
+
+[^smaller]: Or their smaller siblings `edi`/`esi`, `di`/`si` etc
+
+<iframe width="100%" height="330px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'demangle,intel,trim,commentOnly,labels,libraryCode,directives',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'using+ArgType+%3D+long%3B%0AArgType+separate_args(ArgType+x,+ArgType+y)+%7B%0A++return+x+%2B+y%3B%0A%7D%0Astruct+StructArgs+%7B%0A++ArgType+x%7B%7D%3B%0A++ArgType+y%7B%7D%3B%0A%7D%3B%0AArgType+struct_args(StructArgs+args)+%7B%0A++return+args.x+%2B+args.y%3B%0A%7D'"></iframe>
+
+With `ArgType` set to `long` it might surprise you that the body of those two functions are identical! Both are just `lea rax, [rdi+rsi]`: We expect the separate arguments to be in `rdi` and `rsi`, but passing that larger structure by value _also_ got placed in `rdi` and `rsi`. Neat!
+
+If you explore by changing the `ArgType` you'll see that the compiler has to do more work if we don't (conveniently) use `long`s here. For example, changing to `int` changes the separate argument version to `lea eax...` to reflect the 32-bit return value, but the body of the structure version becomes:
+
+```asm
+; structure is _packed_ into rdi as "y<<32 | x"
+  mov rax, rdi      ; rax = args.y<<32 | args.x
+  shr rax, 32       ; rax >>= 32; rax is now 'y'
+  add eax, edi      ; y += x;
+  ret
+```
+
+It's a little tricky to follow as the compiler is cunningly switching between the 64-bit `r` prefixed register names and the 32-bit `e` versions, but you can see that, for the cost of a couple more instructions we still passed the structure pretty efficiently, and in a single register.
+
+It gets more interesting when we pass _lots_ of arguments[^dont]. Even on System V ABI, only the first 6 parameters are passed in registers. After that, it spills to the stack. Let's update our example to pass many arguments to show this:
+
+[^dont]: Which in general is a _bad_ idea anyway. Don't pass lots of arguments, use structures and well defined types, not a load of bools and ints and whatnot.
+
+<iframe width="100%" height="400px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'demangle,intel,trim,commentOnly,labels,libraryCode,directives',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'using+ArgType+%3D+long%3B%0Aauto+separate_args(%0A++++ArgType+a,+ArgType+b,+ArgType+c,+ArgType+d,%0A++++ArgType+e,+ArgType+f,+ArgType+g,+ArgType+h)%0A%7B%0A++return+a+%2B+b+%2B+c+%2B+d+%2B+e+%2B+f+%2B+g+%2B+h%3B%0A%7D%0Astruct+StructArgs+%7B%0A++ArgType+a%7B%7D%3B+ArgType+b%7B%7D%3B+ArgType+c%7B%7D%3B%0A++ArgType+d%7B%7D%3B+ArgType+e%7B%7D%3B+ArgType+f%7B%7D%3B%0A++ArgType+g%7B%7D%3B+ArgType+h%7B%7D%3B%0A%7D%3B%0Aauto+struct_args(StructArgs+args)+%7B%0A++return+args.a+%2B+args.b+%2B+args.c+%2B+args.d%0A+++++++%2B+args.e+%2B+args.f+%2B+args.g+%2B+args.h%3B%0A%7D'"></iframe>
+
+In this case we can see the separate args version adding all the registers, and then having to get some off the stack: `add rax, QWORD PTR [rsp+8]` and so on. On the structure side, the whole structure[^value] is copied to the stack, which seems bad[^vec].
+
+[^vec]: Though the compiler does a decent job of using vector operations here. Which I promise we'll talk about eventually!
+
+[^value]: Remember we're passing by _value_ here, and typically you might normally pass by const reference. Experiment with the code and see the difference it makes.
+
+However! Changing `ArgType` to `char` and you'll see an interesting difference. The separate args version is similar, though it can't use `lea` any more, and has to sign-extend all the values its getting from its registers. The struct args version has no stack spillage: our entire `StructArgs` structure fits into one register! The compiler has a bit of a time shifting it around to extract each `char`, but it's not having to spill to the stack at least. In my testing, different compilers used different tricks, so play around with the `ArgType` and compiler (e.g. clang) and get a sense of what it can do[^explain].
+
+[^explain]: If you get confused, pop out the view with the "Edit on Compiler Explorer" button and consider trying the Claude Explain AI explanation panel from the "Add new..." drop down.
+
+So, all this is pretty abstract: why is this important? Sometimes knowing the ABI, and how the compiler can optimise around it can inform your design. There was some debate about the design of `std::string_view` and `std::optional` and their usefulness[^windows]: these are types that are convenient to pass _by value_, and so their footprint in registers is important[^svlayout].
+
+[^svlayout]: A `std::string_view` is essentially a pointer and a length - two values that fit neatly into two registers, just like the two-`long` struct example above.
+
+[^windows]: The Windows ABI in particular only has four register arguments and so only two `string_view`s can be passed before things end up on the stack.
+
+Overall, knowing the calling convention helps you make smart decisions about layout and parameter passing that give the compiler the best shot at generating efficient code.
+
+
+_See [the video](https://youtu.be/Yaw8AMoP4sI) that accompanies this post._
+
+---
+
+_This post is day 16 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
