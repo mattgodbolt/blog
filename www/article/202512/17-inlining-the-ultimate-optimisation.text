@@ -1,0 +1,81 @@
+Inlining - the ultimate optimisation
+Date: 2025-12-17 06:00:00 America/Chicago
+Status: Public
+Summary: Copy paste can sometimes be a good thing, at least if the compiler does it for you
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Sixteen days in, and I've been dancing around what many consider the fundamental compiler optimisation: inlining. Not because it's complicated - quite the opposite! - but because inlining is less interesting for what it does (copy-paste code), and more interesting for what it enables.
+
+Initially inlining was all about avoiding the expense of the call[^call] itself, but nowadays inlining enables many other optimisations to shine.
+
+[^call]: The `call` and `return` itself, coupled with the preserving and restoring of registers required for the calling convention.
+
+We've already encountered inlining (though I tried to limit it until now): On [day 8](/202512/08-going-loopy) to get the size of a vector, we called its `.size()` method. I completely glossed over the fact that while `size()` is a method on `std::vector`, we don't see a call in the assembly code, just the subtraction and shift.
+
+So, how does inlining enable other optimisations? Using ARMv7[^arm], let's convert a string to uppercase. We might have a utility `change_case` function[^contrived] that either turns a single character from upper to lower, or lower to upper, so, we'll use it in our code:
+
+[^arm]: Again, this is for simplicity and to avoid vectorisation which, while super important, is something we'll get to later.
+
+[^contrived]: A bit contrived, and I'm deliberately rolling my own `std::toupper` etc to avoid locales, and further function calls.
+
+<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:armv7-clang2110,filters:'intel,trim,demangle,commentOnly,labels,libraryCode,directives',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Ccctype%3E%0A%23include+%3Cspan%3E%0A%0Astatic+char+change_case(char+c,+bool+upper)+%7B%0A++if+(!!upper+%26%26+(c+%3E%3D+!'A!'+%26%26+c+%3C%3D+!'Z!'))%0A++++return+c+-+!'A!'+%2B+!'a!'%3B%0A++if+(upper+%26%26+(c+%3E%3D+!'a!'+%26%26+c+%3C%3D+!'z!'))%0A++++return+c+-+!'a!'+%2B+!'A!'%3B%0A++return+c%3B%0A%7D%0A%0Avoid+make_upper(std::span%3Cchar%3E+string)+%7B%0A++for+(auto+%26c+:+string)%0A++++c+%3D+change_case(c,+true)%3B%0A%7D'"></iframe>
+
+The compiler decides[^force] to inline `change_case` into `make_upper`, and then seeing that `upper` is _always_ `true`[^constprop], it can simplify the whole code to:
+
+[^constprop]: This is called constant propagation - when the compiler knows a value is constant, it substitutes it everywhere and simplifies the result. I had planned to do a post on this alone, but somehow I didn't have space for it!
+
+```asm
+.LBB0_1:
+  ldrb r2, [r0]         ; read next `c`; c = *string;
+  sub r3, r2, #97       ; tmp = c - 'a'
+  uxtb r3, r3           ; tmp = tmp & 0xff
+  cmp r3, #26           ; check tmp against 26
+  sublo r2, r2, #32     ; if lower than 26 then c = c - 32
+                        ; c = ((c - 'a') & 0xff) < 26 ? c - 32 : c;
+  strb r2, [r0], #1     ; store 'c' back; *string++ = c
+  subs r1, r1, #1       ; reduce counter
+  bne .LBB0_1           ; loop if not zero
+```
+
+[^force]: I deliberately made the `change_case` function `static` so it won't even appear in the output here as it's otherwise unused. This also strongly hints to the compiler's optimiser to inline it. If I made it non-static, then `make_upper` doesn't change at all (it's still inlined), but there's a big (unused) `change_case` in the output to confuse things. Give it a go and look at the more complex code generated in `change_case`!
+
+There's no trace left of the `!upper` case and the compiler, having inlined the code, has a fresh copy of the code to then further modify to take advantage of things it knows are true. It does a neat trick of avoiding a branch to check whether the character is uppercase: If `(c - 'a') & 0xff`[^uxtb] is less than 26, it must be a lowercase character. It then conditionally subtracts 32, which has the effect of making `a` into `A`.
+
+[^uxtb]: The `& 0xff` comes from the "Unsigned eXTend Byte" `uxtb` instruction.
+
+Inlining gives the compiler the ability to make local changes: The implementation can be special cased at the inline site as by definition there's no other callers to the code. The special casing can include propagating values known to be constants (like the `upper` bool above), and looking for code paths that are unused[^dce].
+
+[^dce]: Also known as dead code elimination, if the compiler can prove that parts of the code are unreachable it can remove them.
+
+Inlining has some drawbacks though: if it's overused, the code size of your program can grow quite substantially[^cache]. The compiler has to make its best guess as to whether inlining a function (and the functions that _it_ calls...and so on), based on heuristics about the code size increase, and whether the perceived benefit is worth it. Ultimately it's a guess though.
+
+[^cache]: This can have performance effects: the instruction cache is a limited resource so filling it up with lots of copies of essentially the same code can put extra pressure on the memory and decode subsystem of the CPU.
+
+In rare cases accepting the cost of calling a common routine _can_ be a benefit: if there is an unavoidable branch in the routine that's globally predictable, sometimes having one shared branch site can be better for the branch predictor. In many cases, though, the reverse is true: if there's a branch in code that's inlined many times across the codebase then sometimes the (more local) branch history for the many copies of that branch can yield more predictability. It's...complex[^nuanced].
+
+[^nuanced]: That is, it's a nuanced trade-off that depends on the specific code and runtime patterns. The compiler often doesn't have that kind of information about your code, and so has to guess. Things like Profile Guided Optimisation can help this, but we won't be covering that in this series.
+
+An important consideration for inlining is the visibility of the _definition_ of the function you're calling (that is, the body of the function). If the compiler has only seen the _declaration_ of a function (e.g. in the case above just `char change_case(char c, bool upper);`), then it can't inline it: there's nothing to inline! In modern C++ with templates and a lot of code in headers, this usually isn't a problem, but if you're trying to minimise build times and interdependency this can be an issue[^lto].
+
+[^lto]: Using link-time optimisation (LTO; sometimes called link-time code generation), will allow the compiler to inline across translation units. LTO is a powerful technique and is well-supported on compilers. I always enable LTO for my release builds.
+
+Frustratingly, inlining is also one of the most heuristic-driven optimisations; with different compilers making reasonable but different guesses about which functions should be inlined. This can be frustrating when adding a single line to a function somewhere has ripple effects throughout a codebase affecting inlining decisions[^amit].
+
+[^amit]: Quite famously, once a single newline in a function definition caused a [significant Linux performance regression](https://sites.google.com/site/nadavamit/blog/linux-inline), though this is more a limitation with the way GCC chooses to interpret inline assembly's cost during inline analysis.
+
+All that said: Inlining is the ultimate enabling optimisation. On its own, copying function bodies into call sites might save a few cycles here and there. But give the compiler a fresh copy of code at the call site, and suddenly it can propagate constants, eliminate dead branches, and apply transformations that would be impossible with a shared function body. Who said copy paste was always bad?
+
+
+_See [the video](https://youtu.be/JFHfFTvMPp0) that accompanies this post._
+
+---
+
+_This post is day 17 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
