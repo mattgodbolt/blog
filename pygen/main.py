@@ -502,7 +502,7 @@ def CleanUpXHtml(title, xhtml):
         for banned_elem_type in ("script", "iframe"):
             for elem in tree.findall(f".//{banned_elem_type}"):
                 parent_map[elem].remove(elem)
-        xhtml = ElementTree.tostring(next(iter(tree)), "utf-8").decode("utf-8")
+        xhtml = "\n".join(ElementTree.tostring(child, "utf-8").decode("utf-8") for child in tree)
     except Exception as e:
         for line, s in enumerate(full.splitlines(keepends=False)):
             print(f"{line + 1: 10}: {s}")
