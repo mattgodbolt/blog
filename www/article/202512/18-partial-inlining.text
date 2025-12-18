@@ -1,0 +1,85 @@
+Partial inlining
+Date: 2025-12-18 06:00:00 America/Chicago
+Status: Public
+Summary: Inlining doesn't have to be all-or-nothing
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>We've learned how important inlining is to optimisation, but also that it might sometimes cause code bloat. Inlining doesn't have to be all-or-nothing!
+
+Let's look at a simple function that has a fast path and slow path; and then see how the compiler handles it[^note].
+
+[^note]: I have had to cheat a little here to get the output I want: I've actually disabled GCC's main inlining pass, otherwise it chooses to inline the whole of `process`. With a larger, more complex "slow path" that would be unnecessary, but in order to demonstrate the effect of partial inlining without generating tons of code, I'm using this slight cheat.
+
+<iframe width="100%" height="200px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,labels,demangle,intel,directives,libraryCode,trim',options:'-O2+-fno-inline-functions+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'unsigned+process(unsigned+value)+%7B%0A++//+Fast+path:+simple+range+check%0A++if+(value+%3C+100)+%7B%0A++++++return+value+%2A+2%3B%0A++%7D%0A%0A++//+Slow+path:+more+complex+computation%0A++unsigned+result+%3D+value+%2A+1103515245+%2B+12345%3B%0A++result+%3D+(result+%3E%3E+16)+%26+0x7fff%3B%0A++result+%3D+result+%2A+1664525+%2B+1013904223%3B%0A++result+%3D+(result+%3E%3E+16)+%26+0x7fff%3B%0A++return+result+%25+100%3B%0A%7D%0A%0Aunsigned+compute(unsigned+a,+unsigned+b)+%7B%0A++return+process(a)+%2B+process(b)%3B%0A%7D'"></iframe>
+
+In this example we have some `process` function that has a really trivial fast case for numbers in the range 0-100. For other numbers it does something more expensive. Then `compute` calls `process` twice (making it less appealing to inline all of `process`).
+
+Looking at the assembly output, we see what's happened: The compiler has split `process` into two functions, a `process (part.0)` that does the expensive part only. It then rewrites `process` into the quick check for 100, returning double the value if less than 100. If not, it jumps to the `(part.0)` function:
+
+```asm
+process(unsigned int):
+  cmp edi, 99                           ; less than or equal to 99?
+  jbe .L7                               ; skip to fast path if so
+  jmp process(unsigned int) (.part.0)   ; else jump to the expensive path
+.L7:
+  lea eax, [rdi+rdi]                    ; return `value * 2`
+  ret
+```
+
+This first step - extracting the cold path into a separate function - is called **function outlining**. The original `process` becomes a thin wrapper handling the hot path, delegating to the outlined `process (.part.0)` when needed. This split sets up the real trick: **partial inlining**. When the compiler later inlines `process` into `compute`, it inlines just the wrapper whilst keeping calls to the outlined cold path. External callers can still call `process` and have it work correctly for all values.
+
+Let's see this optimisation in action in the `compute` function:
+
+```asm
+compute(unsigned int, unsigned int):
+  cmp edi, 99                   ; is a <= 99?
+  jbe .L13                      ; if so, go to the inlined fast path for a
+  call process(unsigned int) (.part.0) ; else, call expensive case
+  mov r8d, eax                  ; save the result of process(a)
+  cmp esi, 99                   ; is b <= 99?
+  jbe .L14                      ; if so go to the inlined fast path for b
+.L11:
+  mov edi, esi                  ; otherwise, call expensive case for b
+  call process(unsigned int) (.part.0)
+  add eax, r8d                  ; add the two slow cases together
+  ret                           ; return
+
+.L13:                           ; case where a is fast case
+  lea r8d, [rdi+rdi]            ; process(a) is just a + a
+  cmp esi, 99                   ; is b > 99?
+  ja .L11                       ; jump to b slow case if so
+                                ; (falls through to...)
+.L14:                           ; b fast case
+  lea eax, [rsi+rsi]            ; double b
+  add eax, r8d                  ; return 2*a + 2 * b
+  ret
+```
+
+Looking at `compute`, we can see the benefits of this approach clearly: The simple range check and arithmetic (`cmp`, `lea`) are inlined directly, avoiding the function call overhead for the fast path. When a value is 100 or greater, it calls the outlined `process (.part.0)` function for the more expensive computation.
+
+This is the best of both worlds: we get the performance benefit of inlining the lightweight check and simple arithmetic, whilst avoiding code bloat from duplicating the expensive computation[^again]. The original `process` function remains intact and callable, so external callers still work correctly.
+
+[^again]: Again, in this contrived example it probably _would_ be OK to inline `process`, and the compiler really wants to, but for didactic purposes I've prevented that here. You can hopefully get the gist of this.
+
+Partial inlining lets the compiler make nuanced trade-offs about what to inline and what to keep shared. The compiler can outline portions of a function based on its heuristics about code size and performance[^tradeoff], giving you benefits of inlining without necessarily paying the full code size cost. In this example, the simple check is duplicated whilst the complex computation stays shared.
+
+[^tradeoff]: Of course, nothing is free - duplicating code still takes up instruction cache space. The compiler's heuristics have to weigh the benefits against the costs, and different compilers make different choices.
+
+As with many optimisations, the compiler's heuristics[^clang] usually make reasonable choices about when to apply partial inlining, but it's worth checking your hot code paths to see if the compiler has made the decisions you expect. Taking a quick peek in [Compiler Explorer](https://godbolt.org) is a good way to develop your intuition.
+
+[^clang]: Note that this varies substantially from compiler to compiler: I couldn't trick clang into making similar partial inlining decisions to gcc using flags, so I couldn't compare like with like. In my experience gcc and clang make quite different choices about inlining.
+
+
+_See [the video](https://youtu.be/STZb5K5sPDs) that accompanies this post._
+
+---
+
+_This post is day 18 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
