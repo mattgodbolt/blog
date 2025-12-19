@@ -52,7 +52,7 @@ compute(unsigned int, unsigned int):
                                 ; (falls through to...)
 .L14:                           ; b fast case
   lea eax, [rsi+rsi]            ; double b
-  add eax, r8d                  ; return 2*a + 2 * b
+  add eax, r8d                  ; return 2*a + 2*b
   ret
 ```
 
