@@ -1,0 +1,122 @@
+SIMD City: Auto-vectorisation
+Date: 2025-12-20 06:00:00 America/Chicago
+Status: Public
+Summary: Doing more with less: vectorising can speed your code up 8x or more!
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>It's time to look at one of the most sophisticated optimisations compilers can do: autovectorisation. Most "big data" style problems boil down to "do this maths to huge arrays", and the limiting factor isn't the maths itself, but the feeding of instructions to the CPU, along with the data it needs.
+
+To help with this problem, CPU designers came up with SIMD: "Single Instruction, Multiple Data". One instruction tells the CPU what to do with a whole chunk of data. These chunks could be 2, 4, 8, 16 or similar units of integers or floating point values, all treated individually. Initially[^games] the only way to use this capability was to write assembly language directly, but luckily for us, compilers are now able to help.
+
+[^games]: I spent some of the late 90s and early 2000s writing video games, whose main rendering loops need to do a lot of matrix maths on a lot of 3d points. Writing big chunks of SIMD-like assembly code was a big part of that. You can see some of my code from that era in the [Red Dog source](https://github.com/mattgodbolt/reddog).
+
+To take advantage of SIMD we need to ensure our data is laid out in a nice long line, like an array, or vector[^vectorisation]. It's also much better to store different "fields" of the data in separate arrays[^acton]. We're going to start with some integer maths - let's update an array `x` to be element-wise the max of `x` and `y`:
+
+[^acton]: See Mike Acton's seminal video on [Data Oriented Design](https://www.youtube.com/watch?v=rX0ItVEVjHc)
+[^vectorisation]: I mean, it's also called "vectorisation" for a reason, eh? This has great benefits for caching too: a long sequence is best-case for the automatic prefetchers in modern CPUs.
+
+<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,labels,trim,libraryCode,directives,demangle,intel',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Aconstexpr+auto+Size+%3D+65536%3B+//+would+normally+be+a+template+param%0Avoid+maxArray(%0A++++std::span%3Cint,+Size%3E+x,%0A++++std::span%3Cconst+int,+Size%3E+y)%0A%7B%0A++for+(std::size_t+i+%3D+0%3B+i+%3C+Size%3B+%2B%2Bi)+%7B%0A++++if+(y%5Bi%5D+%3E+x%5Bi%5D)+x%5Bi%5D+%3D+y%5Bi%5D%3B%0A++%7D%0A%7D'"></iframe>
+
+In this `-O2`-compiled code[^temp], we don't see any vectorisation, just the nice tight loop code we've come to expect:
+
+```asm
+.L3:
+  mov edx, DWORD PTR [rsi+rax*4]    ; read y[i]
+  cmp edx, DWORD PTR [rdi+rax*4]    ; compare with x[i]
+  jle .L2                           ; if less, skip next instr
+  mov DWORD PTR [rdi+rax*4], edx    ; x[i] = y[i]
+.L2:
+  add rax, 1                        ; ++i
+  cmp rax, 65536                    ; are we at 65536?
+  jne .L3                           ; keep looping if not
+```
+
+[^temp]: In "real" code we'd make `Size` a template parameter, but without an instantiation we'd see no code. To keep things brief, I'm hardcoding it to a constant here.
+
+To ramp up to the next level, we'll need to add two flags: first we need to turn up the optimiser to `-O3`[^or], and then we need to tell the compiler to target a CPU that has the appropriate SIMD instruction[^most] with something like `-march=skylake`.
+
+[^or]: Or, more targetedly, use `-ftree-loop-vectorize`
+[^most]: Almost every CPU made in the last decade supports it, but the default target of GCC doesn't have the masked instructions the compiler wants to use.
+
+<iframe width="100%" height="620px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,labels,trim,libraryCode,directives,demangle,intel',options:'-O3+-march%3Dskylake+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Aconstexpr+auto+Size+%3D+65536%3B+//+would+normally+be+a+template+param%0Avoid+maxArray(%0A++++std::span%3Cint,+Size%3E+x,%0A++++std::span%3Cconst+int,+Size%3E+y)%0A%7B%0A++for+(std::size_t+i+%3D+0%3B+i+%3C+Size%3B+%2B%2Bi)+%7B%0A++++if+(y%5Bi%5D+%3E+x%5Bi%5D)+x%5Bi%5D+%3D+y%5Bi%5D%3B%0A++%7D%0A%7D'"></iframe>
+
+Our inner loop has gotten a little more complex, but spot the cool part:
+
+```asm
+.L4:
+  ; Reads 8 integers into ymm1, y[i..i+7]
+  vmovdqu ymm1, YMMWORD PTR [rsi+rax]
+  ; Compares that with 8 integers x[i..i+7]
+  vpcmpgtd ymm0, ymm1, YMMWORD PTR [rdi+rax]
+  ; Were all 8 values less or equal?
+  vptest ymm0, ymm0
+  ; if so, skip the write
+  je .L3
+  ; mask move x[i..i+7] with the y values that were greater
+  vpmaskmovd YMMWORD PTR [rdi+rax], ymm0, ymm1
+.L3:
+  add rax, 32           ; move forward 32 bytes
+  cmp rax, 262144       ; are we at the end? (32*65536)
+  jne .L4               ; keep looping if not
+```
+
+With a very similar number of instructions we're now processing 8 integers at a time! This is the power of SIMD - we'd likely be limited by the bandwidth to memory rather than the housekeeping of working out what to do with them.
+
+There are a couple of things to talk about though. Firstly, what's all this "mask move" stuff? Well, with SIMD we can act on "multiple data" but only with a "single instruction". Our original code has a conditional update: not every array element is necessarily processed in the same way. The compiler has cleverly used a "mask move" to let it _conditionally_ write back only the elements that are "greater than", which is pretty clever of it. We can help it if we don't mind unconditionally writing to memory:
+
+<iframe width="100%" height="540px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,labels,trim,libraryCode,directives,demangle,intel',options:'-O3+-march%3Dskylake+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Aconstexpr+auto+Size+%3D+65536%3B+//+would+normally+be+a+template+param%0Avoid+maxArray(%0A++++std::span%3Cint,+Size%3E+x,%0A++++std::span%3Cconst+int,+Size%3E+y)%0A%7B%0A++for+(std::size_t+i+%3D+0%3B+i+%3C+Size%3B+%2B%2Bi)+%7B%0A++++x%5Bi%5D+%3D+(y%5Bi%5D+%3E+x%5Bi%5D)+%3F+y%5Bi%5D+:+x%5Bi%5D%3B%0A++%7D%0A%7D'"></iframe>
+
+By unconditionally writing to `x[i]`[^ok] we can reduce the loop to:
+
+[^ok]: This _might_ be OK if we think we'll need to update many of the x array elements anyway. If we expect not to update much of `x` then this could be a pessimisation as we unconditionally write to the whole array now.
+
+```asm
+.L3:
+  ; Read 8 integers from x[i..i+7]
+  vmovdqu ymm0, YMMWORD PTR [rdi+rax]
+  ; "max" the integers with y[i..i+7]
+  vpmaxsd ymm0, ymm0, YMMWORD PTR [rsi+rax]
+  ; Store them back
+  vmovdqu YMMWORD PTR [rdi+rax], ymm0
+  add rax, 32       ; move forward 32 bytes
+  cmp rax, 262144   ; are we at the end?
+  jne .L3           ; keep looping if not
+```
+
+The compiler has spotted our ternary operator is actually exactly the same as the built-in vector "max" instruction! No explicit comparisons or branches now - fantastic.
+
+There's one last thing to cover - the eagle-eyed amongst you might have spotted the fact there are actually _two_ loops, one using vector instructions, and one doing regular one-at-a-time operations. The regular loop is jumped to conditionally after this check:
+
+```asm
+  lea rax, [rdi-4]      ; rax = x - 4
+  sub rax, rsi          ; rax = x - 4 - y
+  cmp rax, 24           ; compare rax with 24
+  mov eax, 0            ; (set up loop counter for below)
+  jbe .L2               ; if rax <= 24; jump to the slow case
+; falls through to the vectorised loop here
+```
+
+So what's going on here? We're checking `x` and `y` - not the _values_ of the two arrays, but the addresses. That somewhat awkward sequence is essentially saying "do the two arrays overlap with each other in a way that would prevent us being able to vectorise". If they overlap by 28 or more bytes, then we can't read and write in 8 `int` (32-byte) chunks: working in batches like this would give different results as the overlap means writing to `x[i]` might affect `y[i+2]` (or similar). So, the compiler has to add this check _and_ generate a fall-back case that does one at a time.
+
+With some non-standard trickery we tell the compiler to ignore vector dependencies for the loop[^restrict]:
+
+[^restrict]: Ideally we'd have a way in standard to say "these don't overlap". Try as I might, without making things a lot more complex, neither `__restrict` on pointers derived from the span nor `[[assume(...)]]` could convince the compiler that it didn't need to be conservative. Splitting the function into two, one taking `__restrict__` pointers and the other passing `x.data()` did work but was horrible.
+
+<iframe width="100%" height="280px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'commentOnly,labels,trim,libraryCode,directives,demangle,intel',options:'-O3+-march%3Dskylake+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0A%0Aconstexpr+auto+Size+%3D+65536%3B+//+would+normally+be+a+template+param%0Avoid+maxArray(%0A++++std::span%3Cint,+Size%3E+x,%0A++++std::span%3Cconst+int,+Size%3E+y)%0A%7B%0A%23pragma+GCC+ivdep%0A++for+(std::size_t+i+%3D+0%3B+i+%3C+Size%3B+%2B%2Bi)+%7B%0A++++x%5Bi%5D+%3D+(y%5Bi%5D+%3E+x%5Bi%5D)+%3F+y%5Bi%5D+:+x%5Bi%5D%3B%0A++%7D%0A%7D'"></iframe>
+
+That's it for today: with the right flags and a little care about data layout, the compiler can turn your one-at-a-time loops into batch-processing powerhouses! Tomorrow we'll look at floating point vectorisation and its own peculiar quirks.
+
+
+_See [the video](https://youtu.be/d68x8TF7XJs) that accompanies this post._
+
+---
+
+_This post is day 20 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
