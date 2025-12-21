@@ -1,0 +1,95 @@
+When SIMD Fails: Floating Point Associativity
+Date: 2025-12-21 06:00:00 America/Chicago
+Status: Public
+Summary: Why floating point maths doesn't vectorise like integers, and what to do about it
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>[Yesterday](/202512/20-simd-city) we saw SIMD work beautifully with integers. But floating point has a surprise in store. Let's try summing an array[^sum]:
+
+[^sum]: Yes, I know, this is what `std::accumulate` and similar are for, and you'll see similar code generation if you use them.
+
+<iframe width="100%" height="400px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'directives,libraryCode,commentOnly,demangle,labels,trim,intel',options:'-O3+-march%3Dskylake+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0Ausing+T+%3D+int%3B%0AT+sum(std::span%3CT,+65536%3E+span)+%7B%0A++T+result%7B%7D%3B%0A++for+(auto+x+:+span)%0A++++result+%2B%3D+x%3B%0A++return+result%3B%0A%7D'"></iframe>
+
+Looking at the core loop, the compiler has pulled off a clever trick:
+
+```asm
+.L2:
+  ; pick up 8 integers and add them element-wise to ymm0
+  vpaddd ymm0, ymm0, YMMWORD PTR [rdi]
+  add rdi, 32       ; move to the next batch of integers
+  cmp rax, rdi      ; at the end?
+  jne .L2           ; loop if not
+```
+
+The compiler is using a vectorised add instruction which treats the `ymm0` as 8 separate integers, adding them up individually to the corresponding elements read from `[rdi]`. That's incredibly efficient, processing 8 integers per loop iteration, but at the end of that loop we'll have 8 separate subtotals. The compiler adds a bit of "fix up" code after the loop to sum all these 8 subtotals:
+
+```asm
+  vextracti128 xmm1, ymm0, 0x1  ; xmm1 = ymm0 >> 128
+  vpaddd xmm0, xmm1, xmm0       ; xmm0 += xmm1
+  vpsrldq xmm1, xmm0, 8         ; xmm1 = xmm0 >> 64
+  vpaddd xmm0, xmm0, xmm1       ; xmm0 += xmm1
+  vpsrldq xmm1, xmm0, 4         ; xmm1 = xmm0 >> 32
+  vpaddd xmm0, xmm0, xmm1       ; xmm0 += xmm1
+  vmovd eax, xmm0               ; return xmm0
+```
+
+This sequence repeatedly adds the "top half" of the result to the bottom half until there's only one left. This fix up code is a little bit extra work, but the efficiency of the loop makes up for it[^esp].
+
+[^esp]: Especially in this situation where the compiler can see we have 65536 elements to process. If we had a variable number of elements, the compiler might add code to conditionally vectorise based on the number - which it has to do anyway to check if there are fewer than 8 elements, anyway.
+
+Let's switch to `float`s[^hmm] and see what happens:
+
+[^hmm]: If you go back to yesterday's post and switch to `float`s, you'll see the compiler is able to `max` with vectors just as well as integers.
+
+<iframe width="100%" height="400px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'directives,libraryCode,commentOnly,demangle,labels,trim,intel',options:'-O3+-march%3Dskylake+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0Ausing+T+%3D+float%3B%0AT+sum(std::span%3CT,+65536%3E+span)+%7B%0A++T+result%7B%7D%3B%0A++for+(auto+x+:+span)%0A++++result+%2B%3D+x%3B%0A++return+result%3B%0A%7D'"></iframe>
+
+We're still processing 32 bytes' worth of `float`s per loop iteration[^cheat], but something unfortunate is going on:
+
+```asm
+.L2:
+  vaddss xmm0, xmm0, DWORD PTR [rdi]    ; xmm0 += first elem
+  add rdi, 32                           ; move to next 8 floats
+  vaddss xmm0, xmm0, DWORD PTR [rdi-28] ; xmm0 += second
+  vaddss xmm0, xmm0, DWORD PTR [rdi-24] ; etc
+  vaddss xmm0, xmm0, DWORD PTR [rdi-20] ; ...
+  vaddss xmm0, xmm0, DWORD PTR [rdi-16]
+  vaddss xmm0, xmm0, DWORD PTR [rdi-12]
+  vaddss xmm0, xmm0, DWORD PTR [rdi-8]
+  vaddss xmm0, xmm0, DWORD PTR [rdi-4]  ; xmm0 += eighth
+  cmp rax, rdi                          ; at the end?
+  jne .L2                               ; loop if not
+```
+
+The compiler has chosen to do 8 floats per loop iteration...but then proceeded to do each add individually. What has happened here?
+
+[^cheat]: My heuristic to see if the compiler has vectorised is to find the loop and then look at how much the compiler adds to the loop counter: it's a good starting point for telling if we're doing more than one element at a time. In this case though, it's slightly misleading.
+
+To understand we need to recall that maths on `float`s is special: Operations are not associative. When adding integers, you can regroup the operations however you like—`(x + y) + z` gives the same result as `x + (y + z)`. Not so with `float`s: after each operation, rounding occurs. Depending on the relative magnitudes of `x`, `y` and `z`, regrouping the additions will change the result.
+
+When our compiler rewrote our integer sum loop into eight subtotals to take advantage of SIMD, and then summed the subtotals, it was regrouping the additions. We wrote a loop that summed from the first element to the last, and the compiler changed it to "accumulate every 8th element in 8 separate groups, then add those together". That works for integers but not floating point numbers.
+
+So - are we stuck? Perhaps we know we don't care about associativity? Some of you may be itching to use the `-Ofast` or `-funsafe-math-optimizations`[^fun] flag here. <!-- US-spelling-ok --> Both flags give the compiler leeway to globally ignore the rules about floating-point maths and both will work[^global]. However, there's a better, more targeted way:
+
+[^fun]: My favourite flag to the compiler, though it is neither fun nor safe.
+[^global]: You can edit the flags in the example and see it work. However, both affect the program/compiled translation unit globally. That can lead to some unfortunate side effects outside of the one or two functions you _actually_ want this applied to. Chandler Carruth refers to this as "unbounded precision loss" and he's not wrong.
+
+<iframe width="100%" height="400px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'directives,libraryCode,commentOnly,demangle,labels,trim,intel',options:'-O3+-march%3Dskylake+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'%23include+%3Cspan%3E%0Ausing+T+%3D+float%3B%0A%5B%5Bgnu::optimize(%22associative-math%22)%5D%5D%0AT+sum(std::span%3CT,+65536%3E+span)+%7B%0A++T+result%7B%7D%3B%0A++for+(auto+x+:+span)%0A++++result+%2B%3D+x%3B%0A++return+result%3B%0A%7D'"></iframe>
+
+In this example, we tell GCC to "assume maths is associative" for just the function `sum` by using an annotation. That means the effects are limited to just that one function, and will be applied consistently regardless of how this function is compiled or used. Yes; it does rely on a GCC extension, which is unfortunate. In theory we can use [`std::reduce`](https://en.cppreference.com/w/cpp/algorithm/reduce.html) with an unsequenced execution policy, but in my testing that didn't work here.
+
+Floating point maths has some unusual and perhaps surprising gotchas. Knowing about them can help you work with the compiler to get super fast vectorised code.
+
+
+_See [the video](https://youtu.be/lUTvi_96-D8) that accompanies this post._
+
+---
+
+_This post is day 21 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
