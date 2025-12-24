@@ -1,0 +1,95 @@
+When compilers surprise you
+Date: 2025-12-24 06:00:00 America/Chicago
+Status: Public
+Summary: Sometimes compilers can surprise and delight even a jaded old engineer like me
+Label: Coding, AoCO2025
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>Every now and then a compiler will surprise me with a really smart trick. When I first saw this optimisation I could hardly believe it. I was looking at loop optimisation, and wrote something like this simple function that sums all the numbers up to a given value:
+
+<iframe width="100%" height="400px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:g152,filters:'demangle,commentOnly,libraryCode,trim,intel,directives,labels',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+sum_up_to(int+value)+%7B%0A++int+result+%3D+0%3B%0A++for+(int+x+%3D+0%3B+x+%3C+value%3B+%2B%2Bx)+%7B%0A++++result+%2B%3D+x%3B%0A++%7D%0A++return+result%3B%0A%7D'"></iframe>
+
+So far so decent: GCC has done some preliminary checks, then fallen into a loop that efficiently sums numbers using `lea` (we've [seen this before](/202512/02-adding-integers)). But taking a closer look at the loop we see something unusual:
+
+```asm
+.L3:
+  lea edx, [rdx+1+rax*2]        ; result = result + 1 + x*2
+  add eax, 2                    ; x += 2
+  cmp edi, eax                  ; x != value
+  jne .L3                       ; keep looping
+```
+
+The compiler has cleverly realised it can do two numbers[^check] at a time using the fact it can see we're going to add `x` _and_ `x + 1`, which is the same as adding `x*2 + 1`. Very cunning, I think you'll agree!
+
+[^check]: Some of the initial code checks for odd/even and accounts accordingly.
+
+If you turn the optimiser up to `-O3` you'll see the compiler works even harder to vectorise the loop using parallel adds. All very clever.
+
+This is all for GCC. Let's see what clang does with our code:
+
+
+<iframe width="100%" height="320px" src="https://aoco.compiler-explorer.com/e?hideEditorToolbars=true#compiler:clang2110,filters:'demangle,commentOnly,libraryCode,trim,intel,directives,labels',options:'-O2+-Wall+-Wextra+-Wpedantic+-Wconversion+-Wsign-conversion+-Werror+-std%3Dc%2B%2B2c',source:'int+sum_up_to(int+value)+%7B%0A++int+result+%3D+0%3B%0A++for+(int+x+%3D+0%3B+x+%3C+value%3B+%2B%2Bx)+%7B%0A++++result+%2B%3D+x%3B%0A++%7D%0A++return+result%3B%0A%7D'"></iframe>
+
+This is where I nearly fell off my chair: **there is no loop**! Clang checks for positive `value`, and if so it does:
+
+```asm
+  lea eax, [rdi - 1]        ; eax = value - 1
+  lea ecx, [rdi - 2]        ; ecx = value - 2
+  imul rcx, rax             ; rcx = (value - 1) * (value - 2)
+  shr rcx                   ; rcx >>= 1
+  lea eax, [rdi + rcx]      ; eax = value + rcx
+  dec eax                   ; --eax
+  ret
+```
+
+It was not at all obvious to me what on earth was going on here. By backing out the maths a little, this is equivalent to:
+
+```
+v + ((v - 1)(v - 2) / 2) - 1;
+```
+
+Expanding the parentheses:
+
+```
+v + (v² - 2v - v + 2) / 2 - 1
+```
+
+Rearranging a bit:
+
+```
+(v² - 3v + 2) / 2 + (v - 1)
+```
+
+Multiplying the `(v - 1)` by 2 / 2:
+
+```
+(v² - 3v + 2) / 2 + (2v - 2)/2
+```
+
+Combining those and cancelling:
+
+```
+(v² - v) / 2
+```
+
+Simplifying and factoring gives us `v(v - 1) / 2` which is the closed-form solution to the "sum of integers"! Truly amazing[^why] - we've gone from an O(n) algorithm as written, to an O(1) one!
+
+[^why]: Why does the compiler emit this exact sequence and not a slightly more straightforward sequence? I think it's partly avoiding overflow in cases where it might otherwise overflow _and_ just a side effect of the way clang tracks and infers [induction variables](/202512/09-induction-variables). I really don't know for sure, though.
+
+I love that despite working with compilers for more than twenty years, they can still surprise and delight me. The years of experience and work that have been poured into making compilers great is truly humbling, and inspiring.
+
+We're nearly at the end of this series - there's so much more to say but that will have to wait for another time. Tomorrow will be a little different: see you then!
+
+
+_See [the video](https://youtu.be/V9dy34slaxA) that accompanies this post._
+
+---
+
+_This post is day 24 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+a 25-day series exploring how compilers transform our code._
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
+
+_Support Compiler Explorer on [Patreon](https://patreon.com/c/mattgodbolt)
+or [GitHub](https://github.com/sponsors/compiler-explorer),
+or by buying CE products in the [Compiler Explorer Shop](https://shop.compiler-explorer.com)_.
