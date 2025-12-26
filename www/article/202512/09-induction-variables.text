@@ -93,8 +93,10 @@ _See [the video](https://youtu.be/vZk7Br6Vh1U) that accompanies this post._
 
 ---
 
-_This post is day 9 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 9 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Going loopy](/202512/08-going-loopy) | [Unrolling loops](/202512/10-loop-unrolling) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

@@ -31,8 +31,10 @@ _See [the video](https://youtu.be/wHg9lYPMvvE) that accompanies this post._
 
 ---
 
-_This post is day 3 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 3 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Addressing the adding situation](/202512/02-adding-integers) | [Multiplying with a constant](/202512/04-multiplying-integers) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

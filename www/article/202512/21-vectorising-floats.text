@@ -85,8 +85,10 @@ _See [the video](https://youtu.be/lUTvi_96-D8) that accompanies this post._
 
 ---
 
-_This post is day 21 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 21 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [SIMD City: Auto-vectorisation](/202512/20-simd-city) | [Clever memory tricks](/202512/22-memory-cunningness) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

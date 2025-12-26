@@ -71,8 +71,10 @@ _See [the video](https://youtu.be/JFHfFTvMPp0) that accompanies this post._
 
 ---
 
-_This post is day 17 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 17 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Calling all arguments](/202512/16-calling-conventions) | [Partial inlining](/202512/18-partial-inlining) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

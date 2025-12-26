@@ -48,8 +48,10 @@ _See [the video](https://youtu.be/HvF3tF2efEA) that accompanies this post._
 
 ---
 
-_This post is day 10 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 10 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Induction variables and loops](/202512/09-induction-variables) | [Pop goes the...population count?](/202512/11-pop-goes-the-weasel-er-count) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

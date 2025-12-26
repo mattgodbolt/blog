@@ -75,8 +75,10 @@ _See [the video](https://youtu.be/STZb5K5sPDs) that accompanies this post._
 
 ---
 
-_This post is day 18 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 18 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Inlining - the ultimate optimisation](/202512/17-inlining-the-ultimate-optimisation) | [Chasing your tail](/202512/19-tail-call-optimisation) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

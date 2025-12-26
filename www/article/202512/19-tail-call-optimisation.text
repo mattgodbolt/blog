@@ -79,8 +79,10 @@ _See [the video](https://youtu.be/J1vtP0QDLLU) that accompanies this post._
 
 ---
 
-_This post is day 19 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 19 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Partial inlining](/202512/18-partial-inlining) | [SIMD City: Auto-vectorisation](/202512/20-simd-city) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

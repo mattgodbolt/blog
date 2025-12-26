@@ -36,8 +36,10 @@ _See [the video](https://youtu.be/-VCrYshE7iQ) that accompanies this post._
 
 ---
 
-_This post is day 12 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 12 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Pop goes the...population count?](/202512/11-pop-goes-the-weasel-er-count) | [Loop-Invariant Code Motion](/202512/13-licking-licm) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

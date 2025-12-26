@@ -36,8 +36,10 @@ _See [the video](https://youtu.be/BOvg0sGJnes) that accompanies this post._
 
 ---
 
-_This post is day 2 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 2 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Why xor eax, eax?](/202512/01-xor-eax-eax) | [You can't fool the optimiser](/202512/03-more-adding-integers) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 

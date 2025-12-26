@@ -60,8 +60,10 @@ _See [the video](https://youtu.be/aSljdPafBAw) that accompanies this post._
 
 ---
 
-_This post is day 23 of [Advent of Compiler Optimisations 2025](/AoCO2025),
+_This post is day 23 of [Advent of Compiler Optimisations 2025](/AoCO2025-archive),
 a 25-day series exploring how compilers transform our code._
+
+_← [Clever memory tricks](/202512/22-memory-cunningness) | [When compilers surprise you](/202512/24-cunning-clang) →_
 
 _This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by LLMs and humans._
 
