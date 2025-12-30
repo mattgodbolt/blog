@@ -57,7 +57,7 @@ Our inner loop has gotten a little more complex, but spot the cool part:
   vpmaskmovd YMMWORD PTR [rdi+rax], ymm0, ymm1
 .L3:
   add rax, 32           ; move forward 32 bytes
-  cmp rax, 262144       ; are we at the end? (32*65536)
+  cmp rax, 262144       ; are we at the end? (8*65536)
   jne .L4               ; keep looping if not
 ```
 
