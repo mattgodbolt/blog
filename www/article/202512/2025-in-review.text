@@ -1,0 +1,44 @@
+2025 in Review
+Date: 2025-12-31 15:30:00 America/Chicago
+Status: Public
+Summary: What has this year all been about, eh?
+Label: Blog
+
+<p class="ai-disclaimer">Written by me, proof-read by an LLM.
+<br/>Details at end.</p>
+
+2025 has been quite a year for me. The big ticket things for me were having the majority of the year on a non-compete, a new job, and some videos and conference talks.
+
+It was a bumper year for my public talks, which included:
+
+- ACCU Keynote - [Teaching an Old Dog New Tricks](https://www.youtube.com/watch?v=jlt_fScVl50)
+- C++ on Sea - a [reprise](https://www.youtube.com/watch?v=gg4pLJNCV9I) of the above talk, slightly shortened
+- CppCon Keynote - [C++: Some Assembly Required](https://cppcon.org/2025-keynote-matt-godbolt/)
+- Jane Street - [Microarchitecture: What Happens Beneath](https://www.janestreet.com/tech-talks/microarchitecture/)
+
+I also appeared in a number of [Computerphile videos](https://www.youtube.com/playlist?list=PLzH6n4zXuckpwdGMHgRH5N9xNHzVGCxwf):
+
+- [Computer Timescales Mapped onto Human Timescales](https://www.youtube.com/watch?v=PpaQrzoDW2I)
+- [How CPU Memory & Caches Work](https://www.youtube.com/watch?v=SAk-6gVkio0)
+- [Subroutines in Low Level Code](https://www.youtube.com/watch?v=1su3lAh-k4o)
+- [CPU Interrupts](https://www.youtube.com/watch?v=tGMSARJk7cA)
+- [CPU Kernel Mode](https://www.youtube.com/watch?v=yV4fGeIv7MI)
+- [Memory Mapping](https://www.youtube.com/watch?v=di5WodGWTiY)
+- [CPU Summary](https://www.youtube.com/watch?v=fpkCNu_dzcM)
+- [What is Bootstrapping Anyway?](https://www.youtube.com/watch?v=Pu7LvnxV6N0)
+- [How Computers Store Data Serially](https://www.youtube.com/watch?v=VEyVm6dU55c)
+- [How Ethernet Sends Data](https://www.youtube.com/watch?v=SJE2lFR5utM)
+
+On the [Compiler Explorer](https://godbolt.org/) front, I finally solved a three-year-old problem with [CEFS](/202509/cefs) — our new content-addressable filesystem that mounts compiler images on demand instead of all 2,000+ at boot time. I also launched the experimental [Claude Explain](https://xania.org/202505/ai-and-compiler-explorer) feature during my CppCon keynote, and wrote about [how CE works](/202506/how-compiler-explorer-works) and our [cost transparency](/202506/compiler-explorer-cost-transparency). As always, CE is a community effort and I'm grateful to all the contributors who keep it running.
+
+[Ben](https://benrady.com/) and I kept up our monthly [Two's Complement](https://twoscomplement.org/) podcast, releasing all 12 episodes on schedule. Highlights included pondering [AI pair programming](https://twoscomplement.org/#podcast/AI), debating [C++ and Rust](https://twoscomplement.org/#podcast/cpp_and_rust), worrying about [vibe coding](https://twoscomplement.org/#podcast/vibe_coding) replacing junior developers, and bonding over [Factorio](https://twoscomplement.org/#podcast/factorio_gaming).
+
+I ticked off a bucket list item by appearing in a [Tom7](https://tom7.org/) video, alongside such greats as [Matt Parker](https://standupmaths.com/) and [jan Misali](https://www.youtube.com/@HBMmaster) in a bonkers [Secret Santa video](https://www.youtube.com/watch?v=4pG8_bWpmaE). Such fun, and thank you Santa for my very awesome comic book.
+
+Finally I had my very own series on YouTube - the Advent of Code Optimisation - [27 videos in all](https://www.youtube.com/watch?v=eLjZ48gqbyg&list=PL2HVqYf7If8cY4wLk7JUQ2f0JXY_xMQm2). That was a huge amount of work: with the [blog posts](/AoCO2025-archive), filming and editing I estimate I spent around 10 hours on each 5-10m video!
+
+A very busy year, ending with me starting work at [Hudson River Trading](https://www.hudsonrivertrading.com/). I'm only a month in, but I couldn't be happier with my decision to work here: it's a fantastic place full of impressive technology, interesting problems, and perhaps most importantly, kind and thoughtful human beings.
+
+Here's to whatever excitement 2026 will bring! Happy New Year everyone!
+
+_This post was written by a human ([Matt Godbolt](/MattGodbolt)) and reviewed and proof-read by an LLM._
