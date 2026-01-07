@@ -52,7 +52,7 @@ To fix this issue, we have a couple of choices. The easy way would be to rewrite
 
 The other, non-standard way to work around this issue is to use `__restrict`. This GNU extension (borrowed from C) lets us decorate pointers and essentially promises that this pointer uniquely refers to the object it points at. In our case, the thing we need to prove is unique is the `Counter`'s "this pointer" itself. Adding `__restrict` after the parameter list (where you would add `const` for a const member function) works. But again - this is very non-standard, so use at your peril[^vectorise].
 
-[^vectorise]: Try making the change in the Compiler Explorer window above. You'll see the `total` update move outside of the loop. If you're not scared to jump ahead a bit, make it `-O3` and you'll see the vectorised code, but only with the `__restrict`.
+[^vectorise]: Try making the change in the Compiler Explorer window above. You'll see the `total` update move outside of the loop. If you're not scared to jump ahead a bit, make it `-O3` and you'll see the vectorised code, but only with `__restrict`.
 
 Aliasing is one of C++'s sneakier gotchas, especially when you're working with base types like `int` and `float` - you can't avoid using them, and they're prime candidates for aliasing with each other[^rust]. It's perfectly legal to have overlapping same-type pointers, so the compiler assumes the worst and peppers your hot loops with memory accesses. The fix may be as simple as only using local variables within your loop - but first you have to spot it. Fire up [Compiler Explorer](https://godbolt.org), look for those unexpected writes to memory when you'd expect everything to stay in registers, and you'll know when aliasing is holding you back!
 
