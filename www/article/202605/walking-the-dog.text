@@ -1,0 +1,177 @@
+Walking the dog with Claude
+Date: 2026-05-24 11:55:00 America/Chicago
+Status: Public
+Summary: An AI interview about explaining hard things simply, conducted on a dog walk
+Label: Blog, Personal, Coding, AI
+
+<p class="ai-disclaimer">Written with LLM assistance.<br/>The interview format is genuine; the prose is lightly tidied from voice notes.</p>
+
+I had lunch with a pal yesterday, and we got onto the subject of why
+so much technical material is either accurate-but-impenetrable or
+polished-but-slightly-wrong. It's a gap I think about a lot, partly
+because I make videos that try to land in the middle of it and don't
+always succeed. The conversation stuck with me on the drive home.
+
+This morning, whilst walking the dog, I tried something a bit silly: I
+asked Claude (dictating to the mobile app[^expl]) to interview me about it.
+Voice-to-text on one end, an LLM
+playing journalist on the other, and a black lab setting the pace. What
+follows is that conversation, lightly tidied -- paraphrased in places,
+verbatim in others. The LLM is the interviewer; I'm the subject.
+
+[^expl]: I tried the "conversation mode" but it drives me mad, the thing keeps interrupting me all the time. So I used my phone's own "voice to text" feature and "typed" into the text boxes with it, sending every now and then. Not perfectly seamless, but not bad.
+
+The words are mine, the questions aren't.
+
+---
+
+**Claude:** Let's start wide. Your friend's comment was about the gap
+between people who know things and people who can explain them. Where
+do you see that gap most clearly?
+
+**Matt:** Almost everywhere, honestly. The people with the information
+may not be great presenters, and the great presenters don't necessarily
+have the information. You end up with two failure modes: dry, accurate
+material that nobody wants to watch, or polished material that gets the
+details slightly wrong in ways that make experts twitch. Both are
+common; the overlap is rarer than I'd like.
+
+**Claude:** Who do you think bridges it well?
+
+**Matt:** Grady Hillhouse on [Practical Engineering](https://practical.engineering/) -- he actually is a
+civil engineer, and it shows. Devin Stone, [LegalEagle](https://www.youtube.com/@LegalEagle), is a working
+lawyer. And the Brady Haran shows -- [Numberphile](https://www.numberphile.com/), [Computerphile](https://www.youtube.com/user/Computerphile) -- solve
+it from the other end: Brady and [Sean Riley](https://mastodonapp.uk/@seanski44) are well-prepared "straight
+man" interviewers, and the experts they bring in are carefully chosen.
+The format itself is the trick. I'm biased on Computerphile, mind, since
+I've [done a few](https://www.youtube.com/playlist?list=PLzH6n4zXuckpwdGMHgRH5N9xNHzVGCxwf).
+
+**Claude:** Let's talk craft. You've mentioned the Usborne robots
+before. What are they, and why do they still matter to you?
+
+**Matt:** There were these late-70s / early-80s [Usborne books](https://usborne.com/us/books/computer-and-coding-books) on how
+computers worked, and they used little cartoon robots to show
+information moving around inside the machine. As a kid that just
+clicked for me. The thing I find quietly remarkable is that I still
+use it. When I'm reasoning about out-of-order execution, register
+renaming, modern microarchitecture -- somewhere underneath, there are
+still little robots shuffling things between pigeon-holes. I'm not
+consciously picturing them anymore, but the shape of the model is the
+same.
+
+**Claude:** That sounds like a beginner's model that you've never quite
+outgrown.
+
+**Matt:** Maybe you're right? The thing I
+keep coming back to is that what's easy for me to reason about as an
+expert[^ugh] is often _exactly_ what's easy for a beginner to grasp. The
+mental model and the explanation aren't two things -- they're the same
+object. I think people assume good explanations are simplifications of
+the expert's real model. Sometimes they're just the expert's real
+model.
+
+[^ugh]: Ugh, I don't really want to accept that mantle but apparently that's what I said...
+
+**Claude:** You've talked about a "tell my mum" test. Where does that
+come from?
+
+**Matt:** When I was a teenager with a [BBC Micro](https://bbc.xania.org/), if I figured
+something out I'd run downstairs and tell my mum. She'd listen and
+either follow or politely pretend to. Somewhere along the way that
+became my actual yardstick: could I explain this to her? Simple enough
+to follow, but _not_ dumbed down. True. And underwritten by the fact
+that I actually understand the thing properly, even if I don't expose
+all of it. If I can't clear that bar, I'm not ready.
+
+**Claude:** And the prep that goes with it?
+
+**Matt:** More than people probably realise. For the early
+Computerphiles I'd practise on paper, out loud, two or three times,
+even though the finished video looks off-the-cuff. The
+off-the-cuffness is the prep working.
+
+**Claude:** You skipped a Computerphile recording last week. What
+happened?
+
+**Matt:** Yeah, that's been nagging at me. The topic was how computers
+tell the time -- it's fallout from my C++Now keynote on benchmarking[^kw].
+I wanted to talk about `rdtsc` and `rdtscp` on x86, how raw counter
+ticks get turned into wall-clock time, and the out-of-order execution
+wrinkles that show up when you read the clock. Good material. I just
+couldn't find a visual hook. Computerphile's whole stick is hand-drawn,
+handwritten stuff on lined paper, and I hadn't worked out how to draw
+this one. I'm now mulling writing a tiny x86 assembly snippet
+long-hand and using _that_ to show out-of-order behaviour. But the honest
+reason I bailed is that I hadn't cleared the mum test yet. I hadn't
+reduced it cleanly enough.
+
+**Claude:** Why do you do these at all? Be honest.
+
+**Matt:** Two layers, I think. The first is that I'm a show-off. My
+mum's side of the family are performers -- singers and dancers, mostly --
+and I did school musicals, played instruments, all of that. It faded
+in my twenties and I've sort of rediscovered it through conference
+talks and the videos. I like being on stage. I'm not going to pretend
+otherwise.
+
+**Claude:** And the second layer?
+
+**Matt:** I was giving a guest lecture recently and made the
+showing-off joke to a friend afterwards. He said, "I don't think
+that's all of it." He's being kind, but he's also right. The bigger
+thing is the moment someone _gets_ it. "I know this stuff, and now so
+do you -- isn't that cool?" That penny-dropping moment is the actual
+fuel. My territory is microarchitecture, compilers, assembly -- how
+computers really work, underneath. [Advent of Compiler Optimisations
+2025](/202511/advent-of-compiler-optimisation) was probably the most concentrated dose of all of this in one go.
+
+**Claude:** You've been quieter on the video front lately. Why?
+
+**Matt:** Because they cost. And I want to be careful, because the
+costs aren't the same shape. Something like Advent of Compiler
+Optimisations is genuinely expensive in _hours_ -- between the blog
+posts, filming and editing, I [reckon](/202512/2025-in-review) about ten hours per 5–10-minute
+video, and there were twenty-five of them. Computerphile is much
+lighter on time -- an hour or two of prep once the idea's ready. The
+harder cost there isn't hours, it's the conceptual distillation. I
+can't take it to Sean until it clears the mum bar. Last week's
+no-show is the example.
+
+**Claude:** Final question, and it's a deliberate provocation.
+[Compiler Explorer](https://godbolt.org/) takes the most opaque part of writing C++ -- what the
+compiler actually does -- and makes it inspectable in real time. Is
+that the same impulse as the videos and the talks, just made into a
+tool?
+
+**Matt:** Do you know what? I'd never actually thought of it that way.
+But -- yeah, I suppose there is a bit of that going on. There's the
+immediacy I like: it compiles as you type, rather than you having to
+kick off some long process. And I try[^try] to keep pushing it to be more
+accessible, more instinctive. Put like that, there's clearly overlap.
+The tool, the videos and the talks have something of the same flavour I suppose.
+
+[^try]: Even though I might not be as good at this as I'd like.
+
+---
+
+That last question was quite a surprise; I genuinely hadn't thought of CE that
+way before.
+
+I want to do more of these -- more Computerphiles, more talks, more written-up material -- and I
+keep not doing them as often as I'd like. The honest reason is the one
+above: sometimes the cost is hours, sometimes it's getting the idea
+clean enough to be worth saying[^hrt]. I'm trying to give myself permission
+for the output to be _infrequent_ without it being _stopped_. Those
+are different things, and I keep conflating them.
+
+[^hrt]: And my day job is keeping me busy too!
+
+And -- is this the future? An LLM as an interviewer while you walk the
+dog? I'm not sure, but I will say: I came home
+with a thought I didn't leave with, which is more than I can say for
+most dog walks. Monty remains unconvinced (though he's now snoozing happily on the sofa).
+
+[^kw]:
+    [_Benchmarking: It's About Time -- As-If By Magic_](https://hudson-trading.github.io/its-about-time), if you want to
+    look it up. The skipped Computerphile was meant to be a domesticated
+    version of one slice of it.

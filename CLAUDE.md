@@ -42,3 +42,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - This blog uses Python-Markdown 3.8, which has slightly different syntax from GitHub Markdown
 - **Important**: Bullet lists require a blank line before them to render properly
 - See README.md for complete markdown syntax requirements and examples
+
+## Article Frontmatter: Summary line
+- The `Summary:` field is a short, descriptive one-liner — typically 8–15 words, almost always under ~20
+- Plain descriptive prose, *not* a teaser, hook, or pitch. No em-dashes, no rhetorical setup, no quoted phrases from the post
+- Written in third person / neutral voice ("How we handle X", "Why compilers do Y", "A look at Z") — not in the post's narrative voice
+- Style to match: see existing posts, e.g. "Behind-the-scenes look at recording a CPU fundamentals series for Computerphile", "How we handle 92 million compilations a year without everything catching fire", "Compilers can rewrite loops to avoid expensive calculations"
+- When in doubt, shorter is better. If it reads like a sentence from the post's opening paragraph, it's too long
