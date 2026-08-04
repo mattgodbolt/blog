@@ -1,0 +1,175 @@
+How Compiler Explorer Runs on AWS in 2026
+Date: 2026-08-04 09:00:00 America/Chicago
+Status: Draft
+Summary: A tour of the AWS services behind every Compiler Explorer compilation
+Label: Coding, Compiler Explorer
+
+<p class="ai-disclaimer">Written with LLM assistance.<br/>Details at end.</p>
+
+I've been meaning to write an update on how [Compiler Explorer](https://godbolt.org) actually runs on Amazon's cloud, and it's been sat on my list for a good while now, somewhere behind the other random things that take up what laughably I refer to as my spare time[^list].
+
+The last time I wrote about this was [2016](/201609/how-compiler-explorer-runs-on-amazon), when the whole site was a load balancer, a couple of instances and some Docker containers I built on my laptop. I wrote a much longer [how it works](/202506/how-compiler-explorer-works) last summer, but that one is mostly about Compiler Explorer and only incidentally about the cloud it sits on.
+
+[^list]: In my defence, those have included a month back in the UK dealing with some family things, a run of C++ talks ([C++Now](https://www.youtube.com/watch?v=EU_nQh8wg5A "Keynote: Benchmarking -- It's About Time"), [ACCU on Sea](https://accuonsea.uk/2026/sessions/microarchitecture-what-lies-beneath/ "Microarchitecture: What Lies Beneath"), [CppCon](https://cppcon.org/ "The C++ Conference"), a keynote at [C++ Under the Sea](https://cppunderthesea.nl/ "In Breda, this October"), and [Meeting C++](https://meetingcpp.com/meetingcpp/news/items/A-first-release-of-the-program-for-Meeting-Cpp-2026.html "My Compiler Explorer talk, in Berlin this November") in Berlin, where I'll be going into a lot of this in rather more detail), some more [Computerphile](https://www.youtube.com/playlist?list=PLzH6n4zXuckpwdGMHgRH5N9xNHzVGCxwf "Matt Godbolt on Computerphile") videos, and getting completely obsessed with how [PAL decoding](https://github.com/mattgodbolt/PALindrome "My PAL encoder/decoder") works.
+
+It's no secret that we run on AWS, and none of it is hidden: the [infra repository](https://github.com/compiler-explorer/infra) has all the terraform, the install scripts and the `ce` command line tool we drive the whole thing with, so if you'd rather read the real thing than my description of it, help yourself. So this one goes the other way round, through the Amazon services we lean on, roughly in the order your compile request runs into them.
+
+### Getting your code as far as our servers
+
+Your browser talks to [CloudFront](https://aws.amazon.com/cloudfront/), Amazon's CDN. We run two separate CloudFront distributions. The one in front of `godbolt.org` mostly just hands requests on to our load balancer, caching what it sensibly can and compressing things on the way back out[^brotli]. The bulky static stuff lives in an S3 bucket behind a second distribution at `static.ce-cdn.net`: the compiled JavaScript, the images, the web fonts. Much the largest part of that is [Monaco](https://github.com/microsoft/monaco-editor), the editor component out of Visual Studio Code, which is what gives you the syntax highlighting and the squiggly underlines and the rest of it. It's a lot of JavaScript to send someone who only wants to look at some assembly, so it's worth having it cached near them.
+
+[^brotli]: We only got round to turning [brotli](https://github.com/google/brotli "Google's compression algorithm, generally smaller than gzip") compression on at the edge for the main app in June this year.
+
+Sitting in front of that is [WAF](https://aws.amazon.com/waf/), doing our rate limiting. Our limits are _very_ simple and _very_ high, mostly because we used to be stricter and it kept catching C++ trainers: a whole classroom behind a conference's NAT looks like a single very keen IP address. We could probably do something cleverer with fingerprinting, but raising the limit was easier and it hasn't been a problem since.[^bans]
+
+[^bans]: WAF also gives us a `banned-ipv4` and a `banned-ipv6` list that I add to by hand when we spot somebody misbehaving, and take them off again once they've got the hint. It doesn't happen often: last year it was one anomalous IPv6 address, and an analytics outfit that was hammering us, who came off the list again the next day. Every now and again some enterprising soul works out that a site which compiles and runs arbitrary code is, if you squint, a free compute farm, but that's rare and it tends to be pretty obvious.
+
+### Rather a lot of fleets behind one load balancer
+
+Behind CloudFront is a single [Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/ "Amazon's HTTP-aware load balancer"). It works out from the path which cluster a request is for, and then picks a healthy instance in that cluster to send it to. Almost everything has no special prefix at all and goes to the production fleet, which is where the overwhelming bulk of the traffic ends up. `/beta*` and `/staging*` go to the beta and staging fleets[^envs]. `/winprod*` goes to a fleet of Windows instances running [MSVC](https://learn.microsoft.com/en-us/cpp/build/reference/compiling-a-c-cpp-program "Microsoft's C++ compiler"), `/aarch64prod*` to [Graviton](https://aws.amazon.com/ec2/graviton/ "Amazon's own ARM64 processors") machines that run ARM code natively rather than under emulation, and `/gpu*` to machines with real NVIDIA cards in them[^gpu].
+
+[^envs]: Beta is very rarely used, but when we do have a longer-term experiment on the go that's where it lives. Staging is for short-lived pre-deploy checks.
+
+[^gpu]: These cost a small fortune to run, but being able to see the results of running GPU code makes it worthwhile. We worked with our friends at NVIDIA to get the drivers and toolchains working properly, and they were a corporate sponsor for a good while too. Thank you NVIDIA!
+
+Each of those is an [Auto Scaling Group](https://aws.amazon.com/ec2/autoscaling/ "Amazon's way of keeping N healthy machines alive"), and these days each one is doubled up: a blue and a green. To deploy, we bring up the other colour, wait for it to go healthy, point the load balancer's target group at it and drain the old one. If it's wrong, we point it back. Before that, deploying meant a rolling restart of the fleet with our `ce` command line tool, one instance at a time. That worked well enough, but backing out a bad release meant rolling the whole fleet forward again onto the previous version, which is a bit slow when you've just broken the site.
+
+The scaling itself is simple: we just try and keep the average CPU load below a threshold. We've kicked around more sophisticated ideas but this one is supported out of the box[^queuescale].
+
+[^queuescale]: The obvious better signal is queue depth: how many compilations are actually waiting, rather than how busy the CPUs happen to look. We already have scaling policies written against `ApproximateNumberOfMessagesVisible` for some of the environments, and once the queue-based compilation path is carrying real traffic everywhere that's what we'd like to scale everything on.
+
+### Renting the bits nobody else wants
+
+The production fleet is almost entirely [spot instances](https://aws.amazon.com/ec2/spot/) -- unused EC2 capacity, sold off cheap, on the understanding that you can be evicted at two minutes' notice. It's a 60-90% saving over on-demand -- quite a lot of money, for us.
+
+We can get away with that because our instances don't really matter. Everything that needs to survive lives on the shared filesystem, in S3 or in DynamoDB, so an instance that vanishes is just an instance that gets replaced. We ask for sixteen different instance types across the `m5`, `m6`, `m7`, `r6` and `i3`/`i4i` families. The allocation strategy is `price-capacity-optimized` -- Amazon's way of saying "pick whichever of these is cheapest and least likely to get yanked". In practice we get evicted, the scaling group notices, and a new one turns up.
+
+### Why the compilers are the hard part
+
+We have around 6,000 compiler entries[^double] across 93 languages, and we never delete any of them[^never]. Once a compiler version goes up it stays up, so that Stack Overflow answer showing a GCC 4.8 codegen quirk still compiles today. It's our bit against link rot, and it does mean we hoard an awful lot of binaries.
+
+[^never]: Nearly never, anyway. Very occasionally an experimental build gets replaced, and the nightly builds replace themselves by definition: today's GCC trunk quietly does away with yesterday's. It's the released versions that stay put forever.
+
+[^gc]: Content addressing does at least make that safe to work out: an image that nothing links to is definitely unused, so the collection can be automatic rather than me squinting at filenames and hoping. A good chunk of those 111 will be yesterday's nightly builds, quietly superseded by today's.
+
+[^double]: 6,157 if you ask the API, but that's cheating slightly: it counts the same GCC once for C, once for C++, once for Fortran and so on. Unique names, it's 4,291. Last June the equivalent numbers were 4,724 and 81 languages, so we're still growing pretty nicely, and almost none of that is me: folks keep turning up with a language I'd never heard of and a working PR.
+
+All of that lives on [EFS](https://aws.amazon.com/efs/), Amazon's elastic NFS, and NFS has latency. C-like languages pull in an enormous number of very small header files, so the naive version of this is unusably slow. Our fix, which sounds daft, is to build a [SquashFS](https://docs.kernel.org/filesystems/squashfs.html "A compressed, read-only Linux filesystem") image per compiler, store the image _also_ on EFS, and mount it through a loopback device. The kernel then thinks it's talking to a local block device and caches blocks properly instead of checking with a server in another building every time[^squash].
+
+[^squash]: Normally NFS caches data locally, but it still validates that cached metadata is fresh with the server via attribute caching. Even when the file data is cached you pay the network latency to check it hasn't changed. Going via a loopback-mounted SquashFS image "launders" away the NFS-ness: the squashfs driver sees a local block device, and the kernel is blissfully unaware that behind those cached blocks is a file on NFS that could in theory change. For immutable compiler images this is a huge boon.
+
+That worked, but it meant mounting a couple of thousand images at every boot, which took the best part of a minute and kept the metadata for thousands of filesystems resident in kernel memory. That cached metadata is a good chunk of why squashfs beats NFS in the first place, so it's not wasted as such; it's just that any one instance is only ever going to touch a handful of those compilers, so we were paying for all of it to use a fraction of it. It took me three years and several abandoned attempts to fix that, and the answer was [CEFS](/202509/cefs): content-addressed images, packed into bundles of around 20GB, mounted on demand by [autofs](https://www.kernel.org/doc/html/latest/filesystems/autofs.html "The kernel's automounter: mounts a filesystem the first time something touches the path") the first time something touches the path. The migration took us from 2,182 images down to 121, and OS startup from 50 seconds to 20! It's crept back up to around 883 since, because the nightly builds keep making new images and consolidation only packs down whatever is already there. A garbage collection while I was writing this turned up 111 images that nothing references any more, about 63GiB's worth[^gc].
+
+Our storage has come down a lot over the year too, though I'm honestly not sure how much of that is CEFS and how much is me finally deleting the old squash images:
+
+```sh
+Aug/04 01:55 admin-node~ $ df -h
+Filesystem                                 Size  Used Avail Use% Mounted on
+/dev/nvme0n1p1                              97G   20G   77G  21% /
+fs-db4c8192.efs.us-east-1.amazonaws.com:/  8.0E  2.2T  8.0E   1% /opt
+```
+
+2.2T, where a year ago it was 3.9T. Still nowhere near 8 exabytes, mind.
+
+### Building compilers all night, every night
+
+We build a pile of compilers from scratch every night: GCC trunk, Clang trunk, and a long tail of experimental branches for reflection, contracts, coroutines and all the other fun stuff. That's 94 nightly build jobs at the moment[^jobs], up from 73 a year ago and 33 in 2022.
+
+[^jobs]: A "job" isn't a compiler: some build one thing, some build a whole family. The builds kick off at midnight UTC and queue on our build infrastructure, and a separate workflow installs at 5:30am, and the two still have no idea about each other, so sometimes we install yesterday's builds. It's on the list.
+
+Those run on our own [GitHub Actions](https://github.com/features/actions "GitHub's CI system") runners on [EC2](https://aws.amazon.com/ec2/ "Elastic Compute Cloud, Amazon's virtual machines"), spun up on demand with the excellent [terraform-aws-github-runner](https://github.com/github-aws-runners/terraform-aws-github-runner), with all the compiler orchestration on top being ours. Building trunk LLVM wants a big machine and a decent chunk of time, and GitHub's hosted runners weren't up to it when we set this up.
+
+This is the part of the bill that goes up every time somebody asks us for another compiler and we say yes[^stale].
+
+[^stale]: We're not completely daft about it: before a nightly build runs it checks whether any of the upstream repositories have had a commit in the last week, and if nothing's moved it skips the build entirely. A quiet week on some experimental branch costs us nothing much.
+
+### The bits that are half-finished
+
+One thing we've built but not finished rolling out is what we call the CE Router: a small fleet whose job is to decide _where_ a compilation should happen, look the answer up in [DynamoDB](https://aws.amazon.com/dynamodb/) and drop the request on an [SQS](https://aws.amazon.com/sqs/) queue, with the result coming back to your browser over an [API Gateway](https://aws.amazon.com/api-gateway/ "Amazon's managed API front end") WebSocket. The point is to stop the machine that answers the HTTP request having to be the machine that owns the compiler.
+
+It works, but it isn't carrying production traffic yet: the load balancer rules that would send compilations through it are still commented out, and we're migrating gradually. Your compile today still goes straight to a machine in the prod fleet, the way it always has.
+
+Building it did turn up a good AWS gotcha, though. API Gateway WebSocket frames top out at 32KiB, and the assembly for almost any non-trivial program is bigger than that; in the other direction SQS messages cap out at 256KB, which a decent-sized multi-file project will go past. So in both directions, if the thing is too big we shove it in S3 and send a key instead.
+
+### Everything else
+
+A scattering of other services doing one job each:
+
+* **[DynamoDB](https://aws.amazon.com/dynamodb/ "Amazon's key-value store")** holds the short links. Every `godbolt.org/z/...` you've put in a slide deck is a row in a table, and there are a couple of million of them.
+* **[S3](https://aws.amazon.com/s3/ "Simple Storage Service, Amazon's object store")** holds the compilers we build, the static assets, the logs, and a daily-expiring content-addressable compilation cache, so the second person to compile the same thing gets it for free.
+* **[Lambda](https://aws.amazon.com/lambda/ "Amazon's run-a-function-without-a-server thing")** does the odd jobs: the [Claude Explain](/202505/ai-and-compiler-explorer) backend, the nightly version tracking, and the one that pushes CloudWatch alarms into our Discord so it's not just my phone buzzing at 3am.
+* **[Route 53](https://aws.amazon.com/route53/ "Amazon's DNS")**, **[ACM](https://aws.amazon.com/certificate-manager/ "Certificate Manager, which keeps our TLS certificates current")**, **[CloudTrail](https://aws.amazon.com/cloudtrail/ "An audit log of everything done to the account")**, **[Backup](https://aws.amazon.com/backup/ "Scheduled backups of the things we cannot rebuild")** and **[SES](https://aws.amazon.com/ses/ "Simple Email Service")** are the plumbing. I don't think about them much.
+* **[CloudWatch](https://aws.amazon.com/cloudwatch/ "Amazon's metrics and alarms")** drives the auto-scaling triggers, though for actually looking at things we run [Grafana](https://grafana.com/ "Dashboards and graphs"), [Prometheus](https://prometheus.io/ "Metrics collection") and [Loki](https://grafana.com/oss/loki/ "Log aggregation"). Those [dashboards are public](https://stats.compiler-explorer.com/).
+
+Everything is in `us-east-1`. If you're compiling from Sydney your code goes a long way round, and I'm afraid it's going to keep doing that: keeping a couple of terabytes of compilers in sync across regions would be an absolute nightmare.
+
+### Some numbers
+
+We log a heavily anonymised JSON record to S3 for every compilation, with a [Glue](https://aws.amazon.com/glue/ "Amazon's data catalogue: lets you run SQL over files in S3") table over the top, so while writing this I went and counted them properly: **5,238,210** compilations in July, and **78.7 million** over the last twelve months. It's been sliding gently all year, down about a third from last autumn's peak.
+
+<p class="picture">
+<a href="/202608/compilations-per-month.svg">
+<img src="/202608/compilations-per-month.svg" width="800" height="400"
+ alt="Chart of monthly compilations from August 2025 to July 2026, peaking at 7.77 million in October 2025 and falling to 5.24 million in July 2026"/>
+</a>
+<br/>Compilations per month over the last year. Generated from <a href="/202608/generate_compilation_chart.py">this script</a>.
+</p>
+
+The big drop before that, from 2024's 14 million a month, I can at least half explain: in mid-2024 we doubled the default delay before we auto-recompile as you type, from 750ms to 1500ms, and then to 2 seconds[^delay]. If you type continuously, doubling that delay roughly halves the number of compilations you generate, without anybody noticing anything much. This latest slide isn't that, though: it started well over a year later.
+
+[^delay]: [#6669](https://github.com/compiler-explorer/compiler-explorer/issues/6669), if you want the gory details. It went out at 1500ms, then someone tried 2 seconds, then it got reverted, then it went back to 2 seconds ten days later. The current default is 2000ms.
+
+So I don't really have a good explanation, and I can't easily go and find one, because we deliberately [don't track who you are](https://godbolt.org/#privacy): no cookies, nothing that would let me tell you how many people used the site yesterday. I'd make that trade again every time, but it does leave me squinting at graphs occasionally.
+
+Since I had the query open, here's what folks actually compiled in July:
+
+```
+id                      compiles   compiler
+g161                   1,386,532   GCC 16.1 (C++)
+cg161                    403,659   GCC 16.1 (C)
+gsnapshot                298,256   GCC trunk
+clang_trunk              287,885   Clang trunk
+g152                     239,331   GCC 15.2
+clang2210                177,958   Clang 22.1
+vcpp_v19_latest_x64      132,186   MSVC
+r1970                     65,380   Rust 1.97
+python314                 51,104   Python 3.14
+```
+
+That top entry is **26%** of everything -- roughly what you'd expect when you're the default[^top10]. The load balancer sees around 14 million requests a month; our busiest day this year was the 21st of April at 1.44 million. The auto-scaling dealt with that one by itself; I only found out about it while writing this.
+
+All of that costs us somewhere around $3,600 a month on AWS at the moment, which works out at about $0.0007 per compilation[^percomp]. AWS's [open source credits](https://aws.amazon.com/blogs/opensource/aws-promotional-credits-open-source-projects/ "AWS's promotional credits programme for open source projects") covered our infrastructure for a good chunk of the last year. That's run out now, so we're back to paying the bill ourselves, which -- thanks to our [Patreon](https://patreon.com/mattgodbolt) supporters, our [GitHub sponsors](https://github.com/sponsors/mattgodbolt) and our [commercial sponsors](https://godbolt.org/#sponsors) -- we comfortably can. I did a [full breakdown of the costs](/202506/compiler-explorer-cost-transparency) last year and it's still roughly the right shape.
+
+[^percomp]: Up from $0.00039 a year ago, and not because anything got dearer. The volume went down and the fixed costs -- all that storage, and building all those compilers every night -- stayed exactly where they were.
+
+[^top10]: I did [this same exercise back in 2014](/201412/gcc-explorer-top-10), out of nearly 2 million compiles *in total*, to work out whether I could retire GCC 4.4. The default then was clang++ 3.0.6 at 37%, so the shape of the list hasn't changed much even if everything else has. I didn't retire GCC 4.4, and it's still there.
+
+<p class="picture">
+<a href="/202608/compiler-wall-dynamic.svg">
+<img src="/202608/compiler-wall-dynamic.svg" width="800" height="600"
+ alt="Visualisation showing 6,157 compilers across 93 languages"/>
+</a>
+<br/>The wall of compilers, a year on: 6,157 entries across 93 languages.<br/>Regenerated from <a href="/202608/generate_compiler_wall.py">the same script</a> as last year's.
+</p>
+
+### Things I'd still like to fix
+
+Deployment is better than it was but there's still more hand-holding in it than I'd like[^discovery]. The CE Router migration has been "nearly done" for a while now... I still wish I'd laid out the NFS directory structure properly at the start instead of growing it one compiler at a time for a decade. And we moved everything to [Ubuntu 24.04](https://releases.ubuntu.com/noble/ "Noble Numbat") this year, which was not the tidy little upgrade it sounds like[^relr].
+
+[^discovery]: Mainly it's our "compiler discovery" step: before a version goes out we go and ask every compiler on the machine what it actually is and what it calls itself, and write the answers to a JSON file the site then reads. It's still a manual step and it can occasionally fall over, though I think I've made it rather more stable in a recent commit. I'm also experimenting with using LLM "scripts" to help where I can't automate things directly in code: there are a lot of weird edge cases to handle and encoding all of them properly is tricky.
+
+[^relr]: Modern glibc uses `SHT_RELR` relocations, which need [binutils](https://www.gnu.org/software/binutils/ "The GNU assembler, linker and friends") 2.38 or newer to link against, and 29 of our older GCCs ship their own `ld` that predates that. We tried rebuilding them all from source, which cascaded into a wall of libsanitizer incompatibilities, so we gave up and settled for symlinking those compilers' `ld` to a newer one at install time instead. Partouf later rebuilt a couple of them properly.
+
+None of this is especially clever: it's a load balancer, some scaling groups full of cheap spot instances, a network filesystem and a decade of accumulated hacks. It does keep working, though, and these days it mostly keeps working without anyone having to go and poke it. I'm pretty happy with that.
+
+### Thanks
+
+As ever, the people who keep this running are the contributors. [Partouf](https://bsky.app/profile/partouf.bsky.social) (Patrick Quist) above all -- I really don't know what CE would do without them -- along with the core team and the many, many people who send PRs and file issues. Thank you all. Thanks too to AWS, whose [open source credits programme](https://aws.amazon.com/blogs/opensource/aws-promotional-credits-open-source-projects/) covered our infrastructure for much of the last year, and to our [Patreon](https://patreon.com/mattgodbolt) and [GitHub Sponsors](https://github.com/sponsors/mattgodbolt) supporters and [commercial sponsors](https://godbolt.org/#sponsors) who cover the rest.
+
+Questions? Complaints? Compilers we're missing? Drop by our [Discord](https://discord.gg/B5WacA7), or find me on [Bluesky](https://bsky.app/profile/matt.godbolt.org) or [Mastodon](https://hachyderm.io/@mattgodbolt).
+
+---
+
+### Disclaimer
+
+This article was a collaboration between a human and an [LLM](https://anthropic.com). I set it off to dig through our infrastructure repositories and our AWS account for the current numbers, which turned up several things I had wrong, and worked from that. It also ran the Athena queries and regenerated the graphs. The opinions and the mistakes are mine.

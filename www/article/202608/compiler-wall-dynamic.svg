@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: bold 24px sans-serif; fill: #333; }
+      .subtitle { font: 16px sans-serif; fill: #666; }
+      .lang-label { font: bold 14px sans-serif; fill: white; }
+      .lang-label-small { font: bold 12px sans-serif; fill: white; }
+      .count-label { font: 12px sans-serif; fill: white; }
+      .percent-label { font: 10px sans-serif; fill: white; opacity: 0.9; }
+      .stat-title { font: bold 24px sans-serif; fill: white; }
+      .stat-label { font: bold 14px sans-serif; fill: white; }
+    </style>
+  </defs>
+
+  <rect width="800" height="600" fill="#f8f9fa"/>
+
+  <text x="400" y="30" text-anchor="middle" class="title">The Compiler Explorer Wall</text>
+  <text x="400" y="50" text-anchor="middle" class="subtitle">6,157 Compilers Across 93 Languages</text>
+
+  <g>
+    <rect x="20" y="80" width="250" height="110"
+          fill="#FF6B6B" stroke="white" stroke-width="2" rx="4"/>
+    <text x="145" y="115" text-anchor="middle" class="lang-label">C++</text>
+    <text x="145" y="140" text-anchor="middle" class="count-label">1156</text>
+    <text x="145" y="160" text-anchor="middle" class="percent-label">18.8%</text>
+  </g>
+  <g>
+    <rect x="274" y="80" width="220" height="110"
+          fill="#4ECDC4" stroke="white" stroke-width="2" rx="4"/>
+    <text x="384" y="115" text-anchor="middle" class="lang-label">C</text>
+    <text x="384" y="140" text-anchor="middle" class="count-label">1017</text>
+    <text x="384" y="160" text-anchor="middle" class="percent-label">16.5%</text>
+  </g>
+  <g>
+    <rect x="498" y="80" width="92" height="110"
+          fill="#45B7D1" stroke="white" stroke-width="2" rx="4"/>
+    <text x="544" y="115" text-anchor="middle" class="lang-label">GIMPLE</text>
+    <text x="544" y="140" text-anchor="middle" class="count-label">436</text>
+    <text x="544" y="160" text-anchor="middle" class="percent-label">7.1%</text>
+  </g>
+  <g>
+    <rect x="594" y="80" width="88" height="110"
+          fill="#96CEB4" stroke="white" stroke-width="2" rx="4"/>
+    <text x="638" y="115" text-anchor="middle" class="lang-label">GO</text>
+    <text x="638" y="140" text-anchor="middle" class="count-label">420</text>
+    <text x="638" y="160" text-anchor="middle" class="percent-label">6.8%</text>
+  </g>
+  <g>
+    <rect x="686" y="80" width="88" height="110"
+          fill="#FECA57" stroke="white" stroke-width="2" rx="4"/>
+    <text x="730" y="115" text-anchor="middle" class="lang-label">FORTRAN</text>
+    <text x="730" y="140" text-anchor="middle" class="count-label">419</text>
+    <text x="730" y="160" text-anchor="middle" class="percent-label">6.8%</text>
+  </g>
+  <g>
+    <rect x="20" y="200" width="141" height="90"
+          fill="#FF7979" stroke="white" stroke-width="2" rx="4"/>
+    <text x="90" y="230" text-anchor="middle" class="lang-label-small">D</text>
+    <text x="90" y="250" text-anchor="middle" class="count-label">317</text>
+    <text x="90" y="268" text-anchor="middle" class="percent-label">5.1%</text>
+  </g>
+  <g>
+    <rect x="165" y="200" width="108" height="90"
+          fill="#786FA6" stroke="white" stroke-width="2" rx="4"/>
+    <text x="219" y="230" text-anchor="middle" class="lang-label-small">OBJC</text>
+    <text x="219" y="250" text-anchor="middle" class="count-label">246</text>
+    <text x="219" y="268" text-anchor="middle" class="percent-label">4.0%</text>
+  </g>
+  <g>
+    <rect x="277" y="200" width="102" height="90"
+          fill="#F8B500" stroke="white" stroke-width="2" rx="4"/>
+    <text x="328" y="230" text-anchor="middle" class="lang-label-small">ADA</text>
+    <text x="328" y="250" text-anchor="middle" class="count-label">232</text>
+    <text x="328" y="268" text-anchor="middle" class="percent-label">3.8%</text>
+  </g>
+  <g>
+    <rect x="383" y="200" width="83" height="90"
+          fill="#58B19F" stroke="white" stroke-width="2" rx="4"/>
+    <text x="424" y="230" text-anchor="middle" class="lang-label-small">OBJC++</text>
+    <text x="424" y="250" text-anchor="middle" class="count-label">190</text>
+    <text x="424" y="268" text-anchor="middle" class="percent-label">3.1%</text>
+  </g>
+  <g>
+    <rect x="470" y="200" width="70" height="90"
+          fill="#2C3E50" stroke="white" stroke-width="2" rx="4"/>
+    <text x="505" y="230" text-anchor="middle" class="lang-label-small">ASSEMB.</text>
+    <text x="505" y="250" text-anchor="middle" class="count-label">157</text>
+    <text x="505" y="268" text-anchor="middle" class="percent-label">2.5%</text>
+  </g>
+  <g>
+    <rect x="544" y="200" width="70" height="90"
+          fill="#CE6F3E" stroke="white" stroke-width="2" rx="4"/>
+    <text x="579" y="230" text-anchor="middle" class="lang-label-small">CUDA</text>
+    <text x="579" y="250" text-anchor="middle" class="count-label">151</text>
+    <text x="579" y="268" text-anchor="middle" class="percent-label">2.5%</text>
+  </g>
+  <g>
+    <rect x="618" y="200" width="70" height="90"
+          fill="#76B900" stroke="white" stroke-width="2" rx="4"/>
+    <text x="653" y="230" text-anchor="middle" class="lang-label-small">RUST</text>
+    <text x="653" y="250" text-anchor="middle" class="count-label">120</text>
+    <text x="653" y="268" text-anchor="middle" class="percent-label">1.9%</text>
+  </g>
+  <g>
+    <rect x="692" y="200" width="70" height="90"
+          fill="#95A5A6" stroke="white" stroke-width="2" rx="4"/>
+    <text x="727" y="230" text-anchor="middle" class="lang-label-small">LLVM</text>
+    <text x="727" y="250" text-anchor="middle" class="count-label">108</text>
+    <text x="727" y="268" text-anchor="middle" class="percent-label">1.8%</text>
+  </g>
+  <g>
+    <rect x="20" y="300" width="70" height="90"
+          fill="#E74C3C" stroke="white" stroke-width="2" rx="4"/>
+    <text x="55" y="330" text-anchor="middle" class="lang-label-small">ANDROI.</text>
+    <text x="55" y="350" text-anchor="middle" class="count-label">74</text>
+    <text x="55" y="368" text-anchor="middle" class="percent-label">1.2%</text>
+  </g>
+  <g>
+    <rect x="94" y="300" width="70" height="90"
+          fill="#3498DB" stroke="white" stroke-width="2" rx="4"/>
+    <text x="129" y="330" text-anchor="middle" class="lang-label-small">ANDROI.</text>
+    <text x="129" y="350" text-anchor="middle" class="count-label">63</text>
+    <text x="129" y="368" text-anchor="middle" class="percent-label">1.0%</text>
+  </g>
+  <g>
+    <rect x="20" y="400" width="140" height="70"
+          fill="#FF6B6B" stroke="white" stroke-width="2" rx="4"/>
+    <text x="90" y="425" text-anchor="middle" class="lang-label-small">RAKU</text>
+    <text x="90" y="445" text-anchor="middle" class="count-label">55</text>
+    <text x="90" y="460" text-anchor="middle" class="percent-label">0.9%</text>
+  </g>
+  <g>
+    <rect x="164" y="400" width="140" height="70"
+          fill="#4ECDC4" stroke="white" stroke-width="2" rx="4"/>
+    <text x="234" y="425" text-anchor="middle" class="lang-label-small">PTX</text>
+    <text x="234" y="445" text-anchor="middle" class="count-label">40</text>
+    <text x="234" y="460" text-anchor="middle" class="percent-label">0.6%</text>
+  </g>
+  <g>
+    <rect x="308" y="400" width="140" height="70"
+          fill="#45B7D1" stroke="white" stroke-width="2" rx="4"/>
+    <text x="378" y="425" text-anchor="middle" class="lang-label-small">CSHARP</text>
+    <text x="378" y="445" text-anchor="middle" class="count-label">39</text>
+    <text x="378" y="460" text-anchor="middle" class="percent-label">0.6%</text>
+  </g>
+  <g>
+    <rect x="452" y="400" width="140" height="70"
+          fill="#96CEB4" stroke="white" stroke-width="2" rx="4"/>
+    <text x="522" y="425" text-anchor="middle" class="lang-label-small">FSHARP</text>
+    <text x="522" y="445" text-anchor="middle" class="count-label">39</text>
+    <text x="522" y="460" text-anchor="middle" class="percent-label">0.6%</text>
+  </g>
+  <g>
+    <rect x="596" y="400" width="140" height="70"
+          fill="#FECA57" stroke="white" stroke-width="2" rx="4"/>
+    <text x="666" y="425" text-anchor="middle" class="lang-label-small">VB</text>
+    <text x="666" y="445" text-anchor="middle" class="count-label">39</text>
+    <text x="666" y="460" text-anchor="middle" class="percent-label">0.6%</text>
+  </g>
+  <g transform="translate(37, 500)">
+    <rect x="0" y="0" width="170" height="80" fill="#2C3E50" rx="4"/>
+    <text x="85" y="30" text-anchor="middle" class="stat-label">Total Languages</text>
+    <text x="85" y="55" text-anchor="middle" class="stat-title">93</text>
+
+    <rect x="185" y="0" width="170" height="80" fill="#E74C3C" rx="4"/>
+    <text x="270" y="30" text-anchor="middle" class="stat-label">Total Compilers</text>
+    <text x="270" y="55" text-anchor="middle" class="stat-title">6,157</text>
+
+    <rect x="370" y="0" width="170" height="80" fill="#3498DB" rx="4"/>
+    <text x="455" y="30" text-anchor="middle" class="stat-label">Storage Size</text>
+    <text x="455" y="55" text-anchor="middle" class="stat-title">3.9 TB</text>
+
+    <rect x="555" y="0" width="170" height="80" fill="#27AE60" rx="4"/>
+    <text x="640" y="30" text-anchor="middle" class="stat-label">Daily Builds</text>
+    <text x="640" y="55" text-anchor="middle" class="stat-title">Trunk</text>
+  </g>
+
+  <text x="400" y="590" text-anchor="middle" style="font: 12px sans-serif; fill: #666;">
+    godbolt.org - Making assembly accessible since 2012
+  </text>
+</svg>
