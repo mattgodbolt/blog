@@ -172,4 +172,4 @@ Questions? Complaints? Compilers we're missing? Drop by our [Discord](https://di
 
 ### Disclaimer
 
-This article was a collaboration between a human and an [LLM](https://anthropic.com). I set it off to dig through our infrastructure repositories and our AWS account for the current numbers, which turned up several things I had wrong, and worked from that. It also ran the Athena queries and regenerated the graphs. The opinions and the mistakes are mine.
+This article was a collaboration between a human and an [LLM](https://anthropic.com). I set it off to dig through our infrastructure repositories and our AWS account for the current numbers, which turned up several things I had wrong, and worked from that. It also ran the Athena queries and regenerated the graphs. The opinions, em- and en-dashes, and mistakes are all mine.
