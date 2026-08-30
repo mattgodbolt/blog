@@ -1,0 +1,74 @@
+Recreating a 2010 Experiment
+Date: 2026-08-30 14:40:00 America/Chicago
+Status: Public
+Summary: Hooking a BBC Master up as a serial terminal to browse the web again
+Label: Blog, Coding, Emulation
+
+Sometime around 2010, while I was working at Google, I came up with a fun mini project to
+marry my love of retro computing with my excitement for working at big G.
+
+I smuggled my BBC Master into the office and hooked it up over a serial cable to my
+work desktop, and then after some jiggery-pokery, was able to get a terminal
+emulator running. The BBC was a dumb terminal to the work machine, and I ran `lynx`
+and visited `google.com`, searched for `google`. I think I can safely say I'm the
+only person who googled Google on a BBC Micro from within Google itself.
+
+<p class="picture">
+<a href="/202608/moog-label.jpeg">
+<img src="/202608/moog-label-thumb.jpeg" width="600" height="452"
+ alt="The power supply of my BBC Master, with a handwritten moog@ label still stuck to the case"/>
+</a>
+<br/>My Beeb still has the <code>moog@</code> sticker (my LDAP login) to show whose it was.
+</p>
+
+I was trying to replicate this at home but sadly Google no longer supports non-JS
+browsers like `lynx` (I guess I could find another one that does?). But I did see
+that DuckDuckGo has a "lite" mode. After an enormous amount of fiddling I was able
+to recreate something similar:
+
+<p class="picture">
+<a href="/202608/beeb-duckduckgo.png">
+<img src="/202608/beeb-duckduckgo-thumb.png" width="720" height="576"
+ alt="A BBC Master screen showing DuckDuckGo Lite search results for 'bbc micro emulators' in lynx"/>
+</a>
+<br/>The glory of DuckDuckGo on a Beeb.
+</p>
+
+The image above was captured with my own in-progress software PAL decoder [PALindrome](https://github.com/mattgodbolt/PALindrome),
+so the blurriness etc is likely from my inept implementation.
+
+I used a cheap no-name USB serial converter[^cheap] and an RS232-RS423 DIN cable. I first put the cable in 180
+degrees the wrong way (bad keying on the cable, oops), but once correctly plugged in things started working. I initially tried with the
+Master's built-in `*TERMINAL` program, but it's frankly pretty rubbish for this. I used the Acornsoft
+"Termulator" ROM instead. 4800 baud was the fastest I could reliably get working, and it needed a bit of
+work to get XON/XOFF configured. With some LLM help I got a `getty` running so I could log in with the Beeb.
+It's hard to type your muscle-memory password on a not-quite-normal keyboard! A hack to tell `lynx` not
+to process XON/XOFF and not show colour:
+
+```cfg
+INCLUDE:/etc/lynx/lynx.cfg
+KEYMAP:^S:DO_NOTHING
+KEYMAP:^Q:DO_NOTHING
+SHOW_COLOR:never
+```
+
+<p class="picture">
+<a href="/202608/whole-setup.jpeg">
+<img src="/202608/whole-setup-thumb.jpeg" width="600" height="452"
+ alt="A desk with a lidless BBC Master, a multimeter, a sticker-covered laptop and a tangle of wires"/>
+</a>
+<br/>The whole Heath Robinson setup.
+</p>
+
+A bit of double-nostalgia for me: 2010 is when my youngest was born, and we just celebrated his 16th...
+where does the time go?
+
+Despite all my [Compiler Explorer](https://compiler-explorer.com) commitments, and my
+[fun new(ish) job](https://hudsonrivertrading.com), I've somehow managed to find time to
+hack on things like this, and also use feedback from both PALindrome and some careful
+audio recordings and test programs to "improve" the audio and video emulation of [jsbeeb](https://bbc.xania.org).
+They make it arguably more authentic... but do sound and look objectively
+worse -- the nostalgia hit is worth it though! All configurable of course (play with the settings
+on the settings page or the top right for quick settings).
+
+[^cheap]: Well, I say no-name but the instruction leaflet says "OIKWAN" and "Dongguan Auqun Industrial Co Ltd", so I suppose it's not completely nameless.
