@@ -1,0 +1,36 @@
+Advent of Microarchitecture 2026
+Date: 2026-11-24 14:00:00 America/Chicago
+Status: Public
+Summary: In which I introduce an ill-advised, last-minute video series
+Label: Blog, Personal, Coding, AoM2026
+
+So. Somehow it's the end of November. Where has the time gone? Apparently
+having [a job](/202512/2025-in-review), working on [Compiler Explorer](https://godbolt.org/), and
+[lots](https://github.com/mattgodbolt/seasocks) [of](https://github.com/mattgodbolt/zindex)
+[other](https://github.com/mattgodbolt/jsbeeb) [side](https://github.com/mattgodbolt/Miracle)
+[projects](https://github.com/mattgodbolt/PALindrome) has made the year go by quickly!
+
+In my travels with my employer, [HRT](https://www.hudsonrivertrading.com/), this year I've been to many conferences,
+meetups, and universities. The thing I'm most asked is: "Will there be an
+Advent of Compiler Optimisations this year?"
+
+So far I've replied that, sorry, no, I can't: I just don't have the time. Each
+of those videos, the research, the writing, the recording, the editing, and the
+rest of the YouTube stuff, took like [10 hours per episode](/202512/2025-in-review)[^but]. I don't have that
+kind of time.
+
+[^but]: Even though I said 8 hours in the video...
+
+But...I **do** want to do something. So! I am announcing the Advent of Microarchitecture 2026!
+I'm recording straight to camera with little or no prep, and then using a light touch on editing
+and fixing in post-production (with a little help from an LLM). All the content is me talking
+directly to camera, ad-libbing, and then the process of turning that into something uploadable
+is automated as much as I can.
+
+So: don't expect too much, it's very low effort, but hopefully you'll enjoy it anyway! The
+introduction video is [now up](https://www.youtube.com/watch?v=00KJ8h5QXcE) ([playlist here](https://www.youtube.com/playlist?list=PLN7owJBX-Fcc)), and you can subscribe to my channel [here](https://www.youtube.com/mattgodbolt)[^like] to ensure you
+don't miss them when they come out each morning!
+
+[^like]: "Don't forget to like and subscribe!"... what is become of me?
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/00KJ8h5QXcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen="allowfullscreen"></iframe>
